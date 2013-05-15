@@ -8,8 +8,15 @@ import org.apache.commons.lang.StringUtils;
 import uk.ac.ebi.fg.java2rdf.utils.OwlApiUtils;
 
 /**
- * TODO: Comment me!
- *  
+ * This maps a JavaBean property to an OWL data-type property. It uses {@link #getRdfLiteralGenerator()} to get the 
+ * literal value that has to be used as the value for this property. For instance, this could be used in a {@link BeanRdfMapper}
+ * about the Book Java class, to generate statements like http://rdf.example.com/isbn/123 dc:title 'I, Robot'. A 
+ * {@link RdfUriGenerator} will be used for the rdf.example.com part, a data type mapper for 
+ * dc:title (given by {@link #getSourcePropertyName()} and a {@link RdfLiteralGenerator} for extracting the title 
+ * value 'I, Robot'.
+ * 
+ * @See {@link RdfLiteralGenerator}.
+ * 
  * <dl><dt>date</dt><dd>Mar 24, 2013</dd></dl>
  * @author Marco Brandizi
  *
@@ -37,7 +44,7 @@ public class ToDatatypePropRdfMapper<T, PT> extends PropertyRdfMapper<T, PT>
 	 * Uses {@link #getRdfLiteralGenerator()} to generate an RDF value for the property target value. Then it generates 
 	 * a triple where the property {@link #getSourcePropertyName()} is asserted for the source. 
 	 * Uses {@link BeanRdfMapperFactory#getMapper(Object)} to get a mapper for the source and a URI from its 
-	 * {@link BeanRdfMapper#getRdfIriGenerator()}.
+	 * {@link BeanRdfMapper#getRdfUriGenerator()}.
 	 */
 	@Override
 	public boolean map ( T source, PT propValue )
@@ -66,6 +73,10 @@ public class ToDatatypePropRdfMapper<T, PT> extends PropertyRdfMapper<T, PT>
 		return true;
 	}
 
+	/**
+	 * This generates the literal value (a plain string at the moment) to be used to map an object which is the value
+	 * of a JavaBean property into a string representation of such value. 
+	 */
 	public RdfLiteralGenerator<PT> getRdfLiteralGenerator () {
 		return rdfLiteralGenerator;
 	}

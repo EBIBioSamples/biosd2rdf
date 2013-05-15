@@ -12,7 +12,7 @@ import uk.ac.ebi.fg.java2rdf.mappers.RdfUriGenerator;
 import uk.ac.ebi.fg.java2rdf.mappers.ToDatatypePropRdfMapper;
 
 /**
- * TODO: Comment me!
+ * Maps a BioSD sample to RDF.
  *
  * <dl><dt>date</dt><dd>Apr 23, 2013</dd></dl>
  * @author Marco Brandizi

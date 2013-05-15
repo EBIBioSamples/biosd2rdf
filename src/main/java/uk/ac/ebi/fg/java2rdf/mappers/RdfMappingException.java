@@ -4,7 +4,7 @@
 package uk.ac.ebi.fg.java2rdf.mappers;
 
 /**
- * TODO: Comment me!
+ * Used throughout this package for any mapping-related problem that arises.
  *
  * <dl><dt>date</dt><dd>Mar 23, 2013</dd></dl>
  * @author Marco Brandizi

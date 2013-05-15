@@ -12,7 +12,17 @@ import org.apache.commons.lang.Validate;
 import org.semanticweb.owlapi.model.OWLOntology;
 
 /**
- * TODO: Comment me!
+ * <p>This takes care of a collection of Bean-to-RDF mappers to be used together and it should be the entry point of 
+ * a the job of converting an instance of an object model to RDF, i.e., you should define your own extension of 
+ * this factory, with your specific mappers defined in it and then invoke {@link #map(Object)} for the 
+ * root-level objects of your model. These in turn should call the {@link PropertyRdfMapper property mappers} stored
+ * inside the {@link BeanRdfMapper bean mappers} and also the same {@link #map(Object)} method from the factory and
+ * {@link #getRdfUriGenerator(Object)}, to obtain property/value statements about the JavaBean visited via such calls.</p>
+ * 
+ * <p>While you do this, the {@link #map(Object)} method in this factory takes care of already-visited objects and 
+ * avoid multiple unneeded visits to the same objects, as well loops. Given that, you should always start a mapping 
+ * from the {@link #map(Object) map() method} in this factory and avoid to invoke
+ * {@link BeanRdfMapper#map(Object)}, since the factory only can be aware of already-visited beans.   
  *
  * <dl><dt>date</dt><dd>Mar 23, 2013</dd></dl>
  * @author Marco Brandizi
@@ -34,12 +44,18 @@ public class BeanRdfMapperFactory
 	
 
 	/**
-	 * The default implementation provides a mapper by looking at the class of the source object. 
+	 * The default implementation provides a mapper by looking at the class of the source object, via {@link #getMappers()}. 
 	 */
 	public <T> BeanRdfMapper<T> getMapper ( T source ) {
 		return mappers.get ( source.getClass() );
 	}
 
+	/**
+	 * Maps a Java class to a {@link BeanRdfMapper}. This will be used by {@link #getMapper(Object)} and, in turn, 
+	 * by {@link #map(Object)}. This method does 
+	 * {@link BeanRdfMapper#setMapperFactory(BeanRdfMapperFactory) mapper.setMapperFactory ( this )} automatically.
+	 * 
+	 */
 	public <T> BeanRdfMapper setMapper ( Class<T> clazz,  BeanRdfMapper<T> mapper ) 
 	{
 		Validate.notNull ( clazz, "Internal error: I cannot map a null class to RDF" );
@@ -50,6 +66,9 @@ public class BeanRdfMapperFactory
 		return (BeanRdfMapper) mappers.put ( clazz, mapper );
 	}
 	
+	/**
+	 * @see #setMapper(Class, BeanRdfMapper).
+	 */
 	public Map<Class, BeanRdfMapper> getMappers () {
 		return mappers;
 	}
@@ -57,6 +76,7 @@ public class BeanRdfMapperFactory
 	public void setMappers ( Map<Class, BeanRdfMapper> mappers ) {
 		this.mappers = mappers;
 	}
+	
 	
 	public OWLOntology getKnowledgeBase () {
 		return knowledgeBase;
@@ -72,8 +92,12 @@ public class BeanRdfMapperFactory
 		this.reset ();
 	}
 
-	/** Always call this, which trace already-mapped beans. Never call {@link BeanRdfMapper#map(Object)} directly. 
-	 *  TODO: AOP around the source mapper.
+	/** 
+	 * <p>This invokes {@link #getMapper(Object)} and then its {@link BeanRdfMapper#map(Object) map method}. It does this
+	 * only if the object has not been already mapped. Always call this, which trace already-mapped beans. 
+	 * Never call {@link BeanRdfMapper#map(Object)} directly.</p>
+	 *  
+	 * <p>TODO: AOP around the source mapper.</p>
 	 */
 	public <T> boolean map ( T source )
 	{
@@ -88,24 +112,32 @@ public class BeanRdfMapperFactory
 		return mapper.map ( source ); 
 	}
 	
-	public <T> RdfUriGenerator<T> getRdfIriGenerator ( T source ) 
+	/**
+	 * A convenience wrapper of {@link #getMapper(Object)}.{@link #getRdfUriGenerator(Object)}.
+	 */
+	public <T> RdfUriGenerator<T> getRdfUriGenerator ( T source ) 
 	{
 		if ( source == null ) return null; 
 		
 		BeanRdfMapper<T> mapper = getMapper ( source );
 		if ( mapper == null ) return null;
 		
-		return mapper.getRdfIriGenerator ();
+		return mapper.getRdfUriGenerator ();
 	}
 
+	/**
+	 * A convenience wrapper of {@link #getRdfUriGenerator(Object)}.{@link RdfUriGenerator#getUri(Object)}.
+	 * @param source
+	 * @return
+	 */
 	public <T> String getUri ( T source ) 
 	{
 		if ( source == null ) return null; 
 		
-		RdfUriGenerator<T> iriGen = getRdfIriGenerator ( source );
-		if ( iriGen == null ) return null;
+		RdfUriGenerator<T> uriGen = getRdfUriGenerator ( source );
+		if ( uriGen == null ) return null;
 		
-		return iriGen.getUri ( source );
+		return uriGen.getUri ( source );
 	}
 
 	/**

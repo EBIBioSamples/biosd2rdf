@@ -13,7 +13,7 @@ import uk.ac.ebi.fg.java2rdf.mappers.ToDatatypePropRdfMapper;
 import uk.ac.ebi.fg.java2rdf.mappers.ToObjectPropRdfMapper;
 
 /**
- * TODO: Comment me!
+ * Maps the submission of a SampleTab file to the BioSD database. 
  *
  * <dl><dt>date</dt><dd>Apr 23, 2013</dd></dl>
  * @author Marco Brandizi

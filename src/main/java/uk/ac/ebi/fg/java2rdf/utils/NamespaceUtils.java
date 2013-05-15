@@ -3,7 +3,6 @@
  */
 package uk.ac.ebi.fg.java2rdf.utils;
 
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -13,7 +12,10 @@ import org.apache.commons.lang.Validate;
 import org.semanticweb.owlapi.vocab.Namespaces;
 
 /**
- * TODO: Comment me!
+ * <p>A utility class that basically has the purpose of keeping a map from prefixes to namespaces and return the namespace
+ * corresponding to a prefix. You can expand the set of predefined namespaces by using {@link #registerNs(String, String)}.</p>
+ * 
+ * <p>TODO: Indeed, we can do much better by loading namespace defs from an RDF file.</p> 
  *
  * <dl><dt>date</dt><dd>Apr 23, 2013</dd></dl>
  * @author Marco Brandizi
@@ -23,11 +25,16 @@ public class NamespaceUtils
 {
 	private NamespaceUtils () {}
 	
+	/**
+	 * See the source to see which defaults are available.
+	 */
 	@SuppressWarnings ( "serial" )
 	private static final Map<String, String> NAMESPACES = new HashMap<String, String> () {{
 		put ( "biosd", 		"http://rdf.ebi.ac.uk/fg/biosamples/" );
-		put ( "dc", 			"http://purl.org/dc/terms/" ); // TODO 
+		put ( "dc", 			"http://purl.org/dc/terms/" );  
 		put ( "obo", 			"http://purl.obolibrary.org/obo/" );
+		put ( "efo",			"http://www.ebi.ac.uk/efo/" );
+		put ( "rdfs",			Namespaces.RDFS.toString () );
 	}}; 
 	
 	public static String ns ( String prefix ) {
@@ -43,8 +50,16 @@ public class NamespaceUtils
 		return namespace + relativePath;
 	}
 	
+	/**
+	 * Returns a unmodifiable view of the namespaces managed by this utility class, use {@link #registerNs(String, String)}
+	 * to make changes.
+	 * 
+	 */
 	public static Map<String, String> getNamespaces () {
 		return Collections.unmodifiableMap ( NAMESPACES ); 
 	}
 
+	public static void registerNs ( String prefix, String uri ) {
+		NAMESPACES.put ( prefix, uri );
+	}
 }

@@ -45,11 +45,21 @@ public class OwlApiUtils
 	{
 		OWLOntologyManager owlMgr = model.getOWLOntologyManager ();
 		OWLDataFactory owlFactory = owlMgr.getOWLDataFactory ();
-		
+				
 		owlMgr.addAxiom ( model, owlFactory.getOWLClassAssertionAxiom (
 			owlFactory.getOWLClass ( IRI.create ( classUri )), 
 			owlFactory.getOWLNamedIndividual( IRI.create ( individualUri ))
 		));		
 	}
 
+	public static void assertClass ( OWLOntology model, String classUri, String superClassUri ) 
+	{
+		OWLOntologyManager owlMgr = model.getOWLOntologyManager ();
+		OWLDataFactory owlFactory = owlMgr.getOWLDataFactory ();
+		
+		owlMgr.addAxiom ( model, owlFactory.getOWLSubClassOfAxiom (
+			owlFactory.getOWLClass ( IRI.create ( classUri )), 
+			owlFactory.getOWLClass( IRI.create ( superClassUri ))
+		));		
+	}
 }

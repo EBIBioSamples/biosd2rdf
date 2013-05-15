@@ -28,7 +28,8 @@ import static uk.ac.ebi.fg.java2rdf.utils.OwlApiUtils.*;
 import static uk.ac.ebi.fg.java2rdf.utils.Java2RdfUtils.*;
 
 /**
- * TODO: Comment me!
+ * Maps a sample property like 'Characteristics[organism]' to proper RDF/OWL statements. OBI and other relevant ontologies
+ * are used for that. 
  *
  * <dl><dt>date</dt><dd>Apr 29, 2013</dd></dl>
  * @author Marco Brandizi
@@ -42,7 +43,12 @@ public class ExpPropValueRdfMapper<T extends Accessible> extends PropertyRdfMapp
 		super ();
 	}
 
-	
+	/**
+	 * Mapping examples:
+	 * 
+	 * TODO
+	 * 
+	 */
 	@Override
 	public boolean map ( T source, ExperimentalPropertyValue pval )
 	{
@@ -68,11 +74,13 @@ public class ExpPropValueRdfMapper<T extends Accessible> extends PropertyRdfMapp
 		String typeStr = StringUtils.trimToNull ( ptype.getTermText () );
 		if ( typeStr == null ) return false;
 		
+		// TODO: is this the same as getAcc() or a secondary accession? 
 		if ( "sample accession".equalsIgnoreCase ( typeStr ) ) return false;
 
 		BeanRdfMapperFactory mapFact = this.getMapperFactory ();
 		OWLOntology onto = mapFact.getKnowledgeBase ();
 		
+		// name -> dc:title
 		if ( "name".equalsIgnoreCase ( typeStr ) ) {
 			assertData ( onto, mapFact.getUri ( source ), ns ( "dc", "title" ), valLabel );
 			return true;
@@ -81,13 +89,14 @@ public class ExpPropValueRdfMapper<T extends Accessible> extends PropertyRdfMapp
 		// TODO: description
 		
 		
-		
-		
 		String valUri = null, typeUri = null; boolean isZoomaUri = false;
 		
-		if ( isZoomaUri )
+		// TODO: invoke Zooma and replace this mock-up
+		if ( isZoomaUri ) 
+		{
 			// If it's a known term, assume same label and same type label correspond to the same property value and type
 			valUri = ns ( "biosd", "exp-prop-val/" + hashUriSignature ( typeStr + valLabel ) );
+		}
 		else 
 		{
 			// else, share label+typeLabel over the same submission
@@ -103,28 +112,28 @@ public class ExpPropValueRdfMapper<T extends Accessible> extends PropertyRdfMapp
 			}
 			valUri = ns ( "biosd", "exp-prop-val/" + srcAcc + "/" + hashUriSignature ( typeStr + valLabel ) ); 
 			typeUri = ns ( "biosd", "exp-prop-type/" + srcAcc + "/" + hashUriSignature (  typeStr ) );
+			
+			// Define the Type as a new class
+			assertClass ( onto, typeUri, ns ( "efo", "EFO_0000001" ) ); // Experimental factor
+			assertData ( onto, typeUri, ns ( "rdfs", "label" ), typeStr );
 		}
 		
 		// Define the property value
-		assertIndividual ( onto, valUri, ns ( "obo", "BFO_0000019" ) ); // Quality
-		assertData ( onto, valUri, ns ( "dc", "title" ), valLabel );		
-
-		// Define the Type
-		assertIndividual ( onto, typeUri, ns ( "biosd", "PropertyType" ) ); // TODO: define as IAO_0000030 (information content entity)
-		assertData ( onto, typeUri, ns ( "dc", "title" ), typeStr );
+		assertData ( onto, valUri, ns ( "dc", "title" ), valLabel );
 		
-		// TODO: if there is a Zooma URI for this type, make the type an instance of such URI
-		// OR SOMETHING ELSE?! REVIEW EFO
+		// So, we have *** propValue a typeUri ***, where the type URI is either a new URI achieved from the type label (essentially 
+		// a type unknown to standard ontologies), or a proper OWL class from a standard ontology, tracked by Zooma.
+		assertIndividual ( onto, valUri, typeUri );
 		
 		// Define the link to the type
-		String typeLinkUri = pval instanceof BioCharacteristicValue  
-			? ns ( "biosd", "has_characteristic_type" ) // TODO: needs to be defined as sub-property of obo:IAO_0000136 (is_about) 
+		String attributeLinkUri = pval instanceof BioCharacteristicValue  
+			? ns ( "biosd", "has-bio-characteristic" ) // TODO: needs to be defined as sub-property of obo:IAO_0000136 (is_about) 
 			: ns ( "obo", "IAO_0000136" );	// is about
-		assertLink ( onto, valUri, typeLinkUri, typeUri );
+			
+		// Now we have either *** sample has-biocharacteristic valUri ***, or *** sample is-about valUri ***, depending on 
+	  // the BioSD property type. has-biocharacteristic is a subproperty of is-about.
+		assertLink ( onto, mapFact.getUri ( source ), attributeLinkUri, valUri );
 		
-		// Link the source to the prop-value
-		assertLink ( onto, mapFact.getUri ( source ), ns ( "obo", "BFO_0000086" ), valUri ); // has quality at some time
-
 		return true;
 	}
 

@@ -10,7 +10,8 @@ import org.apache.commons.lang.StringUtils;
 
 
 /**
- * TODO: Comment me!
+ * Property mappers are used to associate a JavaBean property to an RDFS/OWL property. Property mappers are usually
+ * invoked by {@link BeanRdfMapper#map(Object)}.
  *
  * TODO: do we need a field like this.specificRDFValueMapper? 
  * 
@@ -37,7 +38,9 @@ public abstract class PropertyRdfMapper<T, PT> extends RdfMapper<T>
 	
 
 	/**
-	 * Uses the bean property name, defined by {@link #sourcePropertyName} and maps it to RDF via {@link #targetPropertyUri}.
+	 * Gets the value of the bean property {@link #getSourcePropertyName()} and then create a RDF statement
+	 * uses {@link #map(Object, Object)}, which in turn usually yields a property/value statement having source as 
+	 * subject and {@link #getTargetPropertyUri()} as RDF/OWL property.
 	 */
 	@Override
 	@SuppressWarnings ( "unchecked" )
@@ -59,10 +62,14 @@ public abstract class PropertyRdfMapper<T, PT> extends RdfMapper<T>
 	}
 	
 	/**
-	 * Implements a specific way to map the property value of this source.
-	 * You should take care of the case propValue == null, while {@link #map(Object)} takes care of the null source.
+	 * <p>Implements a specific way to map the property value of this source.
+	 * You should take care of the case propValue == null, while {@link #map(Object)} takes care of the null source.</p>
 	 * 
-	 * As usually, it returns true when a real addition occurs.
+	 * <p>This usually creates a statement having the source as subject (typically uses {@link BeanRdfMapperFactory#getRdfUriGenerator(Object)}
+	 * for its URI), {@link #getTargetPropertyUri()} as RDF/OWL property and a value or another URI as object (again, it
+	 * usually uses the factory for that).</p>
+	 * 
+	 * <p>As usually, it returns true when a real addition occurs.</p>
 	 */
 	public abstract boolean map ( T source, PT propValue );
 

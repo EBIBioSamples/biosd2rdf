@@ -1,8 +1,6 @@
-/*
- * 
- */
 package uk.ac.ebi.fg.java2rdf.mappers;
 
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -25,7 +23,7 @@ import uk.ac.ebi.fg.java2rdf.mappers.ToDatatypePropRdfMapper;
 import uk.ac.ebi.fg.java2rdf.mappers.ToObjectPropRdfMapper;
 
 /**
- * TODO: Comment me!
+ * Tests and examples of basic usage. TODO: there are not so many assertions at the moment...
  *
  * <dl><dt>date</dt><dd>Apr 17, 2013</dd></dl>
  * @author Marco Brandizi
@@ -77,9 +75,15 @@ public class MappersTest
 		}
 	}
 	
+	/** 
+	 * One way to define an RDF mapper is to extend the basic mapper, this will be more common in real situations. 
+	 * You typically will want to prepare it all in the class initialiser or a constructor. 
+	 *  
+	 */
 	public static class FooMapper<F extends Foo> extends BeanRdfMapper<F>
 	{
 		{
+			// How beans of F type generates URI identifiers
 			this.setRdfUriGenerator ( new RdfUriGenerator<F>() {
 				@Override
 				public String getUri ( Foo source ) {
@@ -87,7 +91,10 @@ public class MappersTest
 				}
 			});
 			
+			// How they are mapped to a RDFS/OWL class
 			this.setRdfClassUri ( FOONS + "Foo" );
+			
+			// How the properties for beans of type F are mapped to RDF/OWL.
 			this.setPropertyMapper ( new ToDatatypePropRdfMapper<F, String> ( "name", FOONS + "name" ) );
 			this.setPropertyMapper ( new ToDatatypePropRdfMapper<F, String> ( "description", FOONS + "description" ) );
 		}
@@ -115,6 +122,10 @@ public class MappersTest
 	@Test
 	public void testBasics () throws OWLOntologyCreationException, OWLOntologyStorageException 
 	{
+		/** 
+		 * Anonymous classses is another, less common approach to define the mapping between beans and RDF/OWL. Compare this
+		 * to the FooMapper approach above. Of course you can combine the two. 
+		 */
 		BeanRdfMapperFactory mapFactory = new BeanRdfMapperFactory ( onto ) {{
 			this.setMapper ( Foo.class, new BeanRdfMapper<Foo> ( FOONS + "FooChild" ) {{
 				this.setRdfUriGenerator ( new RdfUriGenerator<Foo>() {
@@ -132,6 +143,7 @@ public class MappersTest
 		outputKB ();
 	}
 	
+	/** Tests the mapping of a single-value JavaBean property to an OWL object property */ 
 	@Test
 	public void testOneOneRelation () throws OWLOntologyCreationException, OWLOntologyStorageException 
 	{
@@ -153,6 +165,12 @@ public class MappersTest
 		outputKB ();
 	}
 	
+	/** 
+	 * <p>Tests the mapping from a multi-value JavaBean property (i.e., one that returns a {@link Collection}) to 
+	 * multiple RDF/OWL statements, each having the same bean's URI and property.</p>
+	 * 
+	 * <p>This uses {@link CollectionPropRdfMapper}, which is equipped with a {@link ToObjectPropRdfMapper single-value property mapper}.   
+	 */
 	@Test
 	public void testOneToManyRelation () throws OWLOntologyCreationException, OWLOntologyStorageException 
 	{
