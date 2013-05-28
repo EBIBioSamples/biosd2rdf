@@ -3,12 +3,13 @@
  */
 package uk.ac.ebi.fg.biosd.biosd2rdf.java2rdf.mappers;
 
+import static uk.ac.ebi.fg.java2rdf.utils.NamespaceUtils.registerNs;
+
 import org.semanticweb.owlapi.model.OWLOntology;
 
 import uk.ac.ebi.fg.biosd.model.expgraph.BioSample;
 import uk.ac.ebi.fg.biosd.model.organizational.MSI;
 import uk.ac.ebi.fg.java2rdf.mappers.BeanRdfMapperFactory;
-import static uk.ac.ebi.fg.java2rdf.utils.NamespaceUtils.registerNs;
 
 /**
  * The mapping entry point for the BioSD-to-RDF converter.

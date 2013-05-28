@@ -1,14 +1,18 @@
 package uk.ac.ebi.fg.biosd.biosd2rdf.java2rdf.mappers;
 
+import static uk.ac.ebi.fg.java2rdf.utils.Java2RdfUtils.hashUriSignature;
 import static uk.ac.ebi.fg.java2rdf.utils.NamespaceUtils.ns;
+import static uk.ac.ebi.fg.java2rdf.utils.OwlApiUtils.assertClass;
+import static uk.ac.ebi.fg.java2rdf.utils.OwlApiUtils.assertData;
+import static uk.ac.ebi.fg.java2rdf.utils.OwlApiUtils.assertIndividual;
+import static uk.ac.ebi.fg.java2rdf.utils.OwlApiUtils.assertLink;
 
 import java.util.Set;
-import java.util.SortedSet;
-import java.util.TreeSet;
 
 import org.apache.commons.lang.StringUtils;
 import org.semanticweb.owlapi.model.OWLOntology;
 
+import uk.ac.ebi.fg.biosd.biosd2rdf.utils.BioSdOntologyTermResolver;
 import uk.ac.ebi.fg.biosd.model.expgraph.BioSample;
 import uk.ac.ebi.fg.biosd.model.organizational.BioSampleGroup;
 import uk.ac.ebi.fg.biosd.model.organizational.MSI;
@@ -19,13 +23,9 @@ import uk.ac.ebi.fg.core_model.expgraph.properties.Unit;
 import uk.ac.ebi.fg.core_model.toplevel.Accessible;
 import uk.ac.ebi.fg.java2rdf.mappers.BeanRdfMapperFactory;
 import uk.ac.ebi.fg.java2rdf.mappers.PropertyRdfMapper;
-import uk.ac.ebi.fg.java2rdf.mappers.RdfMappingException;
-import uk.ac.ebi.fg.java2rdf.utils.Java2RdfUtils;
-import uk.ac.ebi.fg.java2rdf.utils.NamespaceUtils;
-import uk.ac.ebi.fg.java2rdf.utils.OwlApiUtils;
-
-import static uk.ac.ebi.fg.java2rdf.utils.OwlApiUtils.*;
-import static uk.ac.ebi.fg.java2rdf.utils.Java2RdfUtils.*;
+import uk.ac.ebi.fg.ontodiscover.CachedOntoTermDiscoverer;
+import uk.ac.ebi.fg.ontodiscover.OntologyTermDiscoverer;
+import uk.ac.ebi.fg.ontodiscover.Zooma1OntoTermDiscoverer;
 
 /**
  * Maps a sample property like 'Characteristics[organism]' to proper RDF/OWL statements. OBI and other relevant ontologies
@@ -38,6 +38,8 @@ import static uk.ac.ebi.fg.java2rdf.utils.Java2RdfUtils.*;
 @SuppressWarnings ( "rawtypes" )
 public class ExpPropValueRdfMapper<T extends Accessible> extends PropertyRdfMapper<T, ExperimentalPropertyValue>
 {
+	private BioSdOntologyTermResolver otermResolver = new BioSdOntologyTermResolver ();
+	
 	public ExpPropValueRdfMapper ()
 	{
 		super ();
@@ -71,31 +73,33 @@ public class ExpPropValueRdfMapper<T extends Accessible> extends PropertyRdfMapp
 		// Process the type
 		// 
 		ExperimentalPropertyType ptype = pval.getType ();
-		String typeStr = StringUtils.trimToNull ( ptype.getTermText () );
-		if ( typeStr == null ) return false;
+		String typeLabel = StringUtils.trimToNull ( ptype.getTermText () );
+		if ( typeLabel == null ) return false;
 		
 		// TODO: is this the same as getAcc() or a secondary accession? 
-		if ( "sample accession".equalsIgnoreCase ( typeStr ) ) return false;
+		if ( "sample accession".equalsIgnoreCase ( typeLabel ) ) return false;
 
 		BeanRdfMapperFactory mapFact = this.getMapperFactory ();
 		OWLOntology onto = mapFact.getKnowledgeBase ();
 		
 		// name -> dc:title
-		if ( "name".equalsIgnoreCase ( typeStr ) ) {
+		if ( "name".equalsIgnoreCase ( typeLabel ) ) {
 			assertData ( onto, mapFact.getUri ( source ), ns ( "dc", "title" ), valLabel );
 			return true;
 		}
 
 		// TODO: description
 		
+		String valUri = null, typeUri = null;
+
+		// Ask Zooma if it has a known ontology term for typeLabel
+		// TODO: values and units too.
+		typeUri = otermResolver.getOntologyUri ( ptype );
 		
-		String valUri = null, typeUri = null; boolean isZoomaUri = false;
-		
-		// TODO: invoke Zooma and replace this mock-up
-		if ( isZoomaUri ) 
+		if ( typeUri != null ) 
 		{
 			// If it's a known term, assume same label and same type label correspond to the same property value and type
-			valUri = ns ( "biosd", "exp-prop-val/" + hashUriSignature ( typeStr + valLabel ) );
+			valUri = ns ( "biosd", "exp-prop-val/" + hashUriSignature ( typeLabel + valLabel ) );
 		}
 		else 
 		{
@@ -110,12 +114,12 @@ public class ExpPropValueRdfMapper<T extends Accessible> extends PropertyRdfMapp
 				String msiAcc = StringUtils.trimToNull ( msis.iterator ().next ().getAcc () );
 				if ( msiAcc != null ) srcAcc = msiAcc;  
 			}
-			valUri = ns ( "biosd", "exp-prop-val/" + srcAcc + "/" + hashUriSignature ( typeStr + valLabel ) ); 
-			typeUri = ns ( "biosd", "exp-prop-type/" + srcAcc + "/" + hashUriSignature (  typeStr ) );
+			valUri = ns ( "biosd", "exp-prop-val/" + srcAcc + "/" + hashUriSignature ( typeLabel + valLabel ) ); 
+			typeUri = ns ( "biosd", "exp-prop-type/" + srcAcc + "/" + hashUriSignature (  typeLabel ) );
 			
 			// Define the Type as a new class
 			assertClass ( onto, typeUri, ns ( "efo", "EFO_0000001" ) ); // Experimental factor
-			assertData ( onto, typeUri, ns ( "rdfs", "label" ), typeStr );
+			assertData ( onto, typeUri, ns ( "rdfs", "label" ), typeLabel );
 		}
 		
 		// Define the property value

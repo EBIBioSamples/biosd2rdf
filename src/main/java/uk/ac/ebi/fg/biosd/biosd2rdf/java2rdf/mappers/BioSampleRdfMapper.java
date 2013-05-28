@@ -3,7 +3,7 @@
  */
 package uk.ac.ebi.fg.biosd.biosd2rdf.java2rdf.mappers;
 
-import static uk.ac.ebi.fg.java2rdf.utils.NamespaceUtils.*;
+import static uk.ac.ebi.fg.java2rdf.utils.NamespaceUtils.ns;
 import uk.ac.ebi.fg.biosd.model.expgraph.BioSample;
 import uk.ac.ebi.fg.core_model.expgraph.properties.ExperimentalPropertyValue;
 import uk.ac.ebi.fg.java2rdf.mappers.BeanRdfMapper;

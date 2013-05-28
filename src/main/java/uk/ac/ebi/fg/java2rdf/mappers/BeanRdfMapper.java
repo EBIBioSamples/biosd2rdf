@@ -6,9 +6,6 @@ package uk.ac.ebi.fg.java2rdf.mappers;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.commons.beanutils.BeanMap;
-import org.semanticweb.owlapi.vocab.Namespaces;
-
 import uk.ac.ebi.fg.java2rdf.utils.OwlApiUtils;
 
 /**

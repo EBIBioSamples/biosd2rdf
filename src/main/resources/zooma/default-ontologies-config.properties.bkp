@@ -1,0 +1,39 @@
+# Ontologies preferences
+# Specify the "key" value first - this should be a unique identifer within ZOOMA.  It's probably a good idea to use the same name as configured in the zooma-uris.properties file, if present
+# The values are a comma separated list of labels or accessions that this ontology can be identified with in any configured sources
+
+# EFO
+efo=http://www.ebi.ac.uk/efo/,ArrayExpress Experimental Factor Ontology,Experimental Factor Ontology,EFO
+
+# CHEBI
+chebi= http://obo.cvs.sourceforge.net/obo/obo/ontology/chemical/chebi.obo,CHEBI
+
+# CL
+cl=http://obo.cvs.sourceforge.net/obo/obo/ontology/anatomy/cell_type/cell.obo,CL
+
+# MA
+ma=http://obo.cvs.sourceforge.net/obo/obo/ontology/anatomy/gross_anatomy/animal_gross_anatomy/mouse/MA.ontology,MA
+
+# NCI
+nci=http://nciterms.nci.nih.gov/NCIBrowser/Dictionary.do,NCI
+
+# FBbt
+fbbt=http://obo.cvs.sourceforge.net/obo/obo/ontology/anatomy/gross_anatomy/animal_gross_anatomy/fly/fly_anatomy.obo,FBbt
+
+# PO
+po=http://obo.cvs.sourceforge.net/obo/obo/ontology/developmental/plant_development/plant/po_temporal.obo,PO
+
+# ZDB
+zdb=http://obo.cvs.sourceforge.net/obo/obo/ontology/anatomy/gross_anatomy/animal_gross_anatomy/fish/zebrafish_anatomy.obo,ZDB
+
+# NCIM
+ncim=http://ncimeta.nci.nih.gov/MetaServlet/,NCIM
+
+# EMAP
+emap=http://obo.cvs.sourceforge.net/obo/obo/ontology/anatomy/gross_anatomy/animal_gross_anatomy/mouse/EMAP.obo,EMAP
+
+# MAT
+mat=http://www.ebi.ac.uk/microarray-srv/mat/MAT.obo,MAT
+
+# CED
+ced=http://obo.cvs.sourceforge.net/obo/obo/ontology/developmental/animal_development/worm/worm_development.obo,CED
