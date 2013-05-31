@@ -23,9 +23,6 @@ import uk.ac.ebi.fg.core_model.expgraph.properties.Unit;
 import uk.ac.ebi.fg.core_model.toplevel.Accessible;
 import uk.ac.ebi.fg.java2rdf.mappers.BeanRdfMapperFactory;
 import uk.ac.ebi.fg.java2rdf.mappers.PropertyRdfMapper;
-import uk.ac.ebi.fg.ontodiscover.CachedOntoTermDiscoverer;
-import uk.ac.ebi.fg.ontodiscover.OntologyTermDiscoverer;
-import uk.ac.ebi.fg.ontodiscover.Zooma1OntoTermDiscoverer;
 
 /**
  * Maps a sample property like 'Characteristics[organism]' to proper RDF/OWL statements. OBI and other relevant ontologies
@@ -52,13 +49,13 @@ public class ExpPropValueRdfMapper<T extends Accessible> extends PropertyRdfMapp
 	 * 
 	 */
 	@Override
-	public boolean map ( T source, ExperimentalPropertyValue pval )
+	public boolean map ( T sample, ExperimentalPropertyValue pval )
 	{
 		// TODO: warnings
-		if ( source == null || pval == null ) return false;
+		if ( sample == null || pval == null ) return false;
 					
-		String srcAcc = StringUtils.trimToNull ( source.getAcc () );
-		if ( srcAcc == null ) return false;
+		String sampleAcc = StringUtils.trimToNull ( sample.getAcc () );
+		if ( sampleAcc == null ) return false;
 
 		String valLabel = StringUtils.trimToNull ( pval.getTermText () );
 		if ( valLabel == null ) return false;
@@ -84,7 +81,7 @@ public class ExpPropValueRdfMapper<T extends Accessible> extends PropertyRdfMapp
 		
 		// name -> dc:title
 		if ( "name".equalsIgnoreCase ( typeLabel ) ) {
-			assertData ( onto, mapFact.getUri ( source ), ns ( "dc", "title" ), valLabel );
+			assertData ( onto, mapFact.getUri ( sample ), ns ( "dc", "title" ), valLabel );
 			return true;
 		}
 
@@ -92,51 +89,52 @@ public class ExpPropValueRdfMapper<T extends Accessible> extends PropertyRdfMapp
 		
 		String valUri = null, typeUri = null;
 
+		// Find a suitable parent accession for properties, to establish the scope (submission, sample group, or sample itself), 
+		// under which the properties should be shared (i.e, considered the same if the labels are the same).
+		//
+		// TODO: should be correct to share among submissions, to be checked.
+		//
+		String parentAcc = sampleAcc;
+		Set<MSI> msis = sample instanceof BioSample 
+			? ((BioSample) sample).getMSIs () 
+			: sample instanceof BioSampleGroup 
+				? ((BioSampleGroup) sample).getMSIs () : null;
+		if ( msis != null && msis.size () == 1 ) {
+			String msiAcc = StringUtils.trimToNull ( msis.iterator ().next ().getAcc () );
+			if ( msiAcc != null ) parentAcc = msiAcc;  
+		}
+		
+		// Define the property value
+		valUri = ns ( "biosd", "exp-prop-val/" + parentAcc + "#" + hashUriSignature ( typeLabel + valLabel ) ); 
+		assertData ( onto, valUri, ns ( "dc", "title" ), valLabel );
+		
+		
 		// Ask Zooma if it has a known ontology term for typeLabel
 		// TODO: values and units too.
 		typeUri = otermResolver.getOntologyUri ( ptype );
 		
-		if ( typeUri != null ) 
-		{
-			// If it's a known term, assume same label and same type label correspond to the same property value and type
-			valUri = ns ( "biosd", "exp-prop-val/" + hashUriSignature ( typeLabel + valLabel ) );
-		}
-		else 
+		if ( typeUri == null ) 
 		{
 			// else, share label+typeLabel over the same submission
-			// TODO: should be correct to share among submissions, to be checked.
-			//
-			Set<MSI> msis = source instanceof BioSample 
-				? ((BioSample) source).getMSIs () 
-				: source instanceof BioSampleGroup 
-					? ((BioSampleGroup) source).getMSIs () : null;
-			if ( msis != null && msis.size () == 1 ) {
-				String msiAcc = StringUtils.trimToNull ( msis.iterator ().next ().getAcc () );
-				if ( msiAcc != null ) srcAcc = msiAcc;  
-			}
-			valUri = ns ( "biosd", "exp-prop-val/" + srcAcc + "/" + hashUriSignature ( typeLabel + valLabel ) ); 
-			typeUri = ns ( "biosd", "exp-prop-type/" + srcAcc + "/" + hashUriSignature (  typeLabel ) );
+			typeUri = ns ( "biosd", "exp-prop-type/" + parentAcc + "#" + hashUriSignature (  typeLabel ) );
 			
 			// Define the Type as a new class
 			assertClass ( onto, typeUri, ns ( "efo", "EFO_0000001" ) ); // Experimental factor
 			assertData ( onto, typeUri, ns ( "rdfs", "label" ), typeLabel );
 		}
-		
-		// Define the property value
-		assertData ( onto, valUri, ns ( "dc", "title" ), valLabel );
-		
-		// So, we have *** propValue a typeUri ***, where the type URI is either a new URI achieved from the type label (essentially 
+				
+		// So, we have: *** propValue a typeUri ***, where the type URI is either a new URI achieved from the type label (essentially 
 		// a type unknown to standard ontologies), or a proper OWL class from a standard ontology, tracked by Zooma.
 		assertIndividual ( onto, valUri, typeUri );
 		
 		// Define the link to the type
 		String attributeLinkUri = pval instanceof BioCharacteristicValue  
-			? ns ( "biosd", "has-bio-characteristic" ) // TODO: needs to be defined as sub-property of obo:IAO_0000136 (is_about) 
+			? ns ( "ebi-term", "has-bio-characteristic" ) // TODO: needs to be defined as sub-property of obo:IAO_0000136 (is_about) 
 			: ns ( "obo", "IAO_0000136" );	// is about
 			
 		// Now we have either *** sample has-biocharacteristic valUri ***, or *** sample is-about valUri ***, depending on 
 	  // the BioSD property type. has-biocharacteristic is a subproperty of is-about.
-		assertLink ( onto, mapFact.getUri ( source ), attributeLinkUri, valUri );
+		assertLink ( onto, mapFact.getUri ( sample ), attributeLinkUri, valUri );
 		
 		return true;
 	}

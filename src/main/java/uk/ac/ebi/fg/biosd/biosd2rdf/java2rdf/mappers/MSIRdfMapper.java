@@ -5,6 +5,7 @@ package uk.ac.ebi.fg.biosd.biosd2rdf.java2rdf.mappers;
 
 import static uk.ac.ebi.fg.java2rdf.utils.NamespaceUtils.ns;
 import uk.ac.ebi.fg.biosd.model.expgraph.BioSample;
+import uk.ac.ebi.fg.biosd.model.organizational.BioSampleGroup;
 import uk.ac.ebi.fg.biosd.model.organizational.MSI;
 import uk.ac.ebi.fg.java2rdf.mappers.BeanRdfMapper;
 import uk.ac.ebi.fg.java2rdf.mappers.CollectionPropRdfMapper;
@@ -38,6 +39,11 @@ public class MSIRdfMapper extends BeanRdfMapper<MSI>
 		this.setPropertyMapper ( new CollectionPropRdfMapper<MSI, BioSample> ( 
 			"samples", ns ( "obo", "IAO_0000219" ), new ToObjectPropRdfMapper<MSI, BioSample> () ) // denotes
 		);
+		
+		this.setPropertyMapper ( new CollectionPropRdfMapper<MSI, BioSampleGroup> ( 
+			"sampleGroups", ns ( "obo", "IAO_0000219" ), new ToObjectPropRdfMapper<MSI, BioSampleGroup> () ) // denotes
+		);
+		
 	}
 
 }

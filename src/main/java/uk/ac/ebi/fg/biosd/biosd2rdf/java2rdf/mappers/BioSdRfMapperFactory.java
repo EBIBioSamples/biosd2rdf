@@ -8,6 +8,7 @@ import static uk.ac.ebi.fg.java2rdf.utils.NamespaceUtils.registerNs;
 import org.semanticweb.owlapi.model.OWLOntology;
 
 import uk.ac.ebi.fg.biosd.model.expgraph.BioSample;
+import uk.ac.ebi.fg.biosd.model.organizational.BioSampleGroup;
 import uk.ac.ebi.fg.biosd.model.organizational.MSI;
 import uk.ac.ebi.fg.java2rdf.mappers.BeanRdfMapperFactory;
 
@@ -22,15 +23,23 @@ import uk.ac.ebi.fg.java2rdf.mappers.BeanRdfMapperFactory;
 public class BioSdRfMapperFactory extends BeanRdfMapperFactory
 {
 	static {
-		registerNs ( "biosd", 		"http://rdf.ebi.ac.uk/fg/biosamples/" );
-		registerNs ( "dc", 				"http://purl.org/dc/terms/" );  
-		registerNs ( "obo", 			"http://purl.obolibrary.org/obo/" );
-		registerNs ( "efo",				"http://www.ebi.ac.uk/efo/" );
+		init ();
+	}
+	
+	public static void init() 
+	{
+		registerNs ( "biosd", 	 				"http://rdf.ebi.ac.uk/resource/biosamples/" );
+		registerNs ( "biosd-dataset",		"http://rdf.ebi.ac.uk/dataset/biosamples" );
+		registerNs ( "ebi-term",  			"http://rdf.ebi.ac.uk/terms/" );
+		registerNs ( "biosd-term",  		"http://rdf.ebi.ac.uk/terms/biosd/" );
+		registerNs ( "obo", 		 				"http://purl.obolibrary.org/obo/" );
+		registerNs ( "efo",			 				"http://www.ebi.ac.uk/efo/" );
 	}
 	
 	{
 		setMapper ( MSI.class, new MSIRdfMapper () );
 		setMapper ( BioSample.class, new BioSampleRdfMapper () );
+		setMapper ( BioSampleGroup.class, new BioSampleGroupRdfMapper () );
 	}
 	
 	protected BioSdRfMapperFactory () {
@@ -40,6 +49,5 @@ public class BioSdRfMapperFactory extends BeanRdfMapperFactory
 	protected BioSdRfMapperFactory ( OWLOntology knowledgeBase ) {
 		super ( knowledgeBase );
 	}
-
 	
 }

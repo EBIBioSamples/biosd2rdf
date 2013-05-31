@@ -27,17 +27,13 @@ public class BioSampleRdfMapper extends BeanRdfMapper<BioSample>
 			ns ( "obo", "OBI_0000747" ), 
 			new RdfUriGenerator<BioSample> () {
 				@Override public String getUri ( BioSample smp ) {
-					return ns ( "biosd", "msi/" + smp.getAcc () );
+					return ns ( "biosd", "sample/" + smp.getAcc () );
 			}});
 		this.setPropertyMapper ( new ToDatatypePropRdfMapper<BioSample, String> ( "acc", ns ( "dc", "identifier" ) ) );
 		this.setPropertyMapper ( new CollectionPropRdfMapper<BioSample, ExperimentalPropertyValue> ( 
-			"propertyValues", null, new ExpPropValueRdfMapper<BioSample> ()) {});
+			"propertyValues", null, new ExpPropValueRdfMapper<BioSample> ()) 
+		);
 		// TODO: more
-	}
-
-	public void mapExpPropValue ( BioSample smp, ExperimentalPropertyValue<?> expPropVal )
-	{
-		smp.getGroups ();
 	}
 }
 
