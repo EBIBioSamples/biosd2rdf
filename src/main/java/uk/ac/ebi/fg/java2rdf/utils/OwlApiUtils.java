@@ -5,6 +5,8 @@ package uk.ac.ebi.fg.java2rdf.utils;
 
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLDataFactory;
+import org.semanticweb.owlapi.model.OWLDatatype;
+import org.semanticweb.owlapi.model.OWLLiteral;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
 
@@ -26,6 +28,21 @@ public class OwlApiUtils
 			owlFactory.getOWLDataProperty ( IRI.create( propertyUri )), 
 			owlFactory.getOWLNamedIndividual ( IRI.create ( individualUri )),  
 			propertyValue 
+		));
+	}
+	
+	public static void assertData ( OWLOntology model, String individualUri, String propertyUri, String propertyValue, String dataTypeUri )
+	{
+		OWLOntologyManager owlMgr = model.getOWLOntologyManager ();
+		OWLDataFactory owlFactory = owlMgr.getOWLDataFactory ();
+		
+		OWLDatatype dataType = owlFactory.getOWLDatatype ( IRI.create ( dataTypeUri ) );
+		OWLLiteral literal = owlFactory.getOWLLiteral ( propertyValue, dataType );
+
+		owlMgr.addAxiom ( model, owlFactory.getOWLDataPropertyAssertionAxiom ( 
+			owlFactory.getOWLDataProperty ( IRI.create( propertyUri )), 
+			owlFactory.getOWLNamedIndividual ( IRI.create ( individualUri )),
+			literal
 		));
 	}
 

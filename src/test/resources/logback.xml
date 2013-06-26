@@ -41,8 +41,8 @@
     <!-- appender-ref ref="FileApp" / -->
   </root>
 
-	<!-- Add Loggers this way if you want finer reports for selected components -->
+	<!-- Add Loggers this way if you want finer reports for selected components 
   <logger name="uk.ac.ebi.fg.ontodiscover" level="ALL"/>
-  <logger name="uk.ac.ebi.fg.biosd.biosd2rdf.utils" level="ALL"/>
+  <logger name="uk.ac.ebi.fg.biosd.biosd2rdf.utils" level="ALL"/> -->
   
 </configuration>

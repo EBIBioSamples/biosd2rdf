@@ -13,7 +13,8 @@ public abstract class OntologyTermDiscoverer
 {
 	public abstract URI getOntologyTermUri ( String label ) throws OntologyDiscoveryException;
 	
-	public String getOntologyTermUriAsASCII ( String label ) {
+	public String getOntologyTermUriAsASCII ( String label ) throws OntologyDiscoveryException
+	{
 		URI result = getOntologyTermUri ( label );
 		return result == null ? null : result.toASCIIString ();
 	}

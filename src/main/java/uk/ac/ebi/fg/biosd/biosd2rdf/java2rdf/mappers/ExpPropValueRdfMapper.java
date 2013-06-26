@@ -81,7 +81,7 @@ public class ExpPropValueRdfMapper<T extends Accessible> extends PropertyRdfMapp
 		
 		// name -> dc:title
 		if ( "name".equalsIgnoreCase ( typeLabel ) ) {
-			assertData ( onto, mapFact.getUri ( sample ), ns ( "dc", "title" ), valLabel );
+			assertData ( onto, mapFact.getUri ( sample ), ns ( "dc-terms", "title" ), valLabel );
 			return true;
 		}
 
@@ -106,7 +106,7 @@ public class ExpPropValueRdfMapper<T extends Accessible> extends PropertyRdfMapp
 		
 		// Define the property value
 		valUri = ns ( "biosd", "exp-prop-val/" + parentAcc + "#" + hashUriSignature ( typeLabel + valLabel ) ); 
-		assertData ( onto, valUri, ns ( "dc", "title" ), valLabel );
+		assertData ( onto, valUri, ns ( "dc-terms", "title" ), valLabel );
 		
 		
 		// Ask Zooma if it has a known ontology term for typeLabel
@@ -129,7 +129,7 @@ public class ExpPropValueRdfMapper<T extends Accessible> extends PropertyRdfMapp
 		
 		// Define the link to the type
 		String attributeLinkUri = pval instanceof BioCharacteristicValue  
-			? ns ( "ebi-term", "has-bio-characteristic" ) // TODO: needs to be defined as sub-property of obo:IAO_0000136 (is_about) 
+			? ns ( "ebi-terms", "has-bio-characteristic" ) // TODO: needs to be defined as sub-property of obo:IAO_0000136 (is_about) 
 			: ns ( "obo", "IAO_0000136" );	// is about
 			
 		// Now we have either *** sample has-biocharacteristic valUri ***, or *** sample is-about valUri ***, depending on 

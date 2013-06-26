@@ -12,12 +12,14 @@ import org.apache.commons.lang.StringUtils;
 /**
  * Property mappers are used to associate a JavaBean property to an RDFS/OWL property. Property mappers are usually
  * invoked by {@link BeanRdfMapper#map(Object)}.
+ * 
+ * @param <T> the type of source mapped bean which of property is mapped to RDF.
+ * @param <PT> the type of source property that is mapped to RDF.
  *
  * TODO: do we need a field like this.specificRDFValueMapper? 
  * 
  * <dl><dt>date</dt><dd>Mar 24, 2013</dd></dl>
  * @author Marco Brandizi
- *
  */
 public abstract class PropertyRdfMapper<T, PT> extends RdfMapper<T>
 {

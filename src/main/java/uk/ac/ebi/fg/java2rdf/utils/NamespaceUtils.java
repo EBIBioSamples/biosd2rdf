@@ -30,7 +30,7 @@ public class NamespaceUtils
 	 */
 	@SuppressWarnings ( "serial" )
 	private static final Map<String, String> NAMESPACES = new HashMap<String, String> () {{
-		put ( "dc", 			"http://purl.org/dc/terms/" );  
+		put ( "dc-terms", 			"http://purl.org/dc/terms/" );  
 		put ( "rdfs",			Namespaces.RDFS.toString () );
 	}}; 
 	

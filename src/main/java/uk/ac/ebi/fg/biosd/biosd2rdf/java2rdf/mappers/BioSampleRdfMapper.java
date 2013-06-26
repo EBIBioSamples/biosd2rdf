@@ -1,6 +1,3 @@
-/*
- * 
- */
 package uk.ac.ebi.fg.biosd.biosd2rdf.java2rdf.mappers;
 
 import static uk.ac.ebi.fg.java2rdf.utils.NamespaceUtils.ns;
@@ -28,8 +25,9 @@ public class BioSampleRdfMapper extends BeanRdfMapper<BioSample>
 			new RdfUriGenerator<BioSample> () {
 				@Override public String getUri ( BioSample smp ) {
 					return ns ( "biosd", "sample/" + smp.getAcc () );
-			}});
-		this.setPropertyMapper ( new ToDatatypePropRdfMapper<BioSample, String> ( "acc", ns ( "dc", "identifier" ) ) );
+			}}
+		);
+		this.setPropertyMapper ( new ToDatatypePropRdfMapper<BioSample, String> ( "acc", ns ( "dc-terms", "identifier" ) ) );
 		this.setPropertyMapper ( new CollectionPropRdfMapper<BioSample, ExperimentalPropertyValue> ( 
 			"propertyValues", null, new ExpPropValueRdfMapper<BioSample> ()) 
 		);

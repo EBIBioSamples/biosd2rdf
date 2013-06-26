@@ -28,7 +28,7 @@ public class BioSampleGroupRdfMapper extends BeanRdfMapper<BioSampleGroup>
 				@Override public String getUri ( BioSampleGroup sg ) {
 					return ns ( "biosd", "sample-group/" + sg.getAcc () );
 			}});
-		this.setPropertyMapper ( new ToDatatypePropRdfMapper<BioSampleGroup, String> ( "acc", ns ( "dc", "identifier" ) ) );
+		this.setPropertyMapper ( new ToDatatypePropRdfMapper<BioSampleGroup, String> ( "acc", ns ( "dc-terms", "identifier" ) ) );
 		this.setPropertyMapper ( new CollectionPropRdfMapper<BioSampleGroup, ExperimentalPropertyValue> ( 
 			"propertyValues", null, new ExpPropValueRdfMapper<BioSampleGroup> ()) 
 		);
