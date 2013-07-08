@@ -22,6 +22,8 @@ import org.semanticweb.owlapi.vocab.PrefixOWLOntologyFormat;
 import uk.ac.ebi.fg.biosd.model.utils.test.TestModel;
 import uk.ac.ebi.fg.core_model.expgraph.properties.ExperimentalPropertyType;
 import uk.ac.ebi.fg.core_model.expgraph.properties.ExperimentalPropertyValue;
+import uk.ac.ebi.fg.core_model.organizational.Contact;
+import uk.ac.ebi.fg.core_model.organizational.Organization;
 import uk.ac.ebi.fg.core_model.organizational.Publication;
 import uk.ac.ebi.fg.core_model.terms.OntologyEntry;
 import uk.ac.ebi.fg.core_model.xref.ReferenceSource;
@@ -62,7 +64,23 @@ public class BioSdMappersTest
 		pub2.setAuthorList ( "Test A, AA, Test B, BB, Test C, CC" );
 		biosdModel.msi.addPublication ( pub2 );
 		
-
+		Contact cnt = new Contact ();
+		cnt.setFirstName ( "Mr" );
+		cnt.setLastName ( "Test" );
+		cnt.setEmail ( "mr.test@somewhere.net" );
+		cnt.setAffiliation ( "The Test Institute" );
+		cnt.setAddress ( "Some Street in some Town somewhere in the Universe" );
+		cnt.setUrl ( "http://somewhere.net" );
+		biosdModel.msi.addContact ( cnt );
+		
+		Organization org = new Organization ();
+		org.setName ( "The Test Organisation" );
+		org.setEmail ( "info@somewher.net" );
+		org.setAddress ( "Some Street in some Town somewhere in the Universe" );
+		org.setPhone ( "123-456-789" );
+		org.setDescription ( "A test Organisation" );
+		biosdModel.msi.addOrganization ( org );
+		
 		new BioSdRfMapperFactory ( onto ).map ( biosdModel.msi );
 		
 		PrefixOWLOntologyFormat fmt = new TurtleOntologyFormat ();

@@ -89,7 +89,7 @@ public class BioSdOntologyTermResolver
 		{
 			if ( getOntologService () != null ) 
 			{
-//	OLS			oservTerm = this.ontologyService.getTerm ( srcAcc, srcAcc + ":" + oeAcc );
+				//	OLS			oservTerm = this.ontologyService.getTerm ( srcAcc, srcAcc + ":" + oeAcc );
 				String bioPortalOntoAcc = bioPortalOntologies.get ( srcAcc );
 
 				// Try out different combinations for the term accession, this is because the end users suck at using proper

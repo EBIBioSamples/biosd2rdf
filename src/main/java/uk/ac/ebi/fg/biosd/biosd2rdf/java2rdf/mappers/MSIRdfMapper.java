@@ -6,11 +6,11 @@ import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
 
-import uk.ac.ebi.arrayexpress2.sampletab.datamodel.msi.Organization;
 import uk.ac.ebi.fg.biosd.model.expgraph.BioSample;
 import uk.ac.ebi.fg.biosd.model.organizational.BioSampleGroup;
 import uk.ac.ebi.fg.biosd.model.organizational.MSI;
 import uk.ac.ebi.fg.core_model.organizational.Contact;
+import uk.ac.ebi.fg.core_model.organizational.Organization;
 import uk.ac.ebi.fg.core_model.organizational.Publication;
 import uk.ac.ebi.fg.java2rdf.mappers.BeanRdfMapper;
 import uk.ac.ebi.fg.java2rdf.mappers.CollectionPropRdfMapper;
@@ -56,6 +56,16 @@ public class MSIRdfMapper extends BeanRdfMapper<MSI>
 		this.setPropertyMapper ( new CollectionPropRdfMapper<MSI, Publication> ( 
 			"publications", ns ( "obo", "IAO_0000136" ), new ToObjectInversePropRdfMapper<MSI, Publication> () )
 		);
+		
+		// TODO: sub-property of ( (dc-terms:creator union dc-terms:contributor ) and ( schema.org:author union schema.org:contributor ) ) 
+		this.setPropertyMapper ( new CollectionPropRdfMapper<MSI, Contact> ( 
+			"contacts", ns ( "ebi-terms", "has-knowledgeable-person" ), new ToObjectPropRdfMapper<MSI, Contact> () )
+		);
+
+		this.setPropertyMapper ( new CollectionPropRdfMapper<MSI, Organization> ( 
+			"organizations", ns ( "ebi-terms", "has-knowledgeable-organization" ), new ToObjectPropRdfMapper<MSI, Organization> () )
+		);
+
 	}
 
 	@Override

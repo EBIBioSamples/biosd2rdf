@@ -5,6 +5,7 @@ package uk.ac.ebi.fg.java2rdf.mappers;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import uk.ac.ebi.fg.java2rdf.utils.OwlApiUtils;
 
@@ -26,6 +27,7 @@ public class BeanRdfMapper<T> extends RdfMapper<T>
 	 * 
 	 */
 	private Map<String, PropertyRdfMapper> propertyMappers;
+
 	private String targetRdfClassUri;
 
 	private RdfUriGenerator<T> rdfUriGenerator;

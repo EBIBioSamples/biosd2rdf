@@ -28,6 +28,9 @@ public class Zooma1OntoTermDiscoverer extends OntologyTermDiscoverer
 	{
 	  try 
 	  {
+//TODO: DEBUG
+if ( false ) return null;
+	  	
 			BeanFactory factory = new ClassPathXmlApplicationContext ( "zooma-text.xml" );
 		  TextReportingMapper mapper = factory.getBean ( "textMapper", TextReportingMapper.class );
 		  //mapper.addRetriever ( new OntocatRetriever () );

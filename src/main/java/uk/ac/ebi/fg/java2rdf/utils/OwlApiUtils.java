@@ -1,6 +1,3 @@
-/*
- * 
- */
 package uk.ac.ebi.fg.java2rdf.utils;
 
 import org.semanticweb.owlapi.model.IRI;
@@ -36,8 +33,14 @@ public class OwlApiUtils
 		OWLOntologyManager owlMgr = model.getOWLOntologyManager ();
 		OWLDataFactory owlFactory = owlMgr.getOWLDataFactory ();
 		
-		OWLDatatype dataType = owlFactory.getOWLDatatype ( IRI.create ( dataTypeUri ) );
-		OWLLiteral literal = owlFactory.getOWLLiteral ( propertyValue, dataType );
+    OWLLiteral literal;
+    if ( dataTypeUri == null )
+    	literal = owlFactory.getOWLLiteral ( propertyValue );
+    else
+    {
+    	OWLDatatype dataType = owlFactory.getOWLDatatype ( IRI.create ( dataTypeUri ) );
+    	literal = owlFactory.getOWLLiteral ( propertyValue, dataType );
+    }
 
 		owlMgr.addAxiom ( model, owlFactory.getOWLDataPropertyAssertionAxiom ( 
 			owlFactory.getOWLDataProperty ( IRI.create( propertyUri )), 
@@ -79,4 +82,44 @@ public class OwlApiUtils
 			owlFactory.getOWLClass( IRI.create ( superClassUri ))
 		));		
 	}
+	
+	public static void assertAnnotationLink ( OWLOntology model, String subjectUri, String propertyUri, String objectUri )
+	{
+		OWLOntologyManager owlMgr = model.getOWLOntologyManager ();
+		OWLDataFactory owlFactory = owlMgr.getOWLDataFactory ();
+		
+		owlFactory.getOWLAnnotationAssertionAxiom ( 
+			owlFactory.getOWLAnnotationProperty ( IRI.create ( propertyUri ) ),
+			IRI.create ( subjectUri ),
+			IRI.create ( objectUri )
+		);
+	}
+	
+	public static void assertAnnotationData ( OWLOntology model, String subjectUri, String propertyUri, String propertyValue ) 
+	{
+		assertAnnotationData ( model, subjectUri, propertyUri, propertyValue );
+	}
+
+	
+	public static void assertAnnotationData ( OWLOntology model, String subjectUri, String propertyUri, String propertyValue, String dataTypeUri )
+	{
+		OWLOntologyManager owlMgr = model.getOWLOntologyManager ();
+		OWLDataFactory owlFactory = owlMgr.getOWLDataFactory ();
+		
+    OWLLiteral literal;
+    if ( dataTypeUri == null )
+    	literal = owlFactory.getOWLLiteral ( propertyValue );
+    else
+    {
+    	OWLDatatype dataType = owlFactory.getOWLDatatype ( IRI.create ( dataTypeUri ) );
+    	literal = owlFactory.getOWLLiteral ( propertyValue, dataType );
+    }
+		
+		owlFactory.getOWLAnnotationAssertionAxiom ( 
+			owlFactory.getOWLAnnotationProperty ( IRI.create ( propertyUri ) ),
+			IRI.create ( subjectUri ),
+			literal
+		);
+	}
+
 }
