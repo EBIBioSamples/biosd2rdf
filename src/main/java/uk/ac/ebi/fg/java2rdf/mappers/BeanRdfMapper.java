@@ -5,7 +5,10 @@ package uk.ac.ebi.fg.java2rdf.mappers;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
+
+import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import uk.ac.ebi.fg.java2rdf.utils.OwlApiUtils;
 
@@ -31,6 +34,8 @@ public class BeanRdfMapper<T> extends RdfMapper<T>
 	private String targetRdfClassUri;
 
 	private RdfUriGenerator<T> rdfUriGenerator;
+
+	protected Logger log = LoggerFactory.getLogger ( this.getClass () );
 	
 	public BeanRdfMapper () {
 		this ( null );
@@ -64,24 +69,36 @@ public class BeanRdfMapper<T> extends RdfMapper<T>
 	@Override
 	public boolean map ( T source )
 	{
-		if ( source == null ) return false; 
-		String uri = getRdfUriGenerator ().getUri ( source );
-		if ( uri == null ) return false;
-		
-		BeanRdfMapperFactory mapFactory = this.getMapperFactory ();
-		
-		// Generates and rdf:type statement
-		String targetRdfClassUri = getTargetRdfClassUri ();
-		if ( targetRdfClassUri != null ) OwlApiUtils.assertIndividual ( mapFactory.getKnowledgeBase (), 
-				getRdfUriGenerator ().getUri ( source ), targetRdfClassUri );
-		// TODO: else WARN
-
-		for ( String pname: propertyMappers.keySet () )
+		try
 		{
-			PropertyRdfMapper<T, ?> pmapper = propertyMappers.get ( pname );
-			pmapper.map ( source );
+			if ( source == null ) return false; 
+			String uri = getRdfUriGenerator ().getUri ( source );
+			if ( uri == null ) return false;
+			
+			BeanRdfMapperFactory mapFactory = this.getMapperFactory ();
+			
+			// Generates and rdf:type statement
+			String targetRdfClassUri = getTargetRdfClassUri ();
+			if ( targetRdfClassUri != null ) OwlApiUtils.assertIndividual ( mapFactory.getKnowledgeBase (), 
+					getRdfUriGenerator ().getUri ( source ), targetRdfClassUri );
+			// TODO: else WARN
+
+			for ( String pname: propertyMappers.keySet () )
+			{
+				PropertyRdfMapper<T, ?> pmapper = propertyMappers.get ( pname );
+				pmapper.map ( source );
+			}
+			return true;
+		} 
+		catch ( Exception ex )
+		{
+			throw new RdfMappingException ( String.format ( 
+				"Error while mapping %s[%s]='%s' to RDF: %s", 
+				source.getClass ().getSimpleName (), 
+				StringUtils.abbreviate ( source.toString (), 50 ), StringUtils.abbreviate ( source.toString (), 50 ),
+				ex.getMessage ()
+			), ex );
 		}
-		return true;
 	}
 
 	/**

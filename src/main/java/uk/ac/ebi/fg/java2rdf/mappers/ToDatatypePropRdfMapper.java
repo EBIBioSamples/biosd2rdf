@@ -49,28 +49,29 @@ public class ToDatatypePropRdfMapper<T, PT> extends PropertyRdfMapper<T, PT>
 	@Override
 	public boolean map ( T source, PT propValue )
 	{
-		if ( source == null || propValue == null ) return false;
-		
 		try
 		{
+			if ( propValue == null ) return false;
+			
 			BeanRdfMapperFactory mapFactory = this.getMapperFactory ();
 			RdfLiteralGenerator<PT> targetValGen = this.getRdfLiteralGenerator ();
+			String targetRdfVal = targetValGen.getValue ( propValue );
+			if ( targetRdfVal == null ) return false;
 			
 			OwlApiUtils.assertData ( this.getMapperFactory ().getKnowledgeBase (), 
-				mapFactory.getUri ( source ), this.getTargetPropertyUri (), targetValGen.getValue ( propValue ) );
+				mapFactory.getUri ( source ), this.getTargetPropertyUri (), targetRdfVal );
+			return true;
 		} 
-		catch ( ClassCastException ex )
+		catch ( Exception ex )
 		{
 			throw new RdfMappingException ( String.format ( 
-				"Internal error (mapper mismatching), while mapping %s[%s].'%s'[%s] to RDF: %s", 
-					source.getClass ().getSimpleName (), 
-					StringUtils.abbreviate ( source.toString (), 15 ), 
-					this.getSourcePropertyName (),
-					StringUtils.abbreviate ( propValue.toString (), 15 ), 
-					ex.getMessage ()
-			));
+				"Internal error while mapping %s[%s].'%s'='%s' to RDF: %s", 
+				source.getClass ().getSimpleName (), 
+				StringUtils.abbreviate ( source.toString (), 50 ), this.getSourcePropertyName (), 
+				StringUtils.abbreviate ( propValue.toString(), 50 ),
+				ex.getMessage ()
+			), ex);
 		}
-		return true;
 	}
 
 	/**

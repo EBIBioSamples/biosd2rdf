@@ -52,11 +52,11 @@ public class BioSdRfMapperFactory extends BeanRdfMapperFactory
 		setMapper ( Organization.class, new OrganizationRdfMapper () );
 	}
 	
-	protected BioSdRfMapperFactory () {
+	public BioSdRfMapperFactory () {
 		super ();
 	}
 
-	protected BioSdRfMapperFactory ( OWLOntology knowledgeBase ) {
+	public BioSdRfMapperFactory ( OWLOntology knowledgeBase ) {
 		super ( knowledgeBase );
 	}
 

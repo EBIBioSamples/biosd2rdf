@@ -40,28 +40,31 @@ public class ToObjectPropRdfMapper<T, PT> extends PropertyRdfMapper<T, PT>
 	@Override
 	public boolean map ( T source, PT propValue )
 	{
-		if ( source == null || propValue == null ) return false;
+		if ( propValue == null ) return false;
 		try
 		{
 			BeanRdfMapperFactory mapFactory = this.getMapperFactory ();
 			
+			// TODO: can we avoid to keep recomputing this?
+			String objUri = mapFactory.getUri ( propValue );
+			if ( objUri == null ) return false;
+			
 			OwlApiUtils.assertLink ( this.getMapperFactory ().getKnowledgeBase (), 
-					mapFactory.getUri ( source ), this.getTargetPropertyUri (), mapFactory.getUri ( propValue ) );
+				mapFactory.getUri ( source ), this.getTargetPropertyUri (), objUri );
 
 			// Don't use targetMapper, we need to trace this visit.
 			return mapFactory.map ( propValue );
 		} 
-		catch ( ClassCastException ex )
+		catch ( Exception ex )
 		{
 			throw new RdfMappingException ( String.format ( 
-				"Internal error (mapper mismatching), while mapping %s[%s].'%s'[%s] to RDF: %s", 
+				"Error while mapping %s[%s].'%s'[%s] to RDF: %s", 
 					source.getClass ().getSimpleName (), 
-					StringUtils.abbreviate ( source.toString (), 15 ), 
+					StringUtils.abbreviate ( source.toString (), 50 ), 
 					this.getSourcePropertyName (),
-					StringUtils.abbreviate ( propValue.toString (), 15 ), 
+					StringUtils.abbreviate ( propValue.toString (), 50 ), 
 					ex.getMessage ()
-			));
+			), ex );
 		}
 	}
-	
 }

@@ -14,6 +14,7 @@ import uk.ac.ebi.fg.core_model.organizational.Organization;
 import uk.ac.ebi.fg.core_model.organizational.Publication;
 import uk.ac.ebi.fg.java2rdf.mappers.BeanRdfMapper;
 import uk.ac.ebi.fg.java2rdf.mappers.CollectionPropRdfMapper;
+import uk.ac.ebi.fg.java2rdf.mappers.RdfMappingException;
 import uk.ac.ebi.fg.java2rdf.mappers.RdfUriGenerator;
 import uk.ac.ebi.fg.java2rdf.mappers.ToDatatypePropRdfMapper;
 import uk.ac.ebi.fg.java2rdf.mappers.ToObjectInversePropRdfMapper;
@@ -72,14 +73,20 @@ public class MSIRdfMapper extends BeanRdfMapper<MSI>
 	@SuppressWarnings ( { "rawtypes", "unchecked" } )
 	public boolean map ( MSI msi )
 	{
-		String msiAcc = StringUtils.trimToNull ( msi.getAcc () );
-		if ( msiAcc == null ) return false; 
-		
-		Map<Class, BeanRdfMapper> mappers = this.getMapperFactory ().getMappers ();
-		((MSIEquippedRdfUriGenerator<Contact>) mappers.get ( Contact.class ).getRdfUriGenerator ()).setMsiAcc ( msiAcc );
-		((MSIEquippedRdfUriGenerator<Organization>) mappers.get ( Organization.class ).getRdfUriGenerator ()).setMsiAcc ( msiAcc );
+		try
+		{
+			String msiAcc = StringUtils.trimToNull ( msi.getAcc () );
+			if ( msiAcc == null ) return false; 
+			
+			Map<Class, BeanRdfMapper> mappers = this.getMapperFactory ().getMappers ();
+			((MSIEquippedRdfUriGenerator<Contact>) mappers.get ( Contact.class ).getRdfUriGenerator ()).setMsiAcc ( msiAcc );
+			((MSIEquippedRdfUriGenerator<Organization>) mappers.get ( Organization.class ).getRdfUriGenerator ()).setMsiAcc ( msiAcc );
 
-		return super.map ( msi );
+			return super.map ( msi );
+		} 
+		catch ( Exception ex ) {
+			throw new RdfMappingException ( String.format ( "Error while mapping SampleTab submission[%s]: %s", msi, ex.getMessage () ), ex );
+		}
 	}
 	
 }

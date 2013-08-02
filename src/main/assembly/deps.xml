@@ -1,0 +1,26 @@
+<!-- 
+  File for the Maven Assembly plug-in
+  Prepares the jar that is used by all the end-user package.
+-->
+<assembly>
+  <id>deps</id>
+  
+  <formats>
+  	<format>jar</format>
+  </formats>
+  
+  <includeBaseDirectory>false</includeBaseDirectory>
+
+	<dependencySets>
+		<dependencySet>
+		  <!-- Enable only if non-empty <outputFileNameMapping></outputFileNameMapping> -->
+		  <unpack>true</unpack>
+		  <scope>runtime</scope>
+<!-- 		  <excludes>
+				<exclude>org.slf4j:slf4j-log4j12</exclude> 
+		  </excludes> 
+-->
+		</dependencySet>
+	</dependencySets> 
+  
+</assembly>

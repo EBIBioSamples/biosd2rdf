@@ -1,11 +1,14 @@
 package uk.ac.ebi.fg.java2rdf.utils;
 
+import org.apache.commons.lang3.StringUtils;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLDataFactory;
 import org.semanticweb.owlapi.model.OWLDatatype;
 import org.semanticweb.owlapi.model.OWLLiteral;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
+
+import uk.ac.ebi.fg.java2rdf.mappers.RdfMappingException;
 
 /**
  * TODO: Comment me!
@@ -16,20 +19,15 @@ import org.semanticweb.owlapi.model.OWLOntologyManager;
  */
 public class OwlApiUtils
 {
-	public static void assertData ( OWLOntology model, String individualUri, String propertyUri, String propertyValue )
+	
+	public static synchronized void assertData ( OWLOntology model, String subjectUri, String propertyUri, String propertyValue )
 	{
-		OWLOntologyManager owlMgr = model.getOWLOntologyManager ();
-		OWLDataFactory owlFactory = owlMgr.getOWLDataFactory ();
-		
-		owlMgr.addAxiom ( model, owlFactory.getOWLDataPropertyAssertionAxiom ( 
-			owlFactory.getOWLDataProperty ( IRI.create( propertyUri )), 
-			owlFactory.getOWLNamedIndividual ( IRI.create ( individualUri )),  
-			propertyValue 
-		));
+		assertData ( model, subjectUri, propertyUri, propertyValue, null );
 	}
 	
-	public static void assertData ( OWLOntology model, String individualUri, String propertyUri, String propertyValue, String dataTypeUri )
+	public static synchronized void assertData ( OWLOntology model, String subjectUri, String propertyUri, String propertyValue, String dataTypeUri )
 	{
+		checkNonNullTriple ( "assertData", subjectUri, propertyUri, propertyValue, dataTypeUri );
 		OWLOntologyManager owlMgr = model.getOWLOntologyManager ();
 		OWLDataFactory owlFactory = owlMgr.getOWLDataFactory ();
 		
@@ -44,13 +42,14 @@ public class OwlApiUtils
 
 		owlMgr.addAxiom ( model, owlFactory.getOWLDataPropertyAssertionAxiom ( 
 			owlFactory.getOWLDataProperty ( IRI.create( propertyUri )), 
-			owlFactory.getOWLNamedIndividual ( IRI.create ( individualUri )),
+			owlFactory.getOWLNamedIndividual ( IRI.create ( subjectUri )),
 			literal
 		));
 	}
 
-	public static void assertLink ( OWLOntology model, String subjectUri, String propertyUri, String objectUri )
+	public static synchronized void assertLink ( OWLOntology model, String subjectUri, String propertyUri, String objectUri )
 	{
+		checkNonNullTriple ( "assertLink", subjectUri, propertyUri, objectUri, null );
 		OWLOntologyManager owlMgr = model.getOWLOntologyManager ();
 		OWLDataFactory owlFactory = owlMgr.getOWLDataFactory ();
 
@@ -61,8 +60,14 @@ public class OwlApiUtils
 		));
 	}
 	
-	public static void assertIndividual ( OWLOntology model, String individualUri, String classUri ) 
+	public static synchronized void assertIndividual ( OWLOntology model, String individualUri, String classUri ) 
 	{
+		if ( StringUtils.trimToNull ( individualUri ) == null || StringUtils.trimToNull ( classUri ) == null ) 
+			throw new RdfMappingException ( String.format ( 
+				"assertIndividual ( '%s', '%s' ): cannot accept null paramters",
+				individualUri, classUri
+			)); 
+		
 		OWLOntologyManager owlMgr = model.getOWLOntologyManager ();
 		OWLDataFactory owlFactory = owlMgr.getOWLDataFactory ();
 				
@@ -72,8 +77,14 @@ public class OwlApiUtils
 		));		
 	}
 
-	public static void assertClass ( OWLOntology model, String classUri, String superClassUri ) 
+	public static synchronized void assertClass ( OWLOntology model, String classUri, String superClassUri ) 
 	{
+		if ( StringUtils.trimToNull ( classUri ) == null || StringUtils.trimToNull ( superClassUri ) == null ) 
+			throw new RdfMappingException ( String.format ( 
+				"assertClass ( '%s', '%s' ): cannot accept null paramters",
+				classUri, superClassUri
+			)); 
+		
 		OWLOntologyManager owlMgr = model.getOWLOntologyManager ();
 		OWLDataFactory owlFactory = owlMgr.getOWLDataFactory ();
 		
@@ -83,26 +94,28 @@ public class OwlApiUtils
 		));		
 	}
 	
-	public static void assertAnnotationLink ( OWLOntology model, String subjectUri, String propertyUri, String objectUri )
+	public static synchronized void assertAnnotationLink ( OWLOntology model, String subjectUri, String propertyUri, String objectUri )
 	{
+		checkNonNullTriple ( "assertAnnotationLink", subjectUri, propertyUri, objectUri, null );
 		OWLOntologyManager owlMgr = model.getOWLOntologyManager ();
 		OWLDataFactory owlFactory = owlMgr.getOWLDataFactory ();
 		
-		owlFactory.getOWLAnnotationAssertionAxiom ( 
+		owlMgr.addAxiom ( model, owlFactory.getOWLAnnotationAssertionAxiom ( 
 			owlFactory.getOWLAnnotationProperty ( IRI.create ( propertyUri ) ),
 			IRI.create ( subjectUri ),
 			IRI.create ( objectUri )
-		);
+		));
 	}
 	
-	public static void assertAnnotationData ( OWLOntology model, String subjectUri, String propertyUri, String propertyValue ) 
+	public static synchronized void assertAnnotationData ( OWLOntology model, String subjectUri, String propertyUri, String propertyValue ) 
 	{
 		assertAnnotationData ( model, subjectUri, propertyUri, propertyValue );
 	}
 
 	
-	public static void assertAnnotationData ( OWLOntology model, String subjectUri, String propertyUri, String propertyValue, String dataTypeUri )
+	public static synchronized void assertAnnotationData ( OWLOntology model, String subjectUri, String propertyUri, String propertyValue, String dataTypeUri )
 	{
+		checkNonNullTriple ( "assertAnnotationLink", subjectUri, propertyUri, propertyValue, dataTypeUri );
 		OWLOntologyManager owlMgr = model.getOWLOntologyManager ();
 		OWLDataFactory owlFactory = owlMgr.getOWLDataFactory ();
 		
@@ -115,11 +128,27 @@ public class OwlApiUtils
     	literal = owlFactory.getOWLLiteral ( propertyValue, dataType );
     }
 		
-		owlFactory.getOWLAnnotationAssertionAxiom ( 
+		owlMgr.addAxiom ( model, owlFactory.getOWLAnnotationAssertionAxiom ( 
 			owlFactory.getOWLAnnotationProperty ( IRI.create ( propertyUri ) ),
 			IRI.create ( subjectUri ),
 			literal
-		);
+		));
 	}
-
+	
+	private static synchronized void checkNonNullTriple ( String methodName, String subjectUri, String propertyUri, String objectValueOrUri, String dataTypeUri )
+	{
+		if ( StringUtils.trimToNull ( subjectUri ) == null 
+				|| StringUtils.trimToNull ( propertyUri ) == null || StringUtils.trimToNull ( objectValueOrUri ) == null 
+		)
+		{
+			if ( dataTypeUri == null )
+				throw new RdfMappingException ( String.format (
+					"Cannot assert an RDF triple with null elements: %s ( '%s', '%s', '%s' )", 
+					methodName, subjectUri, propertyUri, StringUtils.abbreviate ( objectValueOrUri, 255 ) ));
+			else
+				throw new RdfMappingException ( String.format (
+					"Cannot assert an RDF triple with null elements: %s ( '%s', '%s', '%s', '%s' )", 
+					methodName, subjectUri, propertyUri, StringUtils.abbreviate ( objectValueOrUri, 255 ), dataTypeUri ));
+		}
+	}
 }

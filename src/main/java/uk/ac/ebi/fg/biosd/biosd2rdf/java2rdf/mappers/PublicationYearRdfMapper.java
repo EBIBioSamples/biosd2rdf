@@ -31,10 +31,9 @@ public class PublicationYearRdfMapper extends ToDatatypePropRdfMapper<Publicatio
 	@Override
 	public boolean map ( Publication source, String year )
 	{
-		if ( source == null || year == null ) return false;
-		
 		try
 		{
+			if ( source == null || year == null ) return false;
 			BeanRdfMapperFactory mapFactory = this.getMapperFactory ();
 			RdfLiteralGenerator<String> targetValGen = this.getRdfLiteralGenerator ();
 			
@@ -43,18 +42,18 @@ public class PublicationYearRdfMapper extends ToDatatypePropRdfMapper<Publicatio
 				this.getTargetPropertyUri (), 
 				targetValGen.getValue ( year ), 
 				XSDVocabulary.G_YEAR.toString () );
+			return true;
 		} 
-		catch ( ClassCastException ex )
+		catch ( Exception ex )
 		{
 			throw new RdfMappingException ( String.format ( 
-				"Internal error (mapper mismatching), while mapping %s[%s].'%s'[%s] to RDF: %s", 
+				"Error while mapping %s[%s].'%s'[%s] to RDF: %s", 
 					source.getClass ().getSimpleName (), 
-					StringUtils.abbreviate ( source.toString (), 15 ), 
+					StringUtils.abbreviate ( source.toString (), 50 ), 
 					this.getSourcePropertyName (),
-					StringUtils.abbreviate ( year, 15 ), 
+					StringUtils.abbreviate ( year, 50 ), 
 					ex.getMessage ()
-			));
+			), ex);
 		}
-		return true;
 	}
 }

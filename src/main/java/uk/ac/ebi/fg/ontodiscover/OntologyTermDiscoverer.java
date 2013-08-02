@@ -11,11 +11,11 @@ import java.net.URI;
  */
 public abstract class OntologyTermDiscoverer
 {
-	public abstract URI getOntologyTermUri ( String label ) throws OntologyDiscoveryException;
+	public abstract URI getOntologyTermUri ( String valueLabel, String typeLabel ) throws OntologyDiscoveryException;
 	
-	public String getOntologyTermUriAsASCII ( String label ) throws OntologyDiscoveryException
+	public String getOntologyTermUriAsASCII ( String valueLabel, String typeLabel ) throws OntologyDiscoveryException
 	{
-		URI result = getOntologyTermUri ( label );
+		URI result = getOntologyTermUri ( valueLabel, typeLabel );
 		return result == null ? null : result.toASCIIString ();
 	}
 }

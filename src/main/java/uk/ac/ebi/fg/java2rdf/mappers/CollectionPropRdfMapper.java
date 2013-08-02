@@ -44,26 +44,24 @@ public class CollectionPropRdfMapper<T, PT> extends PropertyRdfMapper<T, Collect
 	@Override
 	public boolean map ( T source, Collection<PT> propValues )
 	{
-		if ( source == null || propValues == null || propValues.isEmpty () ) return false; 
-
-		for ( PT pvalue: propValues ) 
+		try
 		{
-			try {
+			if ( propValues == null || propValues.isEmpty () ) return false; 
+
+			for ( PT pvalue: propValues ) 
 				propertyMapper.map ( source, pvalue );
-			} 
-			catch ( ClassCastException ex )
-			{
-				throw new RdfMappingException ( String.format ( 
-					"Internal error (mapper mismatching), while mapping %s[%s].'%s'[%s] to RDF: %s", 
-						source.getClass ().getSimpleName (), 
-						StringUtils.abbreviate ( source.toString (), 15 ), 
-						this.getSourcePropertyName (),
-						StringUtils.abbreviate ( pvalue.toString (), 15 ), 
-						ex.getMessage ()
-				));
-			}
+			return true;
+		} 
+		catch ( Exception ex )
+		{
+			throw new RdfMappingException ( String.format ( 
+				"Error while mapping %s[%s].'%s'='%s' to RDF: %s", 
+				source.getClass ().getSimpleName (), 
+				StringUtils.abbreviate ( source.toString (), 50 ), getSourcePropertyName (), 
+				StringUtils.abbreviate ( propValues.toString (), 50 ),
+				ex.getMessage ()
+			), ex);
 		}
-		return true;
 	}
 
 	/** The underlining property mapper used to map single values for the property {@link #getSourcePropertyName()} */

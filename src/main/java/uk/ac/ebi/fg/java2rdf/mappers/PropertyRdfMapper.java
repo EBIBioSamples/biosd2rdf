@@ -3,10 +3,10 @@
  */
 package uk.ac.ebi.fg.java2rdf.mappers;
 
-import java.lang.reflect.InvocationTargetException;
-
 import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.lang.StringUtils;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 
 /**
@@ -24,6 +24,7 @@ import org.apache.commons.lang.StringUtils;
 public abstract class PropertyRdfMapper<T, PT> extends RdfMapper<T>
 {
 	private String sourcePropertyName, targetPropertyUri;
+	protected Logger log = LoggerFactory.getLogger ( this.getClass () );
 	
 	public PropertyRdfMapper ()
 	{
@@ -48,18 +49,22 @@ public abstract class PropertyRdfMapper<T, PT> extends RdfMapper<T>
 	@SuppressWarnings ( "unchecked" )
 	public final boolean map ( T source ) throws RdfMappingException
 	{
-		if ( source == null ) return false; 
-		
-		try {
-			PT pval = (PT) PropertyUtils.getSimpleProperty ( source, sourcePropertyName );
+		PT pval = null;
+		try
+		{
+			if ( source == null ) return false; 
+			pval = (PT) PropertyUtils.getSimpleProperty ( source, sourcePropertyName );
 			return map ( source, pval );
 		} 
-		catch ( IllegalAccessException | InvocationTargetException | NoSuchMethodException ex ) {
+		catch ( Exception ex )
+		{
 			throw new RdfMappingException ( String.format ( 
-				"Internal error while mapping %s[%s].'%s' to RDF: %s", 
-					source.getClass ().getSimpleName (), StringUtils.abbreviate ( source.toString (), 15 ), sourcePropertyName,
-					ex.getMessage ()
-			));
+				"Internal error while mapping %s[%s].'%s'='%s' to RDF: %s", 
+				source.getClass ().getSimpleName (), 
+				StringUtils.abbreviate ( source.toString (), 50 ), sourcePropertyName, 
+				pval == null ? null : StringUtils.abbreviate ( pval.toString(), 50 ),
+				ex.getMessage ()
+			), ex);
 		}
 	}
 	

@@ -32,25 +32,28 @@ public class ToObjectInversePropRdfMapper<T, PT> extends ToObjectPropRdfMapper<T
 	@Override
 	public boolean map ( T source, PT propValue )
 	{
-		if ( source == null || propValue == null ) return false;
 		try
 		{
+			if ( propValue == null ) return false;
 			BeanRdfMapperFactory mapFactory = this.getMapperFactory ();
 			
+			String propUri = mapFactory.getUri ( propValue );
+			if ( propUri == null ) return false;
+			
 			OwlApiUtils.assertLink ( this.getMapperFactory ().getKnowledgeBase (), 
-				mapFactory.getUri ( propValue ), this.getTargetPropertyUri (), mapFactory.getUri ( source ) );
+				propUri, this.getTargetPropertyUri (), mapFactory.getUri ( source ) );
 
 			// Don't use targetMapper, we need to trace this visit.
 			return mapFactory.map ( propValue );
 		} 
-		catch ( ClassCastException ex )
+		catch ( Exception ex )
 		{
 			throw new RdfMappingException ( String.format ( 
-				"Internal error (mapper mismatching), while mapping %s[%s].'%s'[%s] to RDF: %s", 
-					source.getClass ().getSimpleName (), 
-					StringUtils.abbreviate ( source.toString (), 15 ), 
+				"Error while mapping %s[%s].'%s'[%s] to RDF: %s", 
+					propValue.getClass ().getSimpleName (), 
+					StringUtils.abbreviate ( propValue.toString (), 50 ), 
 					this.getSourcePropertyName (),
-					StringUtils.abbreviate ( propValue.toString (), 15 ), 
+					StringUtils.abbreviate ( source.toString (), 50 ), 
 					ex.getMessage ()
 			));
 		}

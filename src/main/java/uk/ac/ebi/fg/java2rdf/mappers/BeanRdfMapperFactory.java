@@ -3,6 +3,7 @@
  */
 package uk.ac.ebi.fg.java2rdf.mappers;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -33,7 +34,7 @@ public class BeanRdfMapperFactory
 {
 	private OWLOntology knowledgeBase;
 	private Map<Class, BeanRdfMapper> mappers;
-	private Set visitedBeans = new HashSet<> ();
+	private Set visitedBeans = Collections.synchronizedSet ( new HashSet<> () );
 	
 	public BeanRdfMapperFactory () {
 	}

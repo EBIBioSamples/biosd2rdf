@@ -5,10 +5,9 @@ import static org.apache.commons.lang.StringUtils.trimToNull;
 import static uk.ac.ebi.fg.java2rdf.utils.Java2RdfUtils.hashUriSignature;
 import static uk.ac.ebi.fg.java2rdf.utils.NamespaceUtils.ns;
 import uk.ac.ebi.fg.core_model.organizational.Contact;
-import uk.ac.ebi.fg.core_model.organizational.Publication;
 import uk.ac.ebi.fg.java2rdf.mappers.BeanRdfMapper;
+import uk.ac.ebi.fg.java2rdf.mappers.RdfMappingException;
 import uk.ac.ebi.fg.java2rdf.mappers.ToDatatypePropRdfMapper;
-import uk.ac.ebi.fg.java2rdf.mappers.ToObjectPropRdfMapper;
 import uk.ac.ebi.fg.java2rdf.utils.OwlApiUtils;
 
 /**
@@ -37,8 +36,8 @@ public class ContactRdfMapper extends BeanRdfMapper<Contact>
 				@Override public String getUri ( Contact cnt ) 
 				{
 					String nameLine = trimToEmpty ( cnt.getFirstName () ) 
-							+ trimToEmpty ( cnt.getMidInitials () ) 
-							+ trimToEmpty ( cnt.getLastName () );
+						+ trimToEmpty ( cnt.getMidInitials () ) 
+						+ trimToEmpty ( cnt.getLastName () );
 					nameLine = trimToNull ( nameLine );
 					
 					String email = trimToNull ( cnt.getEmail () );
@@ -79,18 +78,25 @@ public class ContactRdfMapper extends BeanRdfMapper<Contact>
 	@Override
 	public boolean map ( Contact cnt )
 	{
-		if ( super.map ( cnt ) ) return false;
-		
-		String nameLine = trimToEmpty ( cnt.getFirstName () ) 
+		try
+		{
+			if ( super.map ( cnt ) ) return false;
+			
+			String nameLine = trimToEmpty ( cnt.getFirstName () ) 
 				+ trimToEmpty ( cnt.getMidInitials () ) 
 				+ trimToEmpty ( cnt.getLastName () );
-		nameLine = trimToNull ( nameLine );
+			nameLine = trimToNull ( nameLine );
 
-		OwlApiUtils.assertData ( this.getMapperFactory ().getKnowledgeBase (), 
-			this.getRdfUriGenerator ().getUri ( cnt ), ns ( "dc-terms", "title" ), nameLine 
-		);
-		
-		return true;
+			OwlApiUtils.assertData ( this.getMapperFactory ().getKnowledgeBase (), 
+				this.getRdfUriGenerator ().getUri ( cnt ), ns ( "dc-terms", "title" ), nameLine 
+			);
+			
+			return true;
+		} 
+		catch ( Exception ex )
+		{
+			throw new RdfMappingException ( String.format ( "Error while mapping contact[%s]: %s", cnt, ex.getMessage () ), ex );
+		}
 	}
 	
 	

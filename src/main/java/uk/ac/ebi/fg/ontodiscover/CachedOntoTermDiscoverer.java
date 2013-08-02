@@ -50,32 +50,36 @@ public class CachedOntoTermDiscoverer extends OntologyTermDiscoverer
 	}
 			
 	@Override
-	public URI getOntologyTermUri ( String label ) throws OntologyDiscoveryException
+	public URI getOntologyTermUri ( String valueLabel, String typeLabel ) throws OntologyDiscoveryException
 	{
-  	if ( ( label = StringUtils.trimToNull ( label ) ) == null ) return null;
-  	label = label.toLowerCase ();
+  	if ( ( valueLabel = StringUtils.trimToNull ( valueLabel ) ) == null ) return null;
+  	valueLabel = valueLabel.toLowerCase ();
   	
-		URI uri = cache.get ( label );
+  	if ( ( typeLabel = StringUtils.trimToEmpty ( typeLabel ) ).isEmpty () ) return null;
+  	typeLabel = typeLabel.toLowerCase ();
+  	
+  	String cacheEntry = valueLabel + ":" + typeLabel;
+		URI uri = cache.get ( cacheEntry );
 		if ( uri != null )
 		{
 			if ( NULL_URI.equals ( uri ) ) uri = null;
 			if ( log.isTraceEnabled () )
-				log.trace ( "Returning cached result '" + ( uri == null ? null : uri.toASCIIString () ) + "' for '" + label + "'" );
+				log.trace ( "Returning cached result '" + ( uri == null ? null : uri.toASCIIString () ) + "' for '" + cacheEntry + "'" );
 			return uri;
 		}
 		
-		uri = base.getOntologyTermUri ( label );
+		uri = base.getOntologyTermUri ( valueLabel, typeLabel );
 		if ( uri == null ) 
 		{
-			log.trace ( "Returning and caching null for '" + label + "'" );
-			cache.put ( label, NULL_URI );	
+			log.trace ( "Returning and caching null for '" + cacheEntry + "'" );
+			cache.put ( cacheEntry, NULL_URI );	
 			return null;
 		}
 		
 		
 		if ( log.isTraceEnabled () )
-			log.trace ( "Returning and caching '" + uri.toASCIIString () + "' for '" + label + "'" );
-		cache.put ( label, uri );
+			log.trace ( "Returning and caching '" + uri.toASCIIString () + "' for '" + cacheEntry + "'" );
+		cache.put ( cacheEntry, uri );
 		return uri;
 	}
 
