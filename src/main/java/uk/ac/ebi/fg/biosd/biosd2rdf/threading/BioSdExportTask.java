@@ -5,7 +5,7 @@ import javax.persistence.EntityManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import uk.ac.ebi.fg.biosd.biosd2rdf.java2rdf.mappers.BioSdRfMapperFactory;
+import uk.ac.ebi.fg.biosd.biosd2rdf.java2rdf.mapping.BioSdRfMapperFactory;
 import uk.ac.ebi.fg.biosd.model.organizational.MSI;
 import uk.ac.ebi.fg.core_model.persistence.dao.hibernate.toplevel.IdentifiableDAO;
 import uk.ac.ebi.fg.core_model.resources.Resources;

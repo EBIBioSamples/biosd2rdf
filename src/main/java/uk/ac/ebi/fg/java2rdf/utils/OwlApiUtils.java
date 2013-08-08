@@ -8,7 +8,7 @@ import org.semanticweb.owlapi.model.OWLLiteral;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
 
-import uk.ac.ebi.fg.java2rdf.mappers.RdfMappingException;
+import uk.ac.ebi.fg.java2rdf.mapping.RdfMappingException;
 
 /**
  * TODO: Comment me!

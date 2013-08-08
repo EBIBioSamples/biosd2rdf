@@ -7,7 +7,7 @@ import java.security.NoSuchAlgorithmException;
 
 import javax.xml.bind.DatatypeConverter;
 
-import uk.ac.ebi.fg.java2rdf.mappers.RdfMappingException;
+import uk.ac.ebi.fg.java2rdf.mapping.RdfMappingException;
 
 /**
  * Some stuff useful for the RDF mapping job performed by the Java2RDF pacakge.
