@@ -15,6 +15,11 @@ import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.model.OWLOntologyStorageException;
 import org.semanticweb.owlapi.vocab.PrefixOWLOntologyFormat;
 
+import uk.ac.ebi.fg.java2rdf.mappers.CollectionPropRdfMapper;
+import uk.ac.ebi.fg.java2rdf.mappers.ToDatatypePropRdfMapper;
+import uk.ac.ebi.fg.java2rdf.mappers.ToObjectPropRdfMapper;
+import uk.ac.ebi.fg.java2rdf.mappers.RdfUriGenerator;
+
 /**
  * Tests and examples of basic usage. TODO: there are not so many assertions at the moment...
  *

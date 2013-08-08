@@ -3,6 +3,7 @@ package uk.ac.ebi.fg.biosd.biosd2rdf.utils;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -20,6 +21,7 @@ import uk.ac.ebi.ontocat.OntologyServiceException;
 import uk.ac.ebi.ontocat.OntologyTerm;
 import uk.ac.ebi.ontocat.bioportal.BioportalOntologyService;
 import uk.ac.ebi.utils.memory.SimpleCache;
+import uk.ac.ebi.utils.regex.RegEx;
 
 
 /**
@@ -42,6 +44,7 @@ public class BioSdOntologyTermResolver
 	
 	private final SimpleCache<String, String> ontoCache = new SimpleCache<> ( (int) 500E3 ); 
 
+	private final static RegEx COMMENT_RE = new RegEx ( "(Comment|Characteristic)\\s*\\[\\s*(.+)\\s*\\]", Pattern.CASE_INSENSITIVE );
 	private final Logger log = LoggerFactory.getLogger ( this.getClass () );
 	
 	public String getOntoClassUri ( ExperimentalPropertyValue<?> pval ) 
@@ -56,7 +59,7 @@ public class BioSdOntologyTermResolver
 		ExperimentalPropertyType ptype = pval.getType ();
 		if ( ptype == null ) return null; 
 		
-		String pvalTypeLabel = StringUtils.trimToNull ( ptype.getTermText () );
+		String pvalTypeLabel = getExpPropTypeLabel ( ptype );
 		if ( pvalTypeLabel == null ) return null;
 		
 		// Next, see if it is a number
@@ -171,5 +174,19 @@ public class BioSdOntologyTermResolver
 		log.trace ( "caching URI '" + uri + "' for the key '" + oeCacheKey + "'" );
 		ontoCache.put ( oeCacheKey, uri );
 		return uri;		
+	}
+	
+	/**
+	 * Extract the type label, considering things like Comment [ X ] (return 'X' in such cases).
+	 */
+	public static String getExpPropTypeLabel ( ExperimentalPropertyType ptype ) 
+	{
+		if ( ptype == null ) return null;
+		String typeLabel = StringUtils.trimToNull ( ptype.getTermText () );
+		if ( typeLabel == null ) return null;
+		
+		String[] chunks = COMMENT_RE.groups ( typeLabel );
+		if ( chunks == null || chunks.length < 3 ) return typeLabel;
+		return chunks [ 2 ];
 	}
 }

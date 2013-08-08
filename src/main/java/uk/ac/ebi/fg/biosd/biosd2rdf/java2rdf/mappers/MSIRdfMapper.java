@@ -13,12 +13,15 @@ import uk.ac.ebi.fg.core_model.organizational.Contact;
 import uk.ac.ebi.fg.core_model.organizational.Organization;
 import uk.ac.ebi.fg.core_model.organizational.Publication;
 import uk.ac.ebi.fg.java2rdf.mappers.BeanRdfMapper;
-import uk.ac.ebi.fg.java2rdf.mappers.CollectionPropRdfMapper;
 import uk.ac.ebi.fg.java2rdf.mappers.RdfMappingException;
-import uk.ac.ebi.fg.java2rdf.mappers.RdfUriGenerator;
+import uk.ac.ebi.fg.java2rdf.mappers.CollectionPropRdfMapper;
 import uk.ac.ebi.fg.java2rdf.mappers.ToDatatypePropRdfMapper;
 import uk.ac.ebi.fg.java2rdf.mappers.ToObjectInversePropRdfMapper;
 import uk.ac.ebi.fg.java2rdf.mappers.ToObjectPropRdfMapper;
+import uk.ac.ebi.fg.java2rdf.mappers.RdfUriGenerator;
+
+import static uk.ac.ebi.fg.java2rdf.utils.Java2RdfUtils.urlEncode;
+
 
 /**
  * Maps the submission of a SampleTab file to the BioSD database. 
@@ -37,7 +40,7 @@ public class MSIRdfMapper extends BeanRdfMapper<MSI>
 			{
 				@Override
 				public String getUri ( MSI msi ) { msi.getPublications ();
-					return ns ( "biosd", "msi/" + msi.getAcc () );
+					return ns ( "biosd", "msi/" + urlEncode ( msi.getAcc () ) );
 				}
 		});
 		this.setPropertyMapper ( new ToDatatypePropRdfMapper<MSI, String> ( "title", ns ( "dc-terms", "title" ) ) );
@@ -85,7 +88,8 @@ public class MSIRdfMapper extends BeanRdfMapper<MSI>
 			return super.map ( msi );
 		} 
 		catch ( Exception ex ) {
-			throw new RdfMappingException ( String.format ( "Error while mapping SampleTab submission[%s]: %s", msi, ex.getMessage () ), ex );
+			throw new RdfMappingException ( String.format ( 
+				"Error while mapping SampleTab submission[%s]: %s", msi.getAcc(), ex.getMessage () ), ex );
 		}
 	}
 	

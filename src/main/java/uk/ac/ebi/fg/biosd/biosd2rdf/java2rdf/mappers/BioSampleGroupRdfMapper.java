@@ -6,9 +6,11 @@ import uk.ac.ebi.fg.biosd.model.organizational.BioSampleGroup;
 import uk.ac.ebi.fg.core_model.expgraph.properties.ExperimentalPropertyValue;
 import uk.ac.ebi.fg.java2rdf.mappers.BeanRdfMapper;
 import uk.ac.ebi.fg.java2rdf.mappers.CollectionPropRdfMapper;
-import uk.ac.ebi.fg.java2rdf.mappers.RdfUriGenerator;
 import uk.ac.ebi.fg.java2rdf.mappers.ToDatatypePropRdfMapper;
 import uk.ac.ebi.fg.java2rdf.mappers.ToObjectPropRdfMapper;
+import uk.ac.ebi.fg.java2rdf.mappers.RdfUriGenerator;
+
+import static uk.ac.ebi.fg.java2rdf.utils.Java2RdfUtils.urlEncode;
 
 /**
  * Maps a BioSD Sample Group to RDF.
@@ -26,7 +28,7 @@ public class BioSampleGroupRdfMapper extends BeanRdfMapper<BioSampleGroup>
 			ns ( "biosd-term", "SampleGroup" ), 
 			new RdfUriGenerator<BioSampleGroup> () {
 				@Override public String getUri ( BioSampleGroup sg ) {
-					return ns ( "biosd", "sample-group/" + sg.getAcc () );
+					return ns ( "biosd", "sample-group/" + urlEncode ( sg.getAcc () ) );
 			}});
 		this.setPropertyMapper ( new ToDatatypePropRdfMapper<BioSampleGroup, String> ( "acc", ns ( "dc-terms", "identifier" ) ) );
 		this.setPropertyMapper ( new CollectionPropRdfMapper<BioSampleGroup, ExperimentalPropertyValue> ( 

@@ -8,6 +8,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -38,7 +39,7 @@ public class BioSdExportService
 	private OWLOntology onto;
 	private BioSdRfMapperFactory rdfMapFactory;
 
-	private int threadPoolSize = 100;
+	private int threadPoolSize = 25;
 	private ExecutorService executor = Executors.newFixedThreadPool ( threadPoolSize ); 
 
 	private int busyTasks = 0;
@@ -49,6 +50,8 @@ public class BioSdExportService
 	protected Logger log = LoggerFactory.getLogger ( this.getClass () );
 	
 	private int lastExitCode = 0;
+	
+	private PoolSizeTuningTimerTask poolSizeTunerTimerTask = null;
 
 	public BioSdExportService ()
 	{
@@ -66,6 +69,36 @@ public class BioSdExportService
 
 	private void submit ( final BioSdExportTask exportTask )
 	{
+		// This will dynamically tune the thread pool size
+		//
+		if ( this.poolSizeTunerTimerTask == null )
+		{
+			poolSizeTunerTimerTask = new PoolSizeTuningTimerTask () 
+			{
+				@Override
+				protected void setThreadPoolSize ( int size ) 
+				{
+					submissionLock.lock ();
+					threadPoolSize = size;
+					((ThreadPoolExecutor) executor ).setCorePoolSize ( size );
+					((ThreadPoolExecutor) executor ).setMaximumPoolSize ( size );
+					submissionLock.unlock ();
+				}
+				
+				@Override
+				protected int getThreadPoolSize () {
+					return threadPoolSize;
+				}
+				
+				@Override
+				protected long getCompletedTasks () {
+					return completedTasks;
+				}
+			};
+
+			poolSizeTunerTimerTask.start ();
+		}
+		
 		submissionLock.lock ();
 		try
 		{
@@ -181,5 +214,11 @@ public class BioSdExportService
 	{
 		return onto;
 	}
-	
+
+	@Override
+	protected void finalize () throws Throwable
+	{
+		this.poolSizeTunerTimerTask.stop ();
+		super.finalize ();
+	}
 }

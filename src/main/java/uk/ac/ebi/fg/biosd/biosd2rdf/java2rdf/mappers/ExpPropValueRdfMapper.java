@@ -22,8 +22,10 @@ import uk.ac.ebi.fg.core_model.expgraph.properties.ExperimentalPropertyValue;
 import uk.ac.ebi.fg.core_model.expgraph.properties.Unit;
 import uk.ac.ebi.fg.core_model.toplevel.Accessible;
 import uk.ac.ebi.fg.java2rdf.mappers.BeanRdfMapperFactory;
-import uk.ac.ebi.fg.java2rdf.mappers.PropertyRdfMapper;
 import uk.ac.ebi.fg.java2rdf.mappers.RdfMappingException;
+import uk.ac.ebi.fg.java2rdf.mappers.PropertyRdfMapper;
+
+import static uk.ac.ebi.fg.java2rdf.utils.Java2RdfUtils.urlEncode;
 
 /**
  * Maps a sample property like 'Characteristics[organism]' to proper RDF/OWL statements. OBI and other relevant ontologies
@@ -73,7 +75,7 @@ public class ExpPropValueRdfMapper<T extends Accessible> extends PropertyRdfMapp
 			// Process the type
 			// 
 			ExperimentalPropertyType ptype = pval.getType ();
-			String typeLabel = StringUtils.trimToNull ( ptype.getTermText () );
+			String typeLabel = BioSdOntologyTermResolver.getExpPropTypeLabel ( ptype );
 			if ( typeLabel == null ) return false;
 			
 			// TODO: is this the same as getAcc() or a secondary accession? 
@@ -106,6 +108,8 @@ public class ExpPropValueRdfMapper<T extends Accessible> extends PropertyRdfMapp
 				String msiAcc = StringUtils.trimToNull ( msis.iterator ().next ().getAcc () );
 				if ( msiAcc != null ) parentAcc = msiAcc;  
 			}
+			parentAcc = urlEncode ( parentAcc );
+			
 			
 			// Define the property value
 			valUri = ns ( "biosd", "exp-prop-val/" + parentAcc + "#" + hashUriSignature ( typeLabel + valLabel ) ); 
@@ -145,10 +149,9 @@ public class ExpPropValueRdfMapper<T extends Accessible> extends PropertyRdfMapp
 		{
 			throw new RdfMappingException ( String.format ( 
 				"Error while mapping sample '%s'.[%s]=[%s]: '%s'", 
-				sample, pval.getType (), pval, ex.getMessage () ), 
+				sample.getAcc (), pval.getType (), pval, ex.getMessage () ), 
 			ex );
 		}
 	}
-
 	
 }

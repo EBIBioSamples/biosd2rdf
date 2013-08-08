@@ -7,6 +7,8 @@ import java.util.Collection;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import uk.ac.ebi.fgpt.zooma.model.AnnotationSummary;
 import uk.ac.ebi.fgpt.zooma.model.Property;
@@ -17,6 +19,8 @@ import uk.ac.ebi.fgpt.zooma.search.ZOOMASearchClient;
 public class Zooma2OntoTermDiscoverer extends OntologyTermDiscoverer
 {
 	ZOOMASearchClient zoomaClient;
+	
+	Logger log = LoggerFactory.getLogger ( this.getClass () );
 	
 	public Zooma2OntoTermDiscoverer () 
 	{
@@ -32,23 +36,25 @@ public class Zooma2OntoTermDiscoverer extends OntologyTermDiscoverer
 	@Override
 	public URI getOntologyTermUri ( String valueLabel, String typeLabel ) throws OntologyDiscoveryException
 	{
-		if ( (valueLabel = StringUtils.trimToNull ( valueLabel )) == null ) return null;
-		typeLabel = StringUtils.trimToNull ( typeLabel );
-		
-		Property zprop = typeLabel == null 
-			? new SimpleUntypedProperty ( valueLabel ) 
-			: new SimpleTypedProperty ( typeLabel, valueLabel ); 
-		Map<AnnotationSummary, Float> zresult = zoomaClient.searchZOOMA ( zprop, 250, typeLabel == null );
-		
-		if ( zresult == null || zresult.size () == 0 ) return null;
-	
+		try
+		{
+			if ( (valueLabel = StringUtils.trimToNull ( valueLabel )) == null ) return null;
+			typeLabel = StringUtils.trimToNull ( typeLabel );
+			
+			Property zprop = typeLabel == null 
+				? new SimpleUntypedProperty ( valueLabel ) 
+				: new SimpleTypedProperty ( typeLabel, valueLabel ); 
+			Map<AnnotationSummary, Float> zresult = zoomaClient.searchZOOMA ( zprop, 250, typeLabel == null );
+			
+			if ( zresult == null || zresult.size () == 0 ) return null;
+
 // TODO: remove, now Zooma returns results in score-decreasing order
 //		// Sort results by score
 //		// 
 //		@SuppressWarnings ( "unchecked" )
 //		Map.Entry<AnnotationSummary, Float>[] zresultIdx = new Map.Entry [ zresult.size () ];
 //		zresultIdx = zresult.entrySet ().toArray ( zresultIdx );
-		
+			
 //		Arrays.sort ( zresultIdx, new Comparator<Map.Entry<AnnotationSummary, Float>>() 
 //		{
 //			@Override
@@ -63,13 +69,22 @@ public class Zooma2OntoTermDiscoverer extends OntologyTermDiscoverer
 //		
 //		// Get the best scored. 
 //		AnnotationSummary zsummary = zresultIdx [ 0 ].getKey ();
-		AnnotationSummary zsummary = zresult.keySet ().iterator ().next ();
-		Collection<URI> semTags = zsummary.getSemanticTags ();
+			AnnotationSummary zsummary = zresult.keySet ().iterator ().next ();
+			Collection<URI> semTags = zsummary.getSemanticTags ();
 
-		// TODO: the case they're more than one refers to multiple terms used to describe the label, it's rare, but 
-		// might be worth to consider it too somehow
-		if ( semTags == null || semTags.size () != 1 ) return null;
+			// TODO: the case they're more than one refers to multiple terms used to describe the label, it's rare, but 
+			// might be worth to consider it too somehow
+			if ( semTags == null || semTags.size () != 1 ) return null;
 
-		return semTags.iterator ().next ();
+			return semTags.iterator ().next ();
+		} 
+		catch ( Exception ex )
+		{
+			log.error ( String.format ( 
+				"Error while consulting Zooma for '%s' / '%s': %s returning null", 
+				valueLabel, typeLabel, ex.getMessage () ), ex 
+			);
+			return null;
+		}
 	}
 }

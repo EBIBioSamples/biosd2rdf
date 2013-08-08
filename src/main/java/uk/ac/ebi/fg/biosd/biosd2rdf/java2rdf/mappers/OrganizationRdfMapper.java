@@ -6,6 +6,7 @@ import static uk.ac.ebi.fg.java2rdf.utils.NamespaceUtils.ns;
 import uk.ac.ebi.fg.core_model.organizational.Organization;
 import uk.ac.ebi.fg.java2rdf.mappers.BeanRdfMapper;
 import uk.ac.ebi.fg.java2rdf.mappers.ToDatatypePropRdfMapper;
+import static uk.ac.ebi.fg.java2rdf.utils.Java2RdfUtils.urlEncode;
 
 /**
  * TODO: Comment me!
@@ -35,13 +36,12 @@ public class OrganizationRdfMapper extends BeanRdfMapper<Organization>
 					String name = trimToNull ( org.getName () );
 					if ( name == null ) return null;
 					String id = trimToNull ( org.getEmail () );
-					id = id != null ? hashUriSignature ( id ) : getMsiAcc () + "/" + hashUriSignature ( name );    
+					id = id != null ? hashUriSignature ( id ) : urlEncode ( getMsiAcc () ) + "/" + hashUriSignature ( name );    
 					
 					return ns ( "biosd", "organization/" + id );
 			}}
 		);
 		
-		Organization o = null;
 		// TODO: schema.org properties, http://schema.rdfs.org/, 
 		// also foaf properties
 

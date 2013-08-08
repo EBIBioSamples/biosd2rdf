@@ -7,9 +7,9 @@ import org.semanticweb.owlapi.vocab.XSDVocabulary;
 
 import uk.ac.ebi.fg.core_model.organizational.Publication;
 import uk.ac.ebi.fg.java2rdf.mappers.BeanRdfMapperFactory;
-import uk.ac.ebi.fg.java2rdf.mappers.RdfLiteralGenerator;
 import uk.ac.ebi.fg.java2rdf.mappers.RdfMappingException;
 import uk.ac.ebi.fg.java2rdf.mappers.ToDatatypePropRdfMapper;
+import uk.ac.ebi.fg.java2rdf.mappers.RdfLiteralGenerator;
 import uk.ac.ebi.fg.java2rdf.utils.OwlApiUtils;
 
 /**

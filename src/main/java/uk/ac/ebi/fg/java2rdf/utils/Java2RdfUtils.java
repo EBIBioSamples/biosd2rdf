@@ -1,5 +1,7 @@
 package uk.ac.ebi.fg.java2rdf.utils;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
@@ -16,8 +18,6 @@ import uk.ac.ebi.fg.java2rdf.mappers.RdfMappingException;
  */
 public class Java2RdfUtils
 {
-	private static MessageDigest messageDigest = null;
-
 	private Java2RdfUtils () {}
 
 	/**
@@ -28,7 +28,10 @@ public class Java2RdfUtils
 	 */
 	public static String hashUriSignature ( String sig ) 
 	{
-		if ( messageDigest == null ) try {
+		if ( sig == null ) throw new IllegalArgumentException ( "Cannot hash a null URI" );
+		
+		MessageDigest messageDigest = null;		
+		try {
 			messageDigest = MessageDigest.getInstance ( "MD5" );
 		} 
 		catch ( NoSuchAlgorithmException ex ) {
@@ -41,4 +44,20 @@ public class Java2RdfUtils
 		return hash;
 	}
 	
+	/** 
+	 * Invokes {@link URLEncoder#encode(String, String)} with UTF-8 encoding and wraps the generated exception with 
+	 * an {@link IllegalArgumentException}.
+	 * 
+	 * @return null if the parameter is null, or the URL-encoded string.
+	 */
+	public static String urlEncode ( String queryStringUrl )
+	{
+		try {
+			if ( queryStringUrl == null ) return null;
+			return URLEncoder.encode ( queryStringUrl, "UTF-8" );
+		}
+		catch ( UnsupportedEncodingException ex ) {
+			throw new IllegalArgumentException ( "That's strange, UTF-8 encoding seems wrong for encoding '" + queryStringUrl + "'" );
+		}
+	}
 }

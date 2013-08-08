@@ -8,6 +8,8 @@ import uk.ac.ebi.fg.java2rdf.mappers.CollectionPropRdfMapper;
 import uk.ac.ebi.fg.java2rdf.mappers.RdfUriGenerator;
 import uk.ac.ebi.fg.java2rdf.mappers.ToDatatypePropRdfMapper;
 
+import static uk.ac.ebi.fg.java2rdf.utils.Java2RdfUtils.urlEncode;
+
 /**
  * Maps a BioSD sample to RDF.
  *
@@ -24,7 +26,7 @@ public class BioSampleRdfMapper extends BeanRdfMapper<BioSample>
 			ns ( "obo", "OBI_0000747" ), 
 			new RdfUriGenerator<BioSample> () {
 				@Override public String getUri ( BioSample smp ) {
-					return ns ( "biosd", "sample/" + smp.getAcc () );
+					return ns ( "biosd", "sample/" + urlEncode ( smp.getAcc () ) );
 			}}
 		);
 		this.setPropertyMapper ( new ToDatatypePropRdfMapper<BioSample, String> ( "acc", ns ( "dc-terms", "identifier" ) ) );

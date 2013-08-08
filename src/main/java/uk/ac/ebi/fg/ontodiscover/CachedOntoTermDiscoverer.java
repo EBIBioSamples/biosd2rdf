@@ -32,7 +32,7 @@ public class CachedOntoTermDiscoverer extends OntologyTermDiscoverer
 			NULL_URI = new URI ( "" );
 		} 
 		catch ( URISyntaxException ex ) {
-			throw new Error ( "Very unexpected internal error, cannot create an empty URI" );
+			throw new Error ( "Very unexpected internal error, cannot create an empty URI", ex );
 		}
 		
 	}

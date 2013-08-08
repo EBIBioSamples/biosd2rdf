@@ -8,7 +8,7 @@
 			<pattern>%d{HH:mm:ss.SSS} [%-5p]: %m%n</pattern>
 		</encoder>
 		<filter class="ch.qos.logback.classic.filter.ThresholdFilter">
-			<level>ALL</level>
+			<level>INFO</level>
 		</filter>
 	</appender>
 
@@ -32,14 +32,14 @@
 	</appender>
 
 
-	<!-- Minimal logging by default. WARNING: logback expects this to be put after the appenders! -->
+	<!-- Minimal logging by default. WARNING: Logback expects this to be put after the appenders! -->
 	<root level="WARN">
 		<appender-ref ref="ConsoleApp" />
 		<appender-ref ref="FileApp" />
 	</root>
 
 	<!-- Add Loggers this way if you want finer reports for selected components -->
-	<logger name="uk.ac.ebi.fg.biosd.biosd2rdf" level="ALL" />
+	<!-- logger name="uk.ac.ebi.fg.biosd.biosd2rdf" level="ALL" />
 	<logger name="uk.ac.ebi.fg.java2rdf" level="ALL" />
-	<logger name="uk.ac.ebi.fg.ontodiscover" level="ALL" />
+	<logger name="uk.ac.ebi.fg.ontodiscover" level="ALL" / --> 
 </configuration>

@@ -7,9 +7,10 @@ import org.apache.commons.lang.math.NumberUtils;
 
 import uk.ac.ebi.fg.core_model.organizational.Publication;
 import uk.ac.ebi.fg.java2rdf.mappers.BeanRdfMapper;
-import uk.ac.ebi.fg.java2rdf.mappers.RdfUriGenerator;
 import uk.ac.ebi.fg.java2rdf.mappers.ToDatatypePropRdfMapper;
+import uk.ac.ebi.fg.java2rdf.mappers.RdfUriGenerator;
 import uk.ac.ebi.fg.java2rdf.utils.Java2RdfUtils;
+import static uk.ac.ebi.fg.java2rdf.utils.Java2RdfUtils.urlEncode;
 
 /**
  * TODO: Comment me!
@@ -30,14 +31,14 @@ public class PublicationRdfMapper extends BeanRdfMapper<Publication>
 					String title = StringUtils.trimToNull ( pub.getTitle () ); if ( title == null ) return null;
 					String authorList = StringUtils.trimToNull ( pub.getAuthorList () ); if ( authorList == null ) return null;
 					
-					String pmid = StringUtils.trimToNull ( pub.getPubmedId () );
+					String pmid = urlEncode ( StringUtils.trimToNull ( pub.getPubmedId () ) );
 					
 					String id;
 					if ( pmid != null ) 
 						id = pmid;
 					else 
 					{
-						String doi = StringUtils.trimToNull ( pub.getDOI () );
+						String doi = urlEncode ( StringUtils.trimToNull ( pub.getDOI () ) );
 						if ( doi != null )
 							id = Java2RdfUtils.hashUriSignature ( doi );
 						else 

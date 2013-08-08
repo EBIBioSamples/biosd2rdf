@@ -10,6 +10,8 @@ import uk.ac.ebi.fg.java2rdf.mappers.RdfMappingException;
 import uk.ac.ebi.fg.java2rdf.mappers.ToDatatypePropRdfMapper;
 import uk.ac.ebi.fg.java2rdf.utils.OwlApiUtils;
 
+import static uk.ac.ebi.fg.java2rdf.utils.Java2RdfUtils.urlEncode;
+
 /**
  * TODO: Comment me!
  * 
@@ -41,13 +43,12 @@ public class ContactRdfMapper extends BeanRdfMapper<Contact>
 					nameLine = trimToNull ( nameLine );
 					
 					String email = trimToNull ( cnt.getEmail () );
-					String id = email != null ? hashUriSignature ( email ) : getMsiAcc () + "/" + hashUriSignature ( nameLine );    
+					String id = email != null ? hashUriSignature ( email ) : urlEncode ( getMsiAcc () ) + "/" + hashUriSignature ( nameLine );    
 					
 					return ns ( "biosd", "ref-contact/" + id );
 			}}
 		);
 		
-		Contact c = null;
 		// TODO
 		// schema.org properties, http://schema.rdfs.org/, 
 		// also foaf properties
@@ -89,6 +90,9 @@ public class ContactRdfMapper extends BeanRdfMapper<Contact>
 
 			OwlApiUtils.assertData ( this.getMapperFactory ().getKnowledgeBase (), 
 				this.getRdfUriGenerator ().getUri ( cnt ), ns ( "dc-terms", "title" ), nameLine 
+			);
+			OwlApiUtils.assertData ( this.getMapperFactory ().getKnowledgeBase (), 
+				this.getRdfUriGenerator ().getUri ( cnt ), ns ( "rdfs", "label" ), nameLine 
 			);
 			
 			return true;

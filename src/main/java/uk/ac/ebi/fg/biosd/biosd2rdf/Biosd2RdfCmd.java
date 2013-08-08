@@ -40,11 +40,12 @@ public class Biosd2RdfCmd
 	public static void main ( String[] args ) throws Throwable
 	{
 		int exCode = 0;
+		BioSdExportService exportService = new BioSdExportService ();
+		CommandLine cli = null;
 		
 		try
 		{
 			CommandLineParser clparser = new GnuParser ();
-			CommandLine cli;
 			cli = clparser.parse ( getOptions(), args );
 			
 			args = cli.getArgs ();
@@ -53,11 +54,6 @@ public class Biosd2RdfCmd
 			
 			double sampleSize = cli.hasOption ( 'z' ) ? Double.parseDouble ( cli.getOptionValue ( 'z' ) ) : 100d;
 
-			OutputStream out = cli.hasOption ( 'o' ) 
-				? new BufferedOutputStream ( new FileOutputStream ( new File ( cli.getOptionValue ( 'o' ) ) ) )
-			  : System.out;
-
-			BioSdExportService exportService = new BioSdExportService ();
 			exportService.submitAll ( sampleSize );
 			exportService.waitAllFinished ();
 			
@@ -87,7 +83,24 @@ public class Biosd2RdfCmd
 			{
 				EntityManagerFactory emf = Resources.getInstance ().getEntityManagerFactory ();
 				if ( emf != null && emf.isOpen () ) emf.close ();
-			}
+
+				if ( exportService != null )
+				{
+					OWLOntology onto = exportService.getKnolwedgeBase ();
+					if ( onto != null )
+					{
+						err.println ( "Saving the generated knowledge base, you may have to wait still for a while..." );
+						OutputStream out = cli != null && cli.hasOption ( 'o' ) 
+							? new BufferedOutputStream ( new FileOutputStream ( new File ( cli.getOptionValue ( 'o' ) ) ) )
+						  : System.out;
+						PrefixOWLOntologyFormat fmt = new RDFXMLOntologyFormat ();
+						for ( Entry<String, String> nse: getNamespaces ().entrySet () )
+							fmt.setPrefix ( nse.getKey (), nse.getValue () );
+						onto.getOWLOntologyManager ().saveOntology ( exportService.getKnolwedgeBase (), fmt, out );
+					}
+				}
+			
+			}// exitCode	
 			System.exit ( exCode );
 		}
 	}
