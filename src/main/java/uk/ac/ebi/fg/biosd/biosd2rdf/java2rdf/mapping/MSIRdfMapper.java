@@ -17,6 +17,7 @@ import uk.ac.ebi.fg.java2rdf.mapping.ObjRdfMapper;
 import uk.ac.ebi.fg.java2rdf.mapping.RdfMapperFactory;
 import uk.ac.ebi.fg.java2rdf.mapping.RdfMappingException;
 import uk.ac.ebi.fg.java2rdf.mapping.properties.CollectionPropRdfMapper;
+import uk.ac.ebi.fg.java2rdf.mapping.properties.CompositePropRdfMapper;
 import uk.ac.ebi.fg.java2rdf.mapping.properties.InverseOwlObjPropRdfMapper;
 import uk.ac.ebi.fg.java2rdf.mapping.properties.OwlDatatypePropRdfMapper;
 import uk.ac.ebi.fg.java2rdf.mapping.properties.OwlObjPropRdfMapper;
@@ -45,31 +46,37 @@ public class MSIRdfMapper extends BeanRdfMapper<MSI>
 					return ns ( "biosd", "msi/" + urlEncode ( msi.getAcc () ) );
 				}
 		});
-		this.addPropertyMapper ( "title", new OwlDatatypePropRdfMapper<MSI, String> ( ns ( "dc-terms", "title" ) ) );
-		this.addPropertyMapper ( "description", new OwlDatatypePropRdfMapper<MSI, String> ( ns ( "dc-terms", "description" ) ) );
+		this.addPropertyMapper ( "title", new CompositePropRdfMapper<> (  
+			new OwlDatatypePropRdfMapper<MSI, String> ( ns ( "dc-terms", "title" ) ), 
+			new OwlDatatypePropRdfMapper<MSI, String> ( ns ( "rdfs", "label" ) ) 
+		));
+		this.addPropertyMapper ( "description", new CompositePropRdfMapper<> (
+			new OwlDatatypePropRdfMapper<MSI, String> ( ns ( "dc-terms", "description" ) ),
+			new OwlDatatypePropRdfMapper<MSI, String> ( ns ( "rdfs", "comment" ) ) 
+		));
 		
 		// TODO: more
 		
 		this.addPropertyMapper ( "samples", new CollectionPropRdfMapper<MSI, BioSample> ( 
-			ns ( "obo", "IAO_0000219" ), new OwlObjPropRdfMapper<MSI, BioSample> () ) // denotes
+			new OwlObjPropRdfMapper<MSI, BioSample> ( ns ( "obo", "IAO_0000219" ) ) ) // denotes
 		);
 		
 		this.addPropertyMapper ( "sampleGroups", new CollectionPropRdfMapper<MSI, BioSampleGroup> ( 
-			ns ( "obo", "IAO_0000219" ), new OwlObjPropRdfMapper<MSI, BioSampleGroup> () ) // denotes
+			new OwlObjPropRdfMapper<MSI, BioSampleGroup> ( ns ( "obo", "IAO_0000219" ) ) ) // denotes
 		);
 		
 		// 'is about' (used in (pub, is-about, msi))
 		this.addPropertyMapper ( "publications", new CollectionPropRdfMapper<MSI, Publication> ( 
-			ns ( "obo", "IAO_0000136" ), new InverseOwlObjPropRdfMapper<MSI, Publication> () )
+			new InverseOwlObjPropRdfMapper<MSI, Publication> ( ns ( "obo", "IAO_0000136" ) ) )
 		);
 		
 		// TODO: sub-property of ( (dc-terms:creator union dc-terms:contributor ) and ( schema.org:author union schema.org:contributor ) ) 
 		this.addPropertyMapper ( "contacts", new CollectionPropRdfMapper<MSI, Contact> ( 
-			ns ( "ebi-terms", "has-knowledgeable-person" ), new OwlObjPropRdfMapper<MSI, Contact> () )
+			new OwlObjPropRdfMapper<MSI, Contact> ( ns ( "ebi-terms", "has-knowledgeable-person" ) ) )
 		);
 
 		this.addPropertyMapper ( "organizations", new CollectionPropRdfMapper<MSI, Organization> ( 
-			ns ( "ebi-terms", "has-knowledgeable-organization" ), new OwlObjPropRdfMapper<MSI, Organization> () )
+			new OwlObjPropRdfMapper<MSI, Organization> ( ns ( "ebi-terms", "has-knowledgeable-organization" ) ) )
 		);
 
 	}

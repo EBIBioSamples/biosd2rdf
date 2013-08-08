@@ -3,8 +3,10 @@ package uk.ac.ebi.fg.biosd.biosd2rdf.java2rdf.mapping;
 import static org.apache.commons.lang.StringUtils.trimToNull;
 import static uk.ac.ebi.fg.java2rdf.utils.Java2RdfUtils.hashUriSignature;
 import static uk.ac.ebi.fg.java2rdf.utils.NamespaceUtils.ns;
+import uk.ac.ebi.fg.biosd.model.organizational.MSI;
 import uk.ac.ebi.fg.core_model.organizational.Organization;
 import uk.ac.ebi.fg.java2rdf.mapping.BeanRdfMapper;
+import uk.ac.ebi.fg.java2rdf.mapping.properties.CompositePropRdfMapper;
 import uk.ac.ebi.fg.java2rdf.mapping.properties.OwlDatatypePropRdfMapper;
 import static uk.ac.ebi.fg.java2rdf.utils.Java2RdfUtils.urlEncode;
 
@@ -47,9 +49,13 @@ public class OrganizationRdfMapper extends BeanRdfMapper<Organization>
 
 		this.addPropertyMapper ( "email", new OwlDatatypePropRdfMapper<Organization, String> ( ns ( "sch", "email" ) ) );
 		this.addPropertyMapper ( "name", new OwlDatatypePropRdfMapper<Organization, String> ( ns ( "sch", "name" ) ) );
-		// TODO: dc-terms:description/rdfs:comment
-		this.addPropertyMapper ( "description", new OwlDatatypePropRdfMapper<Organization, String> ( ns ( "sch", "description" ) ) );
+		this.addPropertyMapper ( "description", new CompositePropRdfMapper<> (
+			new OwlDatatypePropRdfMapper<Organization, String> ( ns ( "sch", "description" ) ),
+			new OwlDatatypePropRdfMapper<Organization, String> ( ns ( "dc-terms", "description" ) ),
+			new OwlDatatypePropRdfMapper<Organization, String> ( ns ( "rdfs", "comment" ) ) 
+		));
 
+		
 		// TODO: also dc-terms:title/rdfs:label
 		// TODO: not possible for the moment, requires the ability to associate multiple mappers to the bean property: 
 		// this.setPropertyMapper ( new OwlDatatypePropRdfMapper<Organization, String> ( "name", ns ( "dc-terms", "title" ) ) );

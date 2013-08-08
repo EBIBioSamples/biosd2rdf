@@ -1,5 +1,7 @@
 package uk.ac.ebi.fg.java2rdf.mapping;
 
+import static uk.ac.ebi.fg.java2rdf.utils.NamespaceUtils.ns;
+
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
@@ -15,9 +17,11 @@ import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.model.OWLOntologyStorageException;
 import org.semanticweb.owlapi.vocab.PrefixOWLOntologyFormat;
 
+import uk.ac.ebi.fg.biosd.model.organizational.MSI;
 import uk.ac.ebi.fg.java2rdf.mapping.BeanRdfMapper;
 import uk.ac.ebi.fg.java2rdf.mapping.RdfMapperFactory;
 import uk.ac.ebi.fg.java2rdf.mapping.properties.CollectionPropRdfMapper;
+import uk.ac.ebi.fg.java2rdf.mapping.properties.CompositePropRdfMapper;
 import uk.ac.ebi.fg.java2rdf.mapping.properties.OwlDatatypePropRdfMapper;
 import uk.ac.ebi.fg.java2rdf.mapping.properties.OwlObjPropRdfMapper;
 import uk.ac.ebi.fg.java2rdf.mapping.urigen.RdfUriGenerator;
@@ -96,7 +100,12 @@ public class MappersTest
 			
 			// How the properties for beans of type F are mapped to RDF/OWL.
 			this.addPropertyMapper ( "name", new OwlDatatypePropRdfMapper<F, String> ( FOONS + "name" ) );
-			this.addPropertyMapper ( "description", new OwlDatatypePropRdfMapper<F, String> ( FOONS + "description" ) );
+			
+			// This can be used to map the same bean properties onto multiple RDF properties (either datatype or object)
+			this.addPropertyMapper ( "description", new CompositePropRdfMapper<> (
+				new OwlDatatypePropRdfMapper<F, String> ( FOONS + "description" ),
+				new OwlDatatypePropRdfMapper<F, String> ( ns ( "rdfs", "comment" ) ) 
+			));
 		}
 	}
 
@@ -135,7 +144,10 @@ public class MappersTest
 					}
 				});
 				this.addPropertyMapper ( "name", new OwlDatatypePropRdfMapper<Foo, String> ( FOONS + "name" ) );
-				this.addPropertyMapper ( "description", new OwlDatatypePropRdfMapper<Foo, String> ( FOONS + "description" ) );
+				this.addPropertyMapper ( "description", new CompositePropRdfMapper<> (
+					new OwlDatatypePropRdfMapper<Foo, String> ( FOONS + "description" ),
+					new OwlDatatypePropRdfMapper<Foo, String> ( ns ( "rdfs", "comment" ) ) 
+				));
 			}});
 		}};
 		
@@ -178,7 +190,7 @@ public class MappersTest
 			this.setKnowledgeBase ( onto );
 			this.setMapper ( Foo.class, new FooMapper<Foo> () {{
 				this.addPropertyMapper ( "children",
-					new CollectionPropRdfMapper<Foo, FooChild> ( FOONS + "has-child", new OwlObjPropRdfMapper<Foo, FooChild> () )); 
+					new CollectionPropRdfMapper<Foo, FooChild> ( new OwlObjPropRdfMapper<Foo, FooChild> ( FOONS + "has-child") )); 
 			}});
 			this.setMapper ( FooChild.class, new FooMapper<FooChild> () {{
 				this.setRdfClassUri ( FOONS + "FooChild" );

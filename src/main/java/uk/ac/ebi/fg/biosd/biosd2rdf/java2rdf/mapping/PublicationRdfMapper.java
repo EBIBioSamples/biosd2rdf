@@ -5,8 +5,10 @@ import static uk.ac.ebi.fg.java2rdf.utils.NamespaceUtils.ns;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
 
+import uk.ac.ebi.fg.biosd.model.organizational.MSI;
 import uk.ac.ebi.fg.core_model.organizational.Publication;
 import uk.ac.ebi.fg.java2rdf.mapping.BeanRdfMapper;
+import uk.ac.ebi.fg.java2rdf.mapping.properties.CompositePropRdfMapper;
 import uk.ac.ebi.fg.java2rdf.mapping.properties.OwlDatatypePropRdfMapper;
 import uk.ac.ebi.fg.java2rdf.mapping.urigen.RdfUriGenerator;
 import uk.ac.ebi.fg.java2rdf.utils.Java2RdfUtils;
@@ -51,7 +53,12 @@ public class PublicationRdfMapper extends BeanRdfMapper<Publication>
 			}}
 		);
 		
-		this.addPropertyMapper ( "title", new OwlDatatypePropRdfMapper<Publication, String> ( ns ( "dc-terms", "title" ) ) );
+		this.addPropertyMapper ( "title", new CompositePropRdfMapper<> (  
+			new OwlDatatypePropRdfMapper<Publication, String> ( ns ( "dc-terms", "title" ) ), 
+			new OwlDatatypePropRdfMapper<Publication, String> ( ns ( "rdfs", "label" ) ) 
+		));
+
+		
 		// TODO: add EDAM identifiers, which are individuals and not a data values.
 		this.addPropertyMapper ( "pubmedId", new OwlDatatypePropRdfMapper<Publication, String> ( ns ( "fabio", "hasPubMedId" ) ) );
 		this.addPropertyMapper ( "DOI", new OwlDatatypePropRdfMapper<Publication, String> ( ns ( "prism", "doi" ) ) );

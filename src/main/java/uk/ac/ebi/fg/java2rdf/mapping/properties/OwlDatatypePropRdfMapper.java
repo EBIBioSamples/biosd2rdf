@@ -26,7 +26,7 @@ import uk.ac.ebi.fg.java2rdf.utils.OwlApiUtils;
  * @author Marco Brandizi
  *
  */
-public class OwlDatatypePropRdfMapper<T, PT> extends PropertyRdfMapper<T, PT>
+public class OwlDatatypePropRdfMapper<T, PT> extends URIProvidedPropertyRdfMapper<T, PT>
 {
 	private RdfLiteralGenerator<PT> rdfLiteralGenerator;
 	

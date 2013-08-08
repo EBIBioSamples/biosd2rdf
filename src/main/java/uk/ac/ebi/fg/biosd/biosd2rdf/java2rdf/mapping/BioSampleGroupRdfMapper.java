@@ -32,11 +32,11 @@ public class BioSampleGroupRdfMapper extends BeanRdfMapper<BioSampleGroup>
 			}});
 		this.addPropertyMapper ( "acc", new OwlDatatypePropRdfMapper<BioSampleGroup, String> ( ns ( "dc-terms", "identifier" ) ) );
 		this.addPropertyMapper ( "propertyValues", new CollectionPropRdfMapper<BioSampleGroup, ExperimentalPropertyValue> ( 
-			null, new ExpPropValueRdfMapper<BioSampleGroup> ()) 
+			new ExpPropValueRdfMapper<BioSampleGroup> ()) 
 		);
 		// is_about, TODO: probably needs 'sio:has member' too.
 		this.addPropertyMapper ( "samples", new CollectionPropRdfMapper<BioSampleGroup, BioSample> ( 
-			ns ( "obo", "IAO_0000136" ), new OwlObjPropRdfMapper<BioSampleGroup, BioSample> () ) {}
+			new OwlObjPropRdfMapper<BioSampleGroup, BioSample> ( ns ( "obo", "IAO_0000136" ) ) )
 		);
 		// TODO: more
 	}

@@ -24,6 +24,7 @@ import uk.ac.ebi.fg.core_model.toplevel.Accessible;
 import uk.ac.ebi.fg.java2rdf.mapping.RdfMapperFactory;
 import uk.ac.ebi.fg.java2rdf.mapping.RdfMappingException;
 import uk.ac.ebi.fg.java2rdf.mapping.properties.PropertyRdfMapper;
+import uk.ac.ebi.fg.java2rdf.mapping.properties.URIProvidedPropertyRdfMapper;
 
 import static uk.ac.ebi.fg.java2rdf.utils.Java2RdfUtils.urlEncode;
 
@@ -87,6 +88,7 @@ public class ExpPropValueRdfMapper<T extends Accessible> extends PropertyRdfMapp
 			// name -> dc:title
 			if ( "name".equalsIgnoreCase ( typeLabel ) ) {
 				assertData ( onto, mapFact.getUri ( sample ), ns ( "dc-terms", "title" ), valLabel );
+				assertData ( onto, mapFact.getUri ( sample ), ns ( "rdfs", "label" ), valLabel );
 				return true;
 			}
 
@@ -114,6 +116,7 @@ public class ExpPropValueRdfMapper<T extends Accessible> extends PropertyRdfMapp
 			// Define the property value
 			valUri = ns ( "biosd", "exp-prop-val/" + parentAcc + "#" + hashUriSignature ( typeLabel + valLabel ) ); 
 			assertData ( onto, valUri, ns ( "dc-terms", "title" ), valLabel );
+			assertData ( onto, valUri, ns ( "rdfs", "label" ), valLabel );
 			
 			
 			// Ask Zooma if it has a known ontology term for typeLabel
@@ -128,6 +131,7 @@ public class ExpPropValueRdfMapper<T extends Accessible> extends PropertyRdfMapp
 				// Define the Type as a new class
 				assertClass ( onto, typeUri, ns ( "efo", "EFO_0000001" ) ); // Experimental factor
 				assertData ( onto, typeUri, ns ( "rdfs", "label" ), typeLabel );
+				assertData ( onto, typeUri, ns ( "dc-terms", "title" ), typeLabel );
 			}
 					
 			// So, we have: *** propValue a typeUri ***, where the type URI is either a new URI achieved from the type label (essentially 

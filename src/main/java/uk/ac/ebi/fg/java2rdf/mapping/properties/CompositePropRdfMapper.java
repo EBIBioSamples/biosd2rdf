@@ -21,15 +21,18 @@ public class CompositePropRdfMapper<T, PT> extends PropertyRdfMapper<T, PT>
 		this ( null );
 	}
 
-	public CompositePropRdfMapper ( String targetPropertyUri )
+	public CompositePropRdfMapper ( PropertyRdfMapper<T, PT> ... propertyMappers )
 	{
-		this ( targetPropertyUri, null ) ;
+		if ( propertyMappers == null ) return;
+		this.setPropertyMappers ( Arrays.asList ( propertyMappers ) );
 	}
 
-	public CompositePropRdfMapper ( String targetPropertyUri, PropertyRdfMapper<T, PT> ... propertyMappers ) 
+	public CompositePropRdfMapper ( String targetPropertyUri, URIProvidedPropertyRdfMapper<T, PT> ... propertyMappers ) 
 	{
-		super ( targetPropertyUri );
-		if ( propertyMappers != null ) this.setPropertyMappers ( Arrays.asList ( propertyMappers ) );
+		this ( propertyMappers );
+		if ( propertyMappers == null ) return;
+		for ( URIProvidedPropertyRdfMapper<T, PT> pmapper: propertyMappers )
+			pmapper.setTargetPropertyUri ( targetPropertyUri );
 	}
 
 	

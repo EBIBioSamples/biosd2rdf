@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 
 import uk.ac.ebi.fg.java2rdf.mapping.properties.BeanPropRdfMapper;
 import uk.ac.ebi.fg.java2rdf.mapping.properties.PropertyRdfMapper;
+import uk.ac.ebi.fg.java2rdf.mapping.properties.URIProvidedPropertyRdfMapper;
 import uk.ac.ebi.fg.java2rdf.mapping.urigen.RdfUriGenerator;
 import uk.ac.ebi.fg.java2rdf.utils.OwlApiUtils;
 

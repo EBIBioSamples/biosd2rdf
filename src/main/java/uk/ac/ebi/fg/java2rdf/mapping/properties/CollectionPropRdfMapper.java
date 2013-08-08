@@ -13,10 +13,10 @@ import uk.ac.ebi.fg.java2rdf.mapping.RdfMappingException;
 /**
  * TODO: COMMENT ME AGAIN!!!
  * 
- * This is similar to {@link PropertyRdfMapper}, but it takes care of those JavaBean properties that return collections, 
+ * This is similar to {@link URIProvidedPropertyRdfMapper}, but it takes care of those JavaBean properties that return collections, 
  * i.e., multi-value properties. It uses an underlining {@link #getPropertyMapper() property mapper} to map each value 
  * of such a property into a RDF/OWL statement, every statement is spawned pretty by calling 
- * {@link PropertyRdfMapper#map(Object, Object)} for the underlining property mapper.
+ * {@link URIProvidedPropertyRdfMapper#map(Object, Object)} for the underlining property mapper.
  *
  * <dl><dt>date</dt><dd>Mar 24, 2013</dd></dl>
  * @author Marco Brandizi
@@ -27,17 +27,11 @@ public class CollectionPropRdfMapper<T, PT> extends PropertyRdfMapper<T, Collect
 	private PropertyRdfMapper<T, PT> propertyMapper;
 	
 	public CollectionPropRdfMapper () {
-		this ( null, null );
+		this ( null );
 	}
 
-	public CollectionPropRdfMapper ( String targetPropertyUri ) {
-		this ( targetPropertyUri, null );
-	}
-
-
-	public CollectionPropRdfMapper ( String targetPropertyUri, PropertyRdfMapper<T, PT> propertyMapper ) 
+	public CollectionPropRdfMapper ( PropertyRdfMapper<T, PT> propertyMapper ) 
 	{
-		super ( targetPropertyUri );
 		this.setPropertyMapper ( propertyMapper );
 	}
 
@@ -60,10 +54,9 @@ public class CollectionPropRdfMapper<T, PT> extends PropertyRdfMapper<T, Collect
 		catch ( Exception ex )
 		{
 			throw new RdfMappingException ( String.format ( 
-				"Error while doing the RDF mapping <%s[%s] '%s' [%s]: %s", 
+				"Error while doing the RDF mapping of <%s[%s] / [%s]: %s", 
 					source.getClass ().getSimpleName (), 
 					StringUtils.abbreviate ( source.toString (), 50 ), 
-					this.getTargetPropertyUri (),
 					StringUtils.abbreviate ( propValues.toString (), 50 ), 
 					ex.getMessage ()
 			), ex );
@@ -78,7 +71,6 @@ public class CollectionPropRdfMapper<T, PT> extends PropertyRdfMapper<T, Collect
 	
 	public void setPropertyMapper ( PropertyRdfMapper<T, PT> propertyMapper ) 
 	{
-		if ( this.getTargetPropertyUri () != null ) propertyMapper.setTargetPropertyUri ( this.getTargetPropertyUri () );
 		this.propertyMapper = propertyMapper;
 	}
 

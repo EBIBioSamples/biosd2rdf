@@ -31,7 +31,7 @@ public class BioSampleRdfMapper extends BeanRdfMapper<BioSample>
 		);
 		this.addPropertyMapper ( "acc", new OwlDatatypePropRdfMapper<BioSample, String> ( ns ( "dc-terms", "identifier" ) ) );
 		this.addPropertyMapper ( "propertyValues", new CollectionPropRdfMapper<BioSample, ExperimentalPropertyValue> ( 
-			null, new ExpPropValueRdfMapper<BioSample> ()) 
+			new ExpPropValueRdfMapper<BioSample> ()) 
 		);
 		// TODO: more
 	}

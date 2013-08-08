@@ -12,7 +12,7 @@ import java.util.Set;
 import org.apache.commons.lang.Validate;
 import org.semanticweb.owlapi.model.OWLOntology;
 
-import uk.ac.ebi.fg.java2rdf.mapping.properties.PropertyRdfMapper;
+import uk.ac.ebi.fg.java2rdf.mapping.properties.URIProvidedPropertyRdfMapper;
 import uk.ac.ebi.fg.java2rdf.mapping.urigen.RdfUriGenerator;
 
 /**
@@ -21,7 +21,7 @@ import uk.ac.ebi.fg.java2rdf.mapping.urigen.RdfUriGenerator;
  * <p>This takes care of a collection of Bean-to-RDF mappers to be used together and it should be the entry point of 
  * a the job of converting an instance of an object model to RDF, i.e., you should define your own extension of 
  * this factory, with your specific mappers defined in it and then invoke {@link #map(Object)} for the 
- * root-level objects of your model. These in turn should call the {@link PropertyRdfMapper property mappers} stored
+ * root-level objects of your model. These in turn should call the {@link URIProvidedPropertyRdfMapper property mappers} stored
  * inside the {@link BeanRdfMapper bean mappers} and also the same {@link #map(Object)} method from the factory and
  * {@link #getRdfUriGenerator(Object)}, to obtain property/value statements about the JavaBean visited via such calls.</p>
  * 

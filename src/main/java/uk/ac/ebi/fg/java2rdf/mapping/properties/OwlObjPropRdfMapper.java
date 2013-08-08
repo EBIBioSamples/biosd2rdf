@@ -25,7 +25,7 @@ import uk.ac.ebi.fg.java2rdf.utils.OwlApiUtils;
  * @author Marco Brandizi
  *
  */
-public class OwlObjPropRdfMapper<T, PT> extends PropertyRdfMapper<T, PT>
+public class OwlObjPropRdfMapper<T, PT> extends URIProvidedPropertyRdfMapper<T, PT>
 {
 	public OwlObjPropRdfMapper ()  {
 		super ();
