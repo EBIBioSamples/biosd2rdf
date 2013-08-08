@@ -12,7 +12,11 @@ import java.util.Set;
 import org.apache.commons.lang.Validate;
 import org.semanticweb.owlapi.model.OWLOntology;
 
+import uk.ac.ebi.fg.java2rdf.mappers.properties.PropertyRdfMapper;
+
 /**
+ * TODO: COMMENT ME AGAIN!
+ *
  * <p>This takes care of a collection of Bean-to-RDF mappers to be used together and it should be the entry point of 
  * a the job of converting an instance of an object model to RDF, i.e., you should define your own extension of 
  * this factory, with your specific mappers defined in it and then invoke {@link #map(Object)} for the 
@@ -30,16 +34,16 @@ import org.semanticweb.owlapi.model.OWLOntology;
  *
  */
 @SuppressWarnings ( { "rawtypes", "unchecked" } )
-public class BeanRdfMapperFactory
+public class RdfMapperFactory
 {
 	private OWLOntology knowledgeBase;
-	private Map<Class, BeanRdfMapper> mappers;
-	private Set visitedBeans = Collections.synchronizedSet ( new HashSet<> () );
+	private Map<Class, ObjRdfMapper> mappers;
+	private Set visitedObjects = Collections.synchronizedSet ( new HashSet<> () );
 	
-	public BeanRdfMapperFactory () {
+	public RdfMapperFactory () {
 	}
 	
-	public BeanRdfMapperFactory ( OWLOntology knowledgeBase ) {
+	public RdfMapperFactory ( OWLOntology knowledgeBase ) {
 		this.knowledgeBase = knowledgeBase;
 	}
 	
@@ -47,34 +51,37 @@ public class BeanRdfMapperFactory
 	/**
 	 * The default implementation provides a mapper by looking at the class of the source object, via {@link #getMappers()}. 
 	 */
-	public <T> BeanRdfMapper<T> getMapper ( T source ) {
-		return mappers.get ( source.getClass() );
+	public <T> ObjRdfMapper<T> getMapper ( T source ) {
+		return source == null ? null : (ObjRdfMapper<T>) this.getMapper ( source.getClass () );
+	}
+
+	public <T> ObjRdfMapper<T> getMapper ( Class<T> clazz ) 
+	{
+		if ( clazz == null ) return null;
+		return mappers == null ? null : mappers.get ( clazz );
 	}
 
 	/**
 	 * Maps a Java class to a {@link BeanRdfMapper}. This will be used by {@link #getMapper(Object)} and, in turn, 
 	 * by {@link #map(Object)}. This method does 
-	 * {@link BeanRdfMapper#setMapperFactory(BeanRdfMapperFactory) mapper.setMapperFactory ( this )} automatically.
+	 * {@link BeanRdfMapper#setMapperFactory(RdfMapperFactory) mapper.setMapperFactory ( this )} automatically.
 	 * 
 	 */
-	public <T> BeanRdfMapper setMapper ( Class<T> clazz,  BeanRdfMapper<T> mapper ) 
+	public <T> ObjRdfMapper setMapper ( Class<T> clazz,  ObjRdfMapper<T> mapper ) 
 	{
 		Validate.notNull ( clazz, "Internal error: I cannot map a null class to RDF" );
 		Validate.notNull ( mapper, "Internal error: I cannot map '" + clazz.getSimpleName () + "' to RDF using a null mapper" );
 		
-		if ( mappers == null ) mappers = new HashMap<Class, BeanRdfMapper> ();
+		if ( mappers == null ) mappers = new HashMap<> ();
 		mapper.setMapperFactory ( this );
-		return (BeanRdfMapper) mappers.put ( clazz, mapper );
+		return mappers.put ( clazz, mapper );
 	}
 	
-	/**
-	 * @see #setMapper(Class, BeanRdfMapper).
-	 */
-	public Map<Class, BeanRdfMapper> getMappers () {
+	public Map<Class, ObjRdfMapper> getMappers () {
 		return mappers;
 	}
 
-	public void setMappers ( Map<Class, BeanRdfMapper> mappers ) {
+	public void setMappers ( Map<Class, ObjRdfMapper> mappers ) {
 		this.mappers = mappers;
 	}
 	
@@ -102,16 +109,26 @@ public class BeanRdfMapperFactory
 	 */
 	public <T> boolean map ( T source )
 	{
-		if ( source == null ) return false; 
-		if ( this.visitedBeans.contains ( ( source ) ) ) return false;
-		
-		BeanRdfMapper<T> mapper = getMapper ( source );
+		if ( mappers == null ) return false;
+		if ( source == null ) return false;
+		if ( this.visitedObjects.contains ( source ) ) return false;
+			
+		ObjRdfMapper<T> mapper = getMapper ( source );
 		if ( mapper == null ) throw new RuntimeException ( 
 			"Cannot find a mapper for " + source.getClass ().getSimpleName () );
 		
-		this.visitedBeans.add ( source );
+		this.visitedObjects.add ( source );
 		return mapper.map ( source ); 
 	}
+	
+	
+	public <T> RdfUriGenerator<T> getRdfUriGenerator ( Class<T> clazz ) 
+	{
+		if ( clazz == null ) return null;
+		ObjRdfMapper<T> mapper = getMapper ( clazz );
+		if ( ! ( mapper instanceof BeanRdfMapper) ) return null;
+		return ((BeanRdfMapper) mapper).getRdfUriGenerator ();
+	} 
 	
 	/**
 	 * A convenience wrapper of {@link #getMapper(Object)}.{@link #getRdfUriGenerator(Object)}.
@@ -119,11 +136,7 @@ public class BeanRdfMapperFactory
 	public <T> RdfUriGenerator<T> getRdfUriGenerator ( T source ) 
 	{
 		if ( source == null ) return null; 
-		
-		BeanRdfMapper<T> mapper = getMapper ( source );
-		if ( mapper == null ) return null;
-		
-		return mapper.getRdfUriGenerator ();
+		return (RdfUriGenerator<T>) this.getRdfUriGenerator ( source.getClass() );
 	}
 
 	/**
@@ -135,7 +148,7 @@ public class BeanRdfMapperFactory
 	{
 		if ( source == null ) return null; 
 		
-		RdfUriGenerator<T> uriGen = getRdfUriGenerator ( source );
+		RdfUriGenerator<T> uriGen = this.getRdfUriGenerator ( source );
 		if ( uriGen == null ) return null;
 		
 		return uriGen.getUri ( source );
@@ -145,7 +158,8 @@ public class BeanRdfMapperFactory
 	 * Marks all the beans as new, so they'll be re-visited by {@link #map(Object)}, like the first time.
 	 */
 	public void reset () {
-		this.visitedBeans.clear ();
+		this.visitedObjects.clear ();
 	}
 
 }
+

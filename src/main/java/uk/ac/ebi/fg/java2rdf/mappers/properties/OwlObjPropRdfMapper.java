@@ -1,15 +1,18 @@
 /*
  * 
  */
-package uk.ac.ebi.fg.java2rdf.mappers;
+package uk.ac.ebi.fg.java2rdf.mappers.properties;
 
 import org.apache.commons.lang.StringUtils;
 
+import uk.ac.ebi.fg.java2rdf.mappers.BeanRdfMapper;
+import uk.ac.ebi.fg.java2rdf.mappers.RdfMapperFactory;
+import uk.ac.ebi.fg.java2rdf.mappers.RdfMappingException;
 import uk.ac.ebi.fg.java2rdf.utils.OwlApiUtils;
 
 /**
  * This maps the value of a JavaBean property ot an OWL object-proeperty. It uses {@link #getMapperFactory()} and 
- * its method {@link BeanRdfMapperFactory#getRdfUriGenerator(Object)} to get URIs for the source and target beans
+ * its method {@link RdfMapperFactory#getRdfUriGenerator(Object)} to get URIs for the source and target beans
  * to be mapped. For example, to map an instance of b of a Java class Book, having b.author = a, with a as an instance of 
  * the Java class Author, to a statement like: http://rdf.example.com/isbn/123 ex:has-author http://example.com/author/asimov, 
  * you'll define an oobject property mapper having {@link #getSourcePropertyName()} = ex:has-author, while the 
@@ -22,20 +25,20 @@ import uk.ac.ebi.fg.java2rdf.utils.OwlApiUtils;
  * @author Marco Brandizi
  *
  */
-public class ToObjectPropRdfMapper<T, PT> extends PropertyRdfMapper<T, PT>
+public class OwlObjPropRdfMapper<T, PT> extends PropertyRdfMapper<T, PT>
 {
-	public ToObjectPropRdfMapper ()  {
+	public OwlObjPropRdfMapper ()  {
 		super ();
 	}
 
-	public ToObjectPropRdfMapper ( String sourcePropertyName, String targetPropertyUri ) {
-		super ( sourcePropertyName, targetPropertyUri );
+	public OwlObjPropRdfMapper ( String targetPropertyUri ) {
+		super ( targetPropertyUri );
 	}
 	
 	
 	/**
 	 * Generates a triple where the property {@link #getSourcePropertyName()} is asserted for the source, using
-	 * {@link #getTargetPropertyUri()}. Uses {@link BeanRdfMapperFactory#getUri(Object)} for both the source and the target URI. 
+	 * {@link #getTargetPropertyUri()}. Uses {@link RdfMapperFactory#getUri(Object)} for both the source and the target URI. 
 	 */
 	@Override
 	public boolean map ( T source, PT propValue )
@@ -43,7 +46,7 @@ public class ToObjectPropRdfMapper<T, PT> extends PropertyRdfMapper<T, PT>
 		if ( propValue == null ) return false;
 		try
 		{
-			BeanRdfMapperFactory mapFactory = this.getMapperFactory ();
+			RdfMapperFactory mapFactory = this.getMapperFactory ();
 			
 			// TODO: can we avoid to keep recomputing this?
 			String objUri = mapFactory.getUri ( propValue );
@@ -58,10 +61,10 @@ public class ToObjectPropRdfMapper<T, PT> extends PropertyRdfMapper<T, PT>
 		catch ( Exception ex )
 		{
 			throw new RdfMappingException ( String.format ( 
-				"Error while mapping %s[%s].'%s'[%s] to RDF: %s", 
+				"Error while doing the RDF mapping <%s[%s] '%s' [%s]: %s", 
 					source.getClass ().getSimpleName (), 
 					StringUtils.abbreviate ( source.toString (), 50 ), 
-					this.getSourcePropertyName (),
+					this.getTargetPropertyUri (),
 					StringUtils.abbreviate ( propValue.toString (), 50 ), 
 					ex.getMessage ()
 			), ex );

@@ -4,9 +4,9 @@ import static uk.ac.ebi.fg.java2rdf.utils.NamespaceUtils.ns;
 import uk.ac.ebi.fg.biosd.model.expgraph.BioSample;
 import uk.ac.ebi.fg.core_model.expgraph.properties.ExperimentalPropertyValue;
 import uk.ac.ebi.fg.java2rdf.mappers.BeanRdfMapper;
-import uk.ac.ebi.fg.java2rdf.mappers.CollectionPropRdfMapper;
 import uk.ac.ebi.fg.java2rdf.mappers.RdfUriGenerator;
-import uk.ac.ebi.fg.java2rdf.mappers.ToDatatypePropRdfMapper;
+import uk.ac.ebi.fg.java2rdf.mappers.properties.CollectionPropRdfMapper;
+import uk.ac.ebi.fg.java2rdf.mappers.properties.OwlDatatypePropRdfMapper;
 
 import static uk.ac.ebi.fg.java2rdf.utils.Java2RdfUtils.urlEncode;
 
@@ -29,9 +29,9 @@ public class BioSampleRdfMapper extends BeanRdfMapper<BioSample>
 					return ns ( "biosd", "sample/" + urlEncode ( smp.getAcc () ) );
 			}}
 		);
-		this.setPropertyMapper ( new ToDatatypePropRdfMapper<BioSample, String> ( "acc", ns ( "dc-terms", "identifier" ) ) );
-		this.setPropertyMapper ( new CollectionPropRdfMapper<BioSample, ExperimentalPropertyValue> ( 
-			"propertyValues", null, new ExpPropValueRdfMapper<BioSample> ()) 
+		this.addPropertyMapper ( "acc", new OwlDatatypePropRdfMapper<BioSample, String> ( ns ( "dc-terms", "identifier" ) ) );
+		this.addPropertyMapper ( "propertyValues", new CollectionPropRdfMapper<BioSample, ExperimentalPropertyValue> ( 
+			null, new ExpPropValueRdfMapper<BioSample> ()) 
 		);
 		// TODO: more
 	}

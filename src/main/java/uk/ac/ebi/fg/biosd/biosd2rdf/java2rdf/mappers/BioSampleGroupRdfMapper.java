@@ -5,10 +5,10 @@ import uk.ac.ebi.fg.biosd.model.expgraph.BioSample;
 import uk.ac.ebi.fg.biosd.model.organizational.BioSampleGroup;
 import uk.ac.ebi.fg.core_model.expgraph.properties.ExperimentalPropertyValue;
 import uk.ac.ebi.fg.java2rdf.mappers.BeanRdfMapper;
-import uk.ac.ebi.fg.java2rdf.mappers.CollectionPropRdfMapper;
-import uk.ac.ebi.fg.java2rdf.mappers.ToDatatypePropRdfMapper;
-import uk.ac.ebi.fg.java2rdf.mappers.ToObjectPropRdfMapper;
 import uk.ac.ebi.fg.java2rdf.mappers.RdfUriGenerator;
+import uk.ac.ebi.fg.java2rdf.mappers.properties.CollectionPropRdfMapper;
+import uk.ac.ebi.fg.java2rdf.mappers.properties.OwlDatatypePropRdfMapper;
+import uk.ac.ebi.fg.java2rdf.mappers.properties.OwlObjPropRdfMapper;
 
 import static uk.ac.ebi.fg.java2rdf.utils.Java2RdfUtils.urlEncode;
 
@@ -30,13 +30,13 @@ public class BioSampleGroupRdfMapper extends BeanRdfMapper<BioSampleGroup>
 				@Override public String getUri ( BioSampleGroup sg ) {
 					return ns ( "biosd", "sample-group/" + urlEncode ( sg.getAcc () ) );
 			}});
-		this.setPropertyMapper ( new ToDatatypePropRdfMapper<BioSampleGroup, String> ( "acc", ns ( "dc-terms", "identifier" ) ) );
-		this.setPropertyMapper ( new CollectionPropRdfMapper<BioSampleGroup, ExperimentalPropertyValue> ( 
-			"propertyValues", null, new ExpPropValueRdfMapper<BioSampleGroup> ()) 
+		this.addPropertyMapper ( "acc", new OwlDatatypePropRdfMapper<BioSampleGroup, String> ( ns ( "dc-terms", "identifier" ) ) );
+		this.addPropertyMapper ( "propertyValues", new CollectionPropRdfMapper<BioSampleGroup, ExperimentalPropertyValue> ( 
+			null, new ExpPropValueRdfMapper<BioSampleGroup> ()) 
 		);
 		// is_about, TODO: probably needs 'sio:has member' too.
-		this.setPropertyMapper ( new CollectionPropRdfMapper<BioSampleGroup, BioSample> ( 
-			"samples", ns ( "obo", "IAO_0000136" ), new ToObjectPropRdfMapper<BioSampleGroup, BioSample> () ) {}
+		this.addPropertyMapper ( "samples", new CollectionPropRdfMapper<BioSampleGroup, BioSample> ( 
+			ns ( "obo", "IAO_0000136" ), new OwlObjPropRdfMapper<BioSampleGroup, BioSample> () ) {}
 		);
 		// TODO: more
 	}

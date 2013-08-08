@@ -13,12 +13,14 @@ import uk.ac.ebi.fg.core_model.organizational.Contact;
 import uk.ac.ebi.fg.core_model.organizational.Organization;
 import uk.ac.ebi.fg.core_model.organizational.Publication;
 import uk.ac.ebi.fg.java2rdf.mappers.BeanRdfMapper;
+import uk.ac.ebi.fg.java2rdf.mappers.ObjRdfMapper;
+import uk.ac.ebi.fg.java2rdf.mappers.RdfMapperFactory;
 import uk.ac.ebi.fg.java2rdf.mappers.RdfMappingException;
-import uk.ac.ebi.fg.java2rdf.mappers.CollectionPropRdfMapper;
-import uk.ac.ebi.fg.java2rdf.mappers.ToDatatypePropRdfMapper;
-import uk.ac.ebi.fg.java2rdf.mappers.ToObjectInversePropRdfMapper;
-import uk.ac.ebi.fg.java2rdf.mappers.ToObjectPropRdfMapper;
 import uk.ac.ebi.fg.java2rdf.mappers.RdfUriGenerator;
+import uk.ac.ebi.fg.java2rdf.mappers.properties.CollectionPropRdfMapper;
+import uk.ac.ebi.fg.java2rdf.mappers.properties.OwlDatatypePropRdfMapper;
+import uk.ac.ebi.fg.java2rdf.mappers.properties.InverseOwlObjPropRdfMapper;
+import uk.ac.ebi.fg.java2rdf.mappers.properties.OwlObjPropRdfMapper;
 
 import static uk.ac.ebi.fg.java2rdf.utils.Java2RdfUtils.urlEncode;
 
@@ -43,31 +45,31 @@ public class MSIRdfMapper extends BeanRdfMapper<MSI>
 					return ns ( "biosd", "msi/" + urlEncode ( msi.getAcc () ) );
 				}
 		});
-		this.setPropertyMapper ( new ToDatatypePropRdfMapper<MSI, String> ( "title", ns ( "dc-terms", "title" ) ) );
-		this.setPropertyMapper ( new ToDatatypePropRdfMapper<MSI, String> ( "description", ns ( "dc-terms", "description" ) ) );
+		this.addPropertyMapper ( "title", new OwlDatatypePropRdfMapper<MSI, String> ( ns ( "dc-terms", "title" ) ) );
+		this.addPropertyMapper ( "description", new OwlDatatypePropRdfMapper<MSI, String> ( ns ( "dc-terms", "description" ) ) );
 		
 		// TODO: more
 		
-		this.setPropertyMapper ( new CollectionPropRdfMapper<MSI, BioSample> ( 
-			"samples", ns ( "obo", "IAO_0000219" ), new ToObjectPropRdfMapper<MSI, BioSample> () ) // denotes
+		this.addPropertyMapper ( "samples", new CollectionPropRdfMapper<MSI, BioSample> ( 
+			ns ( "obo", "IAO_0000219" ), new OwlObjPropRdfMapper<MSI, BioSample> () ) // denotes
 		);
 		
-		this.setPropertyMapper ( new CollectionPropRdfMapper<MSI, BioSampleGroup> ( 
-			"sampleGroups", ns ( "obo", "IAO_0000219" ), new ToObjectPropRdfMapper<MSI, BioSampleGroup> () ) // denotes
+		this.addPropertyMapper ( "sampleGroups", new CollectionPropRdfMapper<MSI, BioSampleGroup> ( 
+			ns ( "obo", "IAO_0000219" ), new OwlObjPropRdfMapper<MSI, BioSampleGroup> () ) // denotes
 		);
 		
 		// 'is about' (used in (pub, is-about, msi))
-		this.setPropertyMapper ( new CollectionPropRdfMapper<MSI, Publication> ( 
-			"publications", ns ( "obo", "IAO_0000136" ), new ToObjectInversePropRdfMapper<MSI, Publication> () )
+		this.addPropertyMapper ( "publications", new CollectionPropRdfMapper<MSI, Publication> ( 
+			ns ( "obo", "IAO_0000136" ), new InverseOwlObjPropRdfMapper<MSI, Publication> () )
 		);
 		
 		// TODO: sub-property of ( (dc-terms:creator union dc-terms:contributor ) and ( schema.org:author union schema.org:contributor ) ) 
-		this.setPropertyMapper ( new CollectionPropRdfMapper<MSI, Contact> ( 
-			"contacts", ns ( "ebi-terms", "has-knowledgeable-person" ), new ToObjectPropRdfMapper<MSI, Contact> () )
+		this.addPropertyMapper ( "contacts", new CollectionPropRdfMapper<MSI, Contact> ( 
+			ns ( "ebi-terms", "has-knowledgeable-person" ), new OwlObjPropRdfMapper<MSI, Contact> () )
 		);
 
-		this.setPropertyMapper ( new CollectionPropRdfMapper<MSI, Organization> ( 
-			"organizations", ns ( "ebi-terms", "has-knowledgeable-organization" ), new ToObjectPropRdfMapper<MSI, Organization> () )
+		this.addPropertyMapper ( "organizations", new CollectionPropRdfMapper<MSI, Organization> ( 
+			ns ( "ebi-terms", "has-knowledgeable-organization" ), new OwlObjPropRdfMapper<MSI, Organization> () )
 		);
 
 	}
@@ -81,9 +83,10 @@ public class MSIRdfMapper extends BeanRdfMapper<MSI>
 			String msiAcc = StringUtils.trimToNull ( msi.getAcc () );
 			if ( msiAcc == null ) return false; 
 			
-			Map<Class, BeanRdfMapper> mappers = this.getMapperFactory ().getMappers ();
-			((MSIEquippedRdfUriGenerator<Contact>) mappers.get ( Contact.class ).getRdfUriGenerator ()).setMsiAcc ( msiAcc );
-			((MSIEquippedRdfUriGenerator<Organization>) mappers.get ( Organization.class ).getRdfUriGenerator ()).setMsiAcc ( msiAcc );
+			RdfMapperFactory mapFact = this.getMapperFactory ();
+			
+			((MSIEquippedRdfUriGenerator<Contact>) mapFact.getRdfUriGenerator ( Contact.class )).setMsiAcc ( msiAcc );
+			((MSIEquippedRdfUriGenerator<Organization>) mapFact.getRdfUriGenerator ( Organization.class )).setMsiAcc ( msiAcc );
 
 			return super.map ( msi );
 		} 

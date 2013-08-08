@@ -13,17 +13,17 @@ import uk.ac.ebi.fg.biosd.model.organizational.MSI;
 import uk.ac.ebi.fg.core_model.organizational.Contact;
 import uk.ac.ebi.fg.core_model.organizational.Organization;
 import uk.ac.ebi.fg.core_model.organizational.Publication;
-import uk.ac.ebi.fg.java2rdf.mappers.BeanRdfMapperFactory;
+import uk.ac.ebi.fg.java2rdf.mappers.RdfMapperFactory;
 
 /**
  * The mapping entry point for the BioSD-to-RDF converter.
- * @See {@link BeanRdfMapperFactory}.
+ * @See {@link RdfMapperFactory}.
  *
  * <dl><dt>date</dt><dd>Apr 24, 2013</dd></dl>
  * @author Marco Brandizi
  *
  */
-public class BioSdRfMapperFactory extends BeanRdfMapperFactory
+public class BioSdRfMapperFactory extends RdfMapperFactory
 {
 	static {
 		init ();

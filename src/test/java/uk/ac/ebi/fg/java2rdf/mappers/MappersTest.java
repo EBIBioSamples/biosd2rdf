@@ -15,10 +15,10 @@ import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.model.OWLOntologyStorageException;
 import org.semanticweb.owlapi.vocab.PrefixOWLOntologyFormat;
 
-import uk.ac.ebi.fg.java2rdf.mappers.CollectionPropRdfMapper;
-import uk.ac.ebi.fg.java2rdf.mappers.ToDatatypePropRdfMapper;
-import uk.ac.ebi.fg.java2rdf.mappers.ToObjectPropRdfMapper;
 import uk.ac.ebi.fg.java2rdf.mappers.RdfUriGenerator;
+import uk.ac.ebi.fg.java2rdf.mappers.properties.CollectionPropRdfMapper;
+import uk.ac.ebi.fg.java2rdf.mappers.properties.OwlDatatypePropRdfMapper;
+import uk.ac.ebi.fg.java2rdf.mappers.properties.OwlObjPropRdfMapper;
 
 /**
  * Tests and examples of basic usage. TODO: there are not so many assertions at the moment...
@@ -93,8 +93,8 @@ public class MappersTest
 			this.setRdfClassUri ( FOONS + "Foo" );
 			
 			// How the properties for beans of type F are mapped to RDF/OWL.
-			this.setPropertyMapper ( new ToDatatypePropRdfMapper<F, String> ( "name", FOONS + "name" ) );
-			this.setPropertyMapper ( new ToDatatypePropRdfMapper<F, String> ( "description", FOONS + "description" ) );
+			this.addPropertyMapper ( "name", new OwlDatatypePropRdfMapper<F, String> ( FOONS + "name" ) );
+			this.addPropertyMapper ( "description", new OwlDatatypePropRdfMapper<F, String> ( FOONS + "description" ) );
 		}
 	}
 
@@ -124,7 +124,7 @@ public class MappersTest
 		 * Anonymous classses is another, less common approach to define the mapping between beans and RDF/OWL. Compare this
 		 * to the FooMapper approach above. Of course you can combine the two. 
 		 */
-		BeanRdfMapperFactory mapFactory = new BeanRdfMapperFactory ( onto ) {{
+		RdfMapperFactory mapFactory = new RdfMapperFactory ( onto ) {{
 			this.setMapper ( Foo.class, new BeanRdfMapper<Foo> ( FOONS + "FooChild" ) {{
 				this.setRdfUriGenerator ( new RdfUriGenerator<Foo>() {
 					@Override
@@ -132,8 +132,8 @@ public class MappersTest
 						return FOONS + source.getName ().toLowerCase ().replace ( ' ', '_' );
 					}
 				});
-				this.setPropertyMapper ( new ToDatatypePropRdfMapper<Foo, String> ( "name", FOONS + "name" ) );
-				this.setPropertyMapper ( new ToDatatypePropRdfMapper<Foo, String> ( "description", FOONS + "description" ) );
+				this.addPropertyMapper ( "name", new OwlDatatypePropRdfMapper<Foo, String> ( FOONS + "name" ) );
+				this.addPropertyMapper ( "description", new OwlDatatypePropRdfMapper<Foo, String> ( FOONS + "description" ) );
 			}});
 		}};
 		
@@ -145,12 +145,12 @@ public class MappersTest
 	@Test
 	public void testOneOneRelation () throws OWLOntologyCreationException, OWLOntologyStorageException 
 	{
-		BeanRdfMapperFactory mapFactory = new BeanRdfMapperFactory ( onto ) {{
+		RdfMapperFactory mapFactory = new RdfMapperFactory ( onto ) {{
 			this.setKnowledgeBase ( onto );
 			this.setMapper ( Foo.class, new FooMapper<Foo> () );
 			this.setMapper ( FooChild.class, new FooMapper<FooChild> () {{
 				this.setRdfClassUri ( FOONS + "FooChild" );
-				this.setPropertyMapper ( new ToObjectPropRdfMapper<FooChild, Foo> ( "parent", FOONS + "has-parent" ));
+				this.addPropertyMapper ( "parent", new OwlObjPropRdfMapper<FooChild, Foo> ( FOONS + "has-parent" ));
 			}});
 		}};
 		
@@ -167,20 +167,20 @@ public class MappersTest
 	 * <p>Tests the mapping from a multi-value JavaBean property (i.e., one that returns a {@link Collection}) to 
 	 * multiple RDF/OWL statements, each having the same bean's URI and property.</p>
 	 * 
-	 * <p>This uses {@link CollectionPropRdfMapper}, which is equipped with a {@link ToObjectPropRdfMapper single-value property mapper}.   
+	 * <p>This uses {@link CollectionPropRdfMapper}, which is equipped with a {@link OwlObjPropRdfMapper single-value property mapper}.   
 	 */
 	@Test
 	public void testOneToManyRelation () throws OWLOntologyCreationException, OWLOntologyStorageException 
 	{
-		BeanRdfMapperFactory mapFactory = new BeanRdfMapperFactory ( onto ) {{
+		RdfMapperFactory mapFactory = new RdfMapperFactory ( onto ) {{
 			this.setKnowledgeBase ( onto );
 			this.setMapper ( Foo.class, new FooMapper<Foo> () {{
-				this.setPropertyMapper ( 
-					new CollectionPropRdfMapper<Foo, FooChild> ( "children", FOONS + "has-child", new ToObjectPropRdfMapper<Foo, FooChild> () )); 
+				this.addPropertyMapper ( "children",
+					new CollectionPropRdfMapper<Foo, FooChild> ( FOONS + "has-child", new OwlObjPropRdfMapper<Foo, FooChild> () )); 
 			}});
 			this.setMapper ( FooChild.class, new FooMapper<FooChild> () {{
 				this.setRdfClassUri ( FOONS + "FooChild" );
-				this.setPropertyMapper ( new ToObjectPropRdfMapper<FooChild, Foo> ( "parent", FOONS + "has-parent" ));
+				this.addPropertyMapper ( "parent", new OwlObjPropRdfMapper<FooChild, Foo> ( FOONS + "has-parent" ));
 			}});
 		}};
 		

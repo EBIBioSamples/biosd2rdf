@@ -1,13 +1,18 @@
 /*
  * 
  */
-package uk.ac.ebi.fg.java2rdf.mappers;
+package uk.ac.ebi.fg.java2rdf.mappers.properties;
 
 import java.util.Collection;
 
 import org.apache.commons.lang.StringUtils;
 
+import uk.ac.ebi.fg.java2rdf.mappers.RdfMapperFactory;
+import uk.ac.ebi.fg.java2rdf.mappers.RdfMappingException;
+
 /**
+ * TODO: COMMENT ME AGAIN!!!
+ * 
  * This is similar to {@link PropertyRdfMapper}, but it takes care of those JavaBean properties that return collections, 
  * i.e., multi-value properties. It uses an underlining {@link #getPropertyMapper() property mapper} to map each value 
  * of such a property into a RDF/OWL statement, every statement is spawned pretty by calling 
@@ -22,17 +27,17 @@ public class CollectionPropRdfMapper<T, PT> extends PropertyRdfMapper<T, Collect
 	private PropertyRdfMapper<T, PT> propertyMapper;
 	
 	public CollectionPropRdfMapper () {
-		this ( null, null, null );
+		this ( null, null );
 	}
 
-	public CollectionPropRdfMapper ( String sourcePropertyName, String targetPropertyUri ) {
-		this ( sourcePropertyName, targetPropertyUri, null );
+	public CollectionPropRdfMapper ( String targetPropertyUri ) {
+		this ( targetPropertyUri, null );
 	}
 
 
-	public CollectionPropRdfMapper ( String sourcePropertyName, String targetPropertyUri, PropertyRdfMapper<T, PT> propertyMapper ) 
+	public CollectionPropRdfMapper ( String targetPropertyUri, PropertyRdfMapper<T, PT> propertyMapper ) 
 	{
-		super ( sourcePropertyName, targetPropertyUri );
+		super ( targetPropertyUri );
 		this.setPropertyMapper ( propertyMapper );
 	}
 
@@ -55,12 +60,13 @@ public class CollectionPropRdfMapper<T, PT> extends PropertyRdfMapper<T, Collect
 		catch ( Exception ex )
 		{
 			throw new RdfMappingException ( String.format ( 
-				"Error while mapping %s[%s].'%s'='%s' to RDF: %s", 
-				source.getClass ().getSimpleName (), 
-				StringUtils.abbreviate ( source.toString (), 50 ), getSourcePropertyName (), 
-				StringUtils.abbreviate ( propValues.toString (), 50 ),
-				ex.getMessage ()
-			), ex);
+				"Error while doing the RDF mapping <%s[%s] '%s' [%s]: %s", 
+					source.getClass ().getSimpleName (), 
+					StringUtils.abbreviate ( source.toString (), 50 ), 
+					this.getTargetPropertyUri (),
+					StringUtils.abbreviate ( propValues.toString (), 50 ), 
+					ex.getMessage ()
+			), ex );
 		}
 	}
 
@@ -72,7 +78,6 @@ public class CollectionPropRdfMapper<T, PT> extends PropertyRdfMapper<T, Collect
 	
 	public void setPropertyMapper ( PropertyRdfMapper<T, PT> propertyMapper ) 
 	{
-		if ( this.getSourcePropertyName () != null ) propertyMapper.setSourcePropertyName ( this.getSourcePropertyName () );
 		if ( this.getTargetPropertyUri () != null ) propertyMapper.setTargetPropertyUri ( this.getTargetPropertyUri () );
 		this.propertyMapper = propertyMapper;
 	}
@@ -81,9 +86,9 @@ public class CollectionPropRdfMapper<T, PT> extends PropertyRdfMapper<T, Collect
 	 * This sets the same factory for {@link #getPropertyMapper()} too, so you should call the latter before this.
 	 */
 	@Override
-	public void setMapperFactory ( BeanRdfMapperFactory mapperFactory )
+	public void setMapperFactory ( RdfMapperFactory mapperFactory )
 	{
 		super.setMapperFactory ( mapperFactory );
-		this.getPropertyMapper ().setMapperFactory ( mapperFactory );
+		if ( this.propertyMapper != null ) this.propertyMapper.setMapperFactory ( mapperFactory );
 	}
 }

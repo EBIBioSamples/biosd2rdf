@@ -5,7 +5,7 @@ import static uk.ac.ebi.fg.java2rdf.utils.Java2RdfUtils.hashUriSignature;
 import static uk.ac.ebi.fg.java2rdf.utils.NamespaceUtils.ns;
 import uk.ac.ebi.fg.core_model.organizational.Organization;
 import uk.ac.ebi.fg.java2rdf.mappers.BeanRdfMapper;
-import uk.ac.ebi.fg.java2rdf.mappers.ToDatatypePropRdfMapper;
+import uk.ac.ebi.fg.java2rdf.mappers.properties.OwlDatatypePropRdfMapper;
 import static uk.ac.ebi.fg.java2rdf.utils.Java2RdfUtils.urlEncode;
 
 /**
@@ -45,22 +45,22 @@ public class OrganizationRdfMapper extends BeanRdfMapper<Organization>
 		// TODO: schema.org properties, http://schema.rdfs.org/, 
 		// also foaf properties
 
-		this.setPropertyMapper ( new ToDatatypePropRdfMapper<Organization, String> ( "email", ns ( "sch", "email" ) ) );
-		this.setPropertyMapper ( new ToDatatypePropRdfMapper<Organization, String> ( "name", ns ( "sch", "name" ) ) );
+		this.addPropertyMapper ( "email", new OwlDatatypePropRdfMapper<Organization, String> ( ns ( "sch", "email" ) ) );
+		this.addPropertyMapper ( "name", new OwlDatatypePropRdfMapper<Organization, String> ( ns ( "sch", "name" ) ) );
 		// TODO: dc-terms:description/rdfs:comment
-		this.setPropertyMapper ( new ToDatatypePropRdfMapper<Organization, String> ( "description", ns ( "sch", "description" ) ) );
+		this.addPropertyMapper ( "description", new OwlDatatypePropRdfMapper<Organization, String> ( ns ( "sch", "description" ) ) );
 
 		// TODO: also dc-terms:title/rdfs:label
 		// TODO: not possible for the moment, requires the ability to associate multiple mappers to the bean property: 
-		// this.setPropertyMapper ( new ToDatatypePropRdfMapper<Organization, String> ( "name", ns ( "dc-terms", "title" ) ) );
+		// this.setPropertyMapper ( new OwlDatatypePropRdfMapper<Organization, String> ( "name", ns ( "dc-terms", "title" ) ) );
 
 		// ebi-terms:has-address-line (subprop of dc:description/rdfs:comment)
 		// TODO: possibly more annotations to be considered: 
 		//   http://answers.semanticweb.com/questions/298/how-can-you-represent-physical-addresses-in-foaf
-		this.setPropertyMapper ( new ToDatatypePropRdfMapper<Organization, String> ( "address", ns ( "ebi-terms", "has-address-line" ) ) );
+		this.addPropertyMapper ( "address", new OwlDatatypePropRdfMapper<Organization, String> ( ns ( "ebi-terms", "has-address-line" ) ) );
 		
 		// TODO: requires a special mapper that goes from string to URIs, without involving bean classes or URI generators
-		// this.setPropertyMapper ( new ToObjectPropRdfMapper<Organization, String> ( "URI", ns ( "rdfs", "seeAlso" ) ) );
+		// this.setPropertyMapper ( new OwlObjPropRdfMapper<Organization, String> ( "URI", ns ( "rdfs", "seeAlso" ) ) );
 		
 		// TODO: These need to be checked against Zooma
 		// o.getRole ();

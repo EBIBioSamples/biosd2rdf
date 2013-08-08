@@ -1,11 +1,13 @@
-package uk.ac.ebi.fg.java2rdf.mappers;
+package uk.ac.ebi.fg.java2rdf.mappers.properties;
 
 import org.apache.commons.lang.StringUtils;
 
+import uk.ac.ebi.fg.java2rdf.mappers.RdfMapperFactory;
+import uk.ac.ebi.fg.java2rdf.mappers.RdfMappingException;
 import uk.ac.ebi.fg.java2rdf.utils.OwlApiUtils;
 
 /**
- * It works like {@link ToObjectPropRdfMapper}, but for inverse links, i.e., instead of triples 
+ * It works like {@link OwlObjPropRdfMapper}, but for inverse links, i.e., instead of triples 
  * of type (T, {@link #getTargetPropertyUri()}, PT), it builds triples of type (PT, {@link #getTargetPropertyUri()}, T)
  * for the value found in {@link #getSourcePropertyName()}.
  * 
@@ -14,20 +16,20 @@ import uk.ac.ebi.fg.java2rdf.utils.OwlApiUtils;
  * <dl><dt>date</dt><dd>25 Jun 2013</dd></dl>
  * @author Marco Brandizi
  */
-public class ToObjectInversePropRdfMapper<T, PT> extends ToObjectPropRdfMapper<T, PT>
+public class InverseOwlObjPropRdfMapper<T, PT> extends OwlObjPropRdfMapper<T, PT>
 {
-	public ToObjectInversePropRdfMapper ()  {
+	public InverseOwlObjPropRdfMapper ()  {
 		super ();
 	}
 
-	public ToObjectInversePropRdfMapper ( String sourcePropertyName, String targetPropertyUri ) {
-		super ( sourcePropertyName, targetPropertyUri );
+	public InverseOwlObjPropRdfMapper ( String targetPropertyUri ) {
+		super ( targetPropertyUri );
 	}
 	
 	
 	/**
 	 * Generates a triple where the property {@link #getSourcePropertyName()} is asserted for the source, using
-	 * {@link #getTargetPropertyUri()}. Uses {@link BeanRdfMapperFactory#getUri(Object)} for both the source and the target URI. 
+	 * {@link #getTargetPropertyUri()}. Uses {@link RdfMapperFactory#getUri(Object)} for both the source and the target URI. 
 	 */
 	@Override
 	public boolean map ( T source, PT propValue )
@@ -35,13 +37,13 @@ public class ToObjectInversePropRdfMapper<T, PT> extends ToObjectPropRdfMapper<T
 		try
 		{
 			if ( propValue == null ) return false;
-			BeanRdfMapperFactory mapFactory = this.getMapperFactory ();
+			RdfMapperFactory mapFactory = this.getMapperFactory ();
 			
-			String propUri = mapFactory.getUri ( propValue );
-			if ( propUri == null ) return false;
+			String propValUri = mapFactory.getUri ( propValue );
+			if ( propValUri == null ) return false;
 			
 			OwlApiUtils.assertLink ( this.getMapperFactory ().getKnowledgeBase (), 
-				propUri, this.getTargetPropertyUri (), mapFactory.getUri ( source ) );
+				propValUri, this.getTargetPropertyUri (), mapFactory.getUri ( source ) );
 
 			// Don't use targetMapper, we need to trace this visit.
 			return mapFactory.map ( propValue );
@@ -49,13 +51,13 @@ public class ToObjectInversePropRdfMapper<T, PT> extends ToObjectPropRdfMapper<T
 		catch ( Exception ex )
 		{
 			throw new RdfMappingException ( String.format ( 
-				"Error while mapping %s[%s].'%s'[%s] to RDF: %s", 
-					propValue.getClass ().getSimpleName (), 
+				"Error while doing the RDF mapping <%s[%s] '%s' [%s]: %s", 
+					source.getClass ().getSimpleName (), 
 					StringUtils.abbreviate ( propValue.toString (), 50 ), 
-					this.getSourcePropertyName (),
+					this.getTargetPropertyUri (),
 					StringUtils.abbreviate ( source.toString (), 50 ), 
 					ex.getMessage ()
-			));
+			), ex );
 		}
 	}
 	

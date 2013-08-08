@@ -1,10 +1,15 @@
 /*
  * 
  */
-package uk.ac.ebi.fg.java2rdf.mappers;
+package uk.ac.ebi.fg.java2rdf.mappers.properties;
 
 import org.apache.commons.lang.StringUtils;
 
+import uk.ac.ebi.fg.java2rdf.mappers.BeanRdfMapper;
+import uk.ac.ebi.fg.java2rdf.mappers.RdfLiteralGenerator;
+import uk.ac.ebi.fg.java2rdf.mappers.RdfMapperFactory;
+import uk.ac.ebi.fg.java2rdf.mappers.RdfMappingException;
+import uk.ac.ebi.fg.java2rdf.mappers.RdfUriGenerator;
 import uk.ac.ebi.fg.java2rdf.utils.OwlApiUtils;
 
 /**
@@ -21,29 +26,29 @@ import uk.ac.ebi.fg.java2rdf.utils.OwlApiUtils;
  * @author Marco Brandizi
  *
  */
-public class ToDatatypePropRdfMapper<T, PT> extends PropertyRdfMapper<T, PT>
+public class OwlDatatypePropRdfMapper<T, PT> extends PropertyRdfMapper<T, PT>
 {
 	private RdfLiteralGenerator<PT> rdfLiteralGenerator;
 	
-	public ToDatatypePropRdfMapper ()  {
-		this ( null, null, new RdfLiteralGenerator<PT> () );
+	public OwlDatatypePropRdfMapper ()  {
+		this ( null, new RdfLiteralGenerator<PT> () );
 	}
 
-	public ToDatatypePropRdfMapper ( String sourcePropertyName, String targetPropertyUri )
+	public OwlDatatypePropRdfMapper ( String targetPropertyUri )
 	{
-		this ( sourcePropertyName, targetPropertyUri, new RdfLiteralGenerator<PT> () );
+		this ( targetPropertyUri, new RdfLiteralGenerator<PT> () );
 	}
 
-	public ToDatatypePropRdfMapper ( String sourcePropertyName, String targetPropertyUri, RdfLiteralGenerator<PT> rdfLiteralGenerator ) 
+	public OwlDatatypePropRdfMapper ( String targetPropertyUri, RdfLiteralGenerator<PT> rdfLiteralGenerator ) 
 	{
-		super( sourcePropertyName, targetPropertyUri );
+		super ( targetPropertyUri );
 		this.setRdfLiteralGenerator ( rdfLiteralGenerator );
 	}
 	
 	/**
 	 * Uses {@link #getRdfLiteralGenerator()} to generate an RDF value for the property target value. Then it generates 
 	 * a triple where the property {@link #getSourcePropertyName()} is asserted for the source. 
-	 * Uses {@link BeanRdfMapperFactory#getMapper(Object)} to get a mapper for the source and a URI from its 
+	 * Uses {@link RdfMapperFactory#getMapper(Object)} to get a mapper for the source and a URI from its 
 	 * {@link BeanRdfMapper#getRdfUriGenerator()}.
 	 */
 	@Override
@@ -53,7 +58,7 @@ public class ToDatatypePropRdfMapper<T, PT> extends PropertyRdfMapper<T, PT>
 		{
 			if ( propValue == null ) return false;
 			
-			BeanRdfMapperFactory mapFactory = this.getMapperFactory ();
+			RdfMapperFactory mapFactory = this.getMapperFactory ();
 			RdfLiteralGenerator<PT> targetValGen = this.getRdfLiteralGenerator ();
 			String targetRdfVal = targetValGen.getValue ( propValue );
 			if ( targetRdfVal == null ) return false;
@@ -65,12 +70,13 @@ public class ToDatatypePropRdfMapper<T, PT> extends PropertyRdfMapper<T, PT>
 		catch ( Exception ex )
 		{
 			throw new RdfMappingException ( String.format ( 
-				"Internal error while mapping %s[%s].'%s'='%s' to RDF: %s", 
-				source.getClass ().getSimpleName (), 
-				StringUtils.abbreviate ( source.toString (), 50 ), this.getSourcePropertyName (), 
-				StringUtils.abbreviate ( propValue.toString(), 50 ),
-				ex.getMessage ()
-			), ex);
+				"Error while doing the RDF mapping <%s[%s] '%s' [%s]>: %s", 
+					source.getClass ().getSimpleName (), 
+					StringUtils.abbreviate ( source.toString (), 50 ), 
+					this.getTargetPropertyUri (),
+					StringUtils.abbreviate ( propValue.toString (), 50 ), 
+					ex.getMessage ()
+			), ex );
 		}
 	}
 

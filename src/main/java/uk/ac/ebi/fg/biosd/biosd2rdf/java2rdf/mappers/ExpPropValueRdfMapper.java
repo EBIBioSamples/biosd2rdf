@@ -21,9 +21,9 @@ import uk.ac.ebi.fg.core_model.expgraph.properties.ExperimentalPropertyType;
 import uk.ac.ebi.fg.core_model.expgraph.properties.ExperimentalPropertyValue;
 import uk.ac.ebi.fg.core_model.expgraph.properties.Unit;
 import uk.ac.ebi.fg.core_model.toplevel.Accessible;
-import uk.ac.ebi.fg.java2rdf.mappers.BeanRdfMapperFactory;
+import uk.ac.ebi.fg.java2rdf.mappers.RdfMapperFactory;
 import uk.ac.ebi.fg.java2rdf.mappers.RdfMappingException;
-import uk.ac.ebi.fg.java2rdf.mappers.PropertyRdfMapper;
+import uk.ac.ebi.fg.java2rdf.mappers.properties.PropertyRdfMapper;
 
 import static uk.ac.ebi.fg.java2rdf.utils.Java2RdfUtils.urlEncode;
 
@@ -81,7 +81,7 @@ public class ExpPropValueRdfMapper<T extends Accessible> extends PropertyRdfMapp
 			// TODO: is this the same as getAcc() or a secondary accession? 
 			if ( "sample accession".equalsIgnoreCase ( typeLabel ) ) return false;
 
-			BeanRdfMapperFactory mapFact = this.getMapperFactory ();
+			RdfMapperFactory mapFact = this.getMapperFactory ();
 			OWLOntology onto = mapFact.getKnowledgeBase ();
 			
 			// name -> dc:title

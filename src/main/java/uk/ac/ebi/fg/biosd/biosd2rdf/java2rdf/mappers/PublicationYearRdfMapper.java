@@ -6,10 +6,10 @@ import org.apache.commons.lang.StringUtils;
 import org.semanticweb.owlapi.vocab.XSDVocabulary;
 
 import uk.ac.ebi.fg.core_model.organizational.Publication;
-import uk.ac.ebi.fg.java2rdf.mappers.BeanRdfMapperFactory;
+import uk.ac.ebi.fg.java2rdf.mappers.RdfMapperFactory;
 import uk.ac.ebi.fg.java2rdf.mappers.RdfMappingException;
-import uk.ac.ebi.fg.java2rdf.mappers.ToDatatypePropRdfMapper;
 import uk.ac.ebi.fg.java2rdf.mappers.RdfLiteralGenerator;
+import uk.ac.ebi.fg.java2rdf.mappers.properties.OwlDatatypePropRdfMapper;
 import uk.ac.ebi.fg.java2rdf.utils.OwlApiUtils;
 
 /**
@@ -22,10 +22,10 @@ import uk.ac.ebi.fg.java2rdf.utils.OwlApiUtils;
  * @author Marco Brandizi
  *
  */
-public class PublicationYearRdfMapper extends ToDatatypePropRdfMapper<Publication, String>
+public class PublicationYearRdfMapper extends OwlDatatypePropRdfMapper<Publication, String>
 {
 	public PublicationYearRdfMapper () {
-		super ( "year", ns ( "fabio", "hasPublicationYear" ) );
+		super ( ns ( "fabio", "hasPublicationYear" ) );
 	}
 	
 	@Override
@@ -34,7 +34,7 @@ public class PublicationYearRdfMapper extends ToDatatypePropRdfMapper<Publicatio
 		try
 		{
 			if ( source == null || year == null ) return false;
-			BeanRdfMapperFactory mapFactory = this.getMapperFactory ();
+			RdfMapperFactory mapFactory = this.getMapperFactory ();
 			RdfLiteralGenerator<String> targetValGen = this.getRdfLiteralGenerator ();
 			
 			OwlApiUtils.assertData ( this.getMapperFactory ().getKnowledgeBase (), 
@@ -47,13 +47,13 @@ public class PublicationYearRdfMapper extends ToDatatypePropRdfMapper<Publicatio
 		catch ( Exception ex )
 		{
 			throw new RdfMappingException ( String.format ( 
-				"Error while mapping %s[%s].'%s'[%s] to RDF: %s", 
-					source.getClass ().getSimpleName (), 
-					StringUtils.abbreviate ( source.toString (), 50 ), 
-					this.getSourcePropertyName (),
-					StringUtils.abbreviate ( year, 50 ), 
-					ex.getMessage ()
-			), ex);
+				"Error while doing the RDF mapping <%s[%s] '%s' '%s': %s", 
+				source.getClass ().getSimpleName (), 
+				StringUtils.abbreviate ( source.toString (), 50 ), 
+				this.getTargetPropertyUri (),
+				StringUtils.abbreviate ( year, 50 ), 
+				ex.getMessage ()
+			), ex );
 		}
 	}
 }
