@@ -17,7 +17,6 @@ import uk.ac.ebi.fg.java2rdf.mapping.RdfMapperFactory;
  */
 public abstract class PropertyRdfMapper<T, PT> extends RdfMapper<T>
 {
-
 	protected Logger log = LoggerFactory.getLogger ( this.getClass () );
 
 	public PropertyRdfMapper ()

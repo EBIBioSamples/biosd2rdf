@@ -2,8 +2,6 @@ package uk.ac.ebi.fg.biosd.biosd2rdf.java2rdf.mapping;
 
 import static uk.ac.ebi.fg.java2rdf.utils.NamespaceUtils.ns;
 
-import java.util.Map;
-
 import org.apache.commons.lang.StringUtils;
 
 import uk.ac.ebi.fg.biosd.model.expgraph.BioSample;
@@ -13,12 +11,11 @@ import uk.ac.ebi.fg.core_model.organizational.Contact;
 import uk.ac.ebi.fg.core_model.organizational.Organization;
 import uk.ac.ebi.fg.core_model.organizational.Publication;
 import uk.ac.ebi.fg.java2rdf.mapping.BeanRdfMapper;
-import uk.ac.ebi.fg.java2rdf.mapping.ObjRdfMapper;
 import uk.ac.ebi.fg.java2rdf.mapping.RdfMapperFactory;
 import uk.ac.ebi.fg.java2rdf.mapping.RdfMappingException;
 import uk.ac.ebi.fg.java2rdf.mapping.properties.CollectionPropRdfMapper;
 import uk.ac.ebi.fg.java2rdf.mapping.properties.CompositePropRdfMapper;
-import uk.ac.ebi.fg.java2rdf.mapping.properties.InverseOwlObjPropRdfMapper;
+import uk.ac.ebi.fg.java2rdf.mapping.properties.InversePropRdfMapper;
 import uk.ac.ebi.fg.java2rdf.mapping.properties.OwlDatatypePropRdfMapper;
 import uk.ac.ebi.fg.java2rdf.mapping.properties.OwlObjPropRdfMapper;
 import uk.ac.ebi.fg.java2rdf.mapping.urigen.RdfUriGenerator;
@@ -67,8 +64,9 @@ public class MSIRdfMapper extends BeanRdfMapper<MSI>
 		
 		// 'is about' (used in (pub, is-about, msi))
 		this.addPropertyMapper ( "publications", new CollectionPropRdfMapper<MSI, Publication> ( 
-			new InverseOwlObjPropRdfMapper<MSI, Publication> ( ns ( "obo", "IAO_0000136" ) ) )
-		);
+			new InversePropRdfMapper<MSI, Publication> ( 
+				new OwlObjPropRdfMapper<Publication, MSI> ( ns ( "obo", "IAO_0000136" ) ) ) 
+		));
 		
 		// TODO: sub-property of ( (dc-terms:creator union dc-terms:contributor ) and ( schema.org:author union schema.org:contributor ) ) 
 		this.addPropertyMapper ( "contacts", new CollectionPropRdfMapper<MSI, Contact> ( 

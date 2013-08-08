@@ -56,12 +56,6 @@ public class Biosd2RdfCmd
 
 			exportService.submitAll ( sampleSize );
 			exportService.waitAllFinished ();
-			
-			PrefixOWLOntologyFormat fmt = new RDFXMLOntologyFormat ();
-			for ( Entry<String, String> nse: getNamespaces ().entrySet () )
-				fmt.setPrefix ( nse.getKey (), nse.getValue () );
-			OWLOntology onto = exportService.getKnolwedgeBase ();
-			onto.getOWLOntologyManager ().saveOntology ( exportService.getKnolwedgeBase (), fmt, out );
 		} 
 		catch ( Throwable ex ) 
 		{
