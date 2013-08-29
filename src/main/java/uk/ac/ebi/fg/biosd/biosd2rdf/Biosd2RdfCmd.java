@@ -2,14 +2,8 @@ package uk.ac.ebi.fg.biosd.biosd2rdf;
 
 import static java.lang.System.err;
 import static java.lang.System.out;
-import static uk.ac.ebi.fg.java2rdf.utils.NamespaceUtils.getNamespaces;
 
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.OutputStream;
 import java.io.PrintWriter;
-import java.util.Map.Entry;
 
 import javax.persistence.EntityManagerFactory;
 
@@ -20,9 +14,6 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
-import org.semanticweb.owlapi.io.RDFXMLOntologyFormat;
-import org.semanticweb.owlapi.model.OWLOntology;
-import org.semanticweb.owlapi.vocab.PrefixOWLOntologyFormat;
 
 import uk.ac.ebi.fg.biosd.biosd2rdf.threading.BioSdExportService;
 import uk.ac.ebi.fg.core_model.resources.Resources;
@@ -40,7 +31,7 @@ public class Biosd2RdfCmd
 	public static void main ( String[] args ) throws Throwable
 	{
 		int exCode = 0;
-		BioSdExportService exportService = new BioSdExportService ();
+		BioSdExportService exportService = null; 
 		CommandLine cli = null;
 		
 		try
@@ -48,12 +39,17 @@ public class Biosd2RdfCmd
 			CommandLineParser clparser = new GnuParser ();
 			cli = clparser.parse ( getOptions(), args );
 			
+			if ( cli.hasOption ( 'h' ) ) throw new ParseException ( "--help" );
+			
 			args = cli.getArgs ();
+			
 			if ( args.length > 0 )
 				throw new UnsupportedOperationException ( "The case of specified accessions is not supported yet" );
 			
 			double sampleSize = cli.hasOption ( 'z' ) ? Double.parseDouble ( cli.getOptionValue ( 'z' ) ) : 100d;
 
+			exportService = new BioSdExportService ( cli.getOptionValue ( 'o' ) );
+			
 			exportService.submitAll ( sampleSize );
 			exportService.waitAllFinished ();
 		} 
@@ -61,7 +57,9 @@ public class Biosd2RdfCmd
 		{
 			if ( ex instanceof ParseException ) 
 			{
-				err.println ( "\n  Command syntax error: " + ex.getMessage () + "\n\n");
+				if ( !"--help".equals ( ex.getMessage () ) )
+					err.println ( "\n  Command syntax error: " + ex.getMessage () + "\n\n");
+				
 				printUsage ();
 				exCode = 128;
 			}
@@ -78,21 +76,7 @@ public class Biosd2RdfCmd
 				EntityManagerFactory emf = Resources.getInstance ().getEntityManagerFactory ();
 				if ( emf != null && emf.isOpen () ) emf.close ();
 
-				if ( exportService != null )
-				{
-					OWLOntology onto = exportService.getKnolwedgeBase ();
-					if ( onto != null )
-					{
-						err.println ( "Saving the generated knowledge base, you may have to wait still for a while..." );
-						OutputStream out = cli != null && cli.hasOption ( 'o' ) 
-							? new BufferedOutputStream ( new FileOutputStream ( new File ( cli.getOptionValue ( 'o' ) ) ) )
-						  : System.out;
-						PrefixOWLOntologyFormat fmt = new RDFXMLOntologyFormat ();
-						for ( Entry<String, String> nse: getNamespaces ().entrySet () )
-							fmt.setPrefix ( nse.getKey (), nse.getValue () );
-						onto.getOWLOntologyManager ().saveOntology ( exportService.getKnolwedgeBase (), fmt, out );
-					}
-				}
+				if ( exportService != null ) exportService.flushKnowledgeBase ();
 			
 			}// exitCode	
 			System.exit ( exCode );
@@ -137,6 +121,12 @@ public class Biosd2RdfCmd
 			.withType ( Double.class )
 			.withLongOpt ( "sample-size" )
 			.create ( 'z' )
+		);
+		
+		opts.addOption ( OptionBuilder
+			.withDescription ( "Prints out this message" )
+			.withLongOpt ( "help" )
+			.create ( 'h' )
 		);
 		
 		return opts;		

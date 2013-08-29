@@ -1,7 +1,9 @@
 package uk.ac.ebi.fg.biosd.biosd2rdf.java2rdf.mapping;
 
 import static uk.ac.ebi.fg.java2rdf.utils.Java2RdfUtils.hashUriSignature;
+import static uk.ac.ebi.fg.java2rdf.utils.Java2RdfUtils.urlEncode;
 import static uk.ac.ebi.fg.java2rdf.utils.NamespaceUtils.ns;
+import static uk.ac.ebi.fg.java2rdf.utils.OwlApiUtils.assertAnnotationData;
 import static uk.ac.ebi.fg.java2rdf.utils.OwlApiUtils.assertClass;
 import static uk.ac.ebi.fg.java2rdf.utils.OwlApiUtils.assertData;
 import static uk.ac.ebi.fg.java2rdf.utils.OwlApiUtils.assertIndividual;
@@ -24,9 +26,6 @@ import uk.ac.ebi.fg.core_model.toplevel.Accessible;
 import uk.ac.ebi.fg.java2rdf.mapping.RdfMapperFactory;
 import uk.ac.ebi.fg.java2rdf.mapping.RdfMappingException;
 import uk.ac.ebi.fg.java2rdf.mapping.properties.PropertyRdfMapper;
-import uk.ac.ebi.fg.java2rdf.mapping.properties.URIProvidedPropertyRdfMapper;
-
-import static uk.ac.ebi.fg.java2rdf.utils.Java2RdfUtils.urlEncode;
 
 /**
  * Maps a sample property like 'Characteristics[organism]' to proper RDF/OWL statements. OBI and other relevant ontologies
@@ -130,8 +129,8 @@ public class ExpPropValueRdfMapper<T extends Accessible> extends PropertyRdfMapp
 				
 				// Define the Type as a new class
 				assertClass ( onto, typeUri, ns ( "efo", "EFO_0000001" ) ); // Experimental factor
-				assertData ( onto, typeUri, ns ( "rdfs", "label" ), typeLabel );
-				assertData ( onto, typeUri, ns ( "dc-terms", "title" ), typeLabel );
+				assertAnnotationData ( onto, typeUri, ns ( "rdfs", "label" ), typeLabel );
+				assertAnnotationData ( onto, typeUri, ns ( "dc-terms", "title" ), typeLabel );
 			}
 					
 			// So, we have: *** propValue a typeUri ***, where the type URI is either a new URI achieved from the type label (essentially 

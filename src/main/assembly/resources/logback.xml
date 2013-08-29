@@ -39,7 +39,7 @@
 	</root>
 
 	<!-- Add Loggers this way if you want finer reports for selected components -->
-	<!-- logger name="uk.ac.ebi.fg.biosd.biosd2rdf" level="ALL" />
-	<logger name="uk.ac.ebi.fg.java2rdf" level="ALL" />
+	<logger name="uk.ac.ebi.fg.biosd.biosd2rdf" level="INFO" />
+	<!--  logger name="uk.ac.ebi.fg.java2rdf" level="ALL" />
 	<logger name="uk.ac.ebi.fg.ontodiscover" level="ALL" / --> 
 </configuration>

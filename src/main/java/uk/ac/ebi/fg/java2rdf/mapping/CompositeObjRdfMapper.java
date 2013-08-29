@@ -2,7 +2,6 @@ package uk.ac.ebi.fg.java2rdf.mapping;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Set;
 
 /**
  * TODO: Comment me!

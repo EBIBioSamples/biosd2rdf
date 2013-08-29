@@ -9,7 +9,8 @@ if [ "$http_proxy" != '' ]; then
 fi
 
 # These are passed to the JVM. they're appended, so that you can predefine your stuff via export OPTS=...
-OPTS="$OPTS -Xms2G -Xmx4G -XX:PermSize=128m -XX:MaxPermSize=256m"
+# on my laptop: OPTS="$OPTS -Xms4G -Xmx8G -XX:PermSize=256m -XX:MaxPermSize=512m"
+OPTS="$OPTS -Xms16G -Xmx32G -XX:PermSize=512m -XX:MaxPermSize=1G"
 
 # We always work with universal text encoding.
 OPTS="$OPTS -Dfile.encoding=UTF-8"

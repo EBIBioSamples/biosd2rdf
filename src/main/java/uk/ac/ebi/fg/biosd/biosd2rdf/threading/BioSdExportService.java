@@ -1,8 +1,15 @@
 package uk.ac.ebi.fg.biosd.biosd2rdf.threading;
 
+import static uk.ac.ebi.fg.java2rdf.utils.NamespaceUtils.getNamespaces;
 import static uk.ac.ebi.fg.java2rdf.utils.NamespaceUtils.ns;
 
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -15,16 +22,21 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import javax.persistence.EntityManager;
 
+import org.apache.commons.io.FilenameUtils;
 import org.semanticweb.owlapi.apibinding.OWLManager;
+import org.semanticweb.owlapi.io.RDFXMLOntologyFormat;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
+import org.semanticweb.owlapi.model.OWLOntologyStorageException;
+import org.semanticweb.owlapi.vocab.PrefixOWLOntologyFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import uk.ac.ebi.fg.biosd.biosd2rdf.java2rdf.mapping.BioSdRfMapperFactory;
 import uk.ac.ebi.fg.core_model.resources.Resources;
+import uk.ac.ebi.utils.memory.MemoryUtils;
 
 /**
  * TODO: Comment me!
@@ -35,11 +47,10 @@ import uk.ac.ebi.fg.core_model.resources.Resources;
  */
 public class BioSdExportService
 {
-	private OWLOntologyManager owlMgr;
 	private OWLOntology onto;
 	private BioSdRfMapperFactory rdfMapFactory;
 
-	private int threadPoolSize = 25;
+	private int threadPoolSize = 40;
 	private ExecutorService executor = Executors.newFixedThreadPool ( threadPoolSize ); 
 
 	private int busyTasks = 0;
@@ -51,14 +62,26 @@ public class BioSdExportService
 	
 	private int lastExitCode = 0;
 	
+	private String outputPath = null;
+	private int outputCounter = 0;
+	private Runnable memFlushAction = new Runnable() 
+	{
+		@Override
+		public void run () {
+			BioSdExportService.this.flushKnowledgeBase ();
+		}
+	};
+	
 	private PoolSizeTuningTimerTask poolSizeTunerTimerTask = null;
 
-	public BioSdExportService ()
+	public BioSdExportService ( String outputPath )
 	{
 		try
 		{
+			this.outputPath = outputPath;
+			
 			BioSdRfMapperFactory.init (); // cause the definition of BioSD-specific namespaces
-			owlMgr = OWLManager.createOWLOntologyManager ();
+			OWLOntologyManager owlMgr = OWLManager.createOWLOntologyManager ();
 			onto = owlMgr.createOntology ( IRI.create ( ns ( "biosd-dataset" ) ) );
 			rdfMapFactory = new BioSdRfMapperFactory ( onto );
 		} 
@@ -98,6 +121,10 @@ public class BioSdExportService
 
 			poolSizeTunerTimerTask.start ();
 		}
+		
+		// This will flush the triples to the disk when the memory is too full
+		MemoryUtils.checkMemory ( this.memFlushAction, 15d / 100d );
+		// DEBUG if ( completedTasks > 0 && completedTasks % 20 == 0 ) flushKnowledgeBase ();
 		
 		submissionLock.lock ();
 		try
@@ -210,11 +237,74 @@ public class BioSdExportService
 		}
 	}
 	
-	public OWLOntology getKnolwedgeBase ()
+	
+	public void flushKnowledgeBase ()
 	{
-		return onto;
-	}
+		// This is the only way to avoid that multiple threads access a KB that needs to be replaced. I've experienced
+		// that synchronisation over this.onto is not enough.
+		//
+		log.info ( "Waiting all tasks to finish, before flusing the RDF triples created so far to stdout/file" );
+		waitAllFinished ();
 
+		OutputStream kbout = null;
+				
+		try
+		{			
+			if ( this.onto.isEmpty () ) return; 
+		
+			// Don't measure/change the throughput while I'm idle
+			if ( this.poolSizeTunerTimerTask != null ) poolSizeTunerTimerTask.stop ();
+			
+			String outp = null;
+			if ( this.outputPath != null )
+			{
+				if ( outputCounter > 0 ) 
+				{
+					int idot = FilenameUtils.indexOfExtension ( this.outputPath );
+					outp = idot == -1 
+						? this.outputPath + "_" + outputCounter
+						: this.outputPath.substring ( 0, idot ) + "_" + outputCounter + this.outputPath.substring ( idot );
+				}
+				else
+					outp = this.outputPath;
+				
+				File fout = new File ( outp );
+				log.info ( "Please wait, saving triples to '" + fout.getCanonicalPath () + "'" );
+				kbout = new BufferedOutputStream ( new FileOutputStream ( outp ) );
+			}
+			else 
+			{
+				if ( outputCounter == 0 ) 
+					log.info ( "Outputing in-memory tripes to the standard output" );
+				else
+					log.warn ( "Sending more than one OWL document to the standard output" );
+				
+				kbout = System.out;
+				
+			} // if outputPath
+				
+			PrefixOWLOntologyFormat fmt = new RDFXMLOntologyFormat ();
+			for ( Entry<String, String> nse: getNamespaces ().entrySet () )
+				fmt.setPrefix ( nse.getKey (), nse.getValue () );
+			onto.getOWLOntologyManager ().saveOntology ( this.onto, fmt, kbout );
+			
+			OWLOntologyManager owlMgr = OWLManager.createOWLOntologyManager ();
+			this.onto = owlMgr.createOntology ( IRI.create ( ns ( "biosd-dataset" ) ) );
+			this.rdfMapFactory.setKnowledgeBase ( onto );
+		} 
+		catch ( IOException|OWLOntologyStorageException|OWLOntologyCreationException ex ) {
+			throw new IllegalArgumentException ( "Error while saving exported triples: " + ex.getMessage (), ex );
+		}
+		finally 
+		{
+			this.outputCounter++;
+			
+			// Restart dynamic thread pool size optimisation if it was stopped
+			if ( kbout != null && this.poolSizeTunerTimerTask != null ) poolSizeTunerTimerTask.start ();
+		}
+	} // flushKnowledgeBase
+	
+	
 	@Override
 	protected void finalize () throws Throwable
 	{

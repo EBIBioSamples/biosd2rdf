@@ -34,7 +34,7 @@ public class BioSdRfMapperFactory extends RdfMapperFactory
 		registerNs ( "biosd", 	 				"http://rdf.ebi.ac.uk/resource/biosamples/" );
 		registerNs ( "biosd-dataset",		"http://rdf.ebi.ac.uk/dataset/biosamples" );
 		registerNs ( "ebi-terms",  			"http://rdf.ebi.ac.uk/terms/" );
-		registerNs ( "biosd-term",  		"http://rdf.ebi.ac.uk/terms/biosd/" );
+		registerNs ( "biosd-terms",  		"http://rdf.ebi.ac.uk/terms/biosd/" );
 		registerNs ( "obo", 		 				"http://purl.obolibrary.org/obo/" );
 		registerNs ( "efo",			 				"http://www.ebi.ac.uk/efo/" );
 		registerNs ( "fabio",						"http://purl.org/spar/fabio/" ); // Biblio ontology

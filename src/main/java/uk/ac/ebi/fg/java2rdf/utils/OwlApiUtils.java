@@ -44,7 +44,7 @@ public class OwlApiUtils
 			owlFactory.getOWLDataProperty ( IRI.create( propertyUri )), 
 			owlFactory.getOWLNamedIndividual ( IRI.create ( subjectUri )),
 			literal
-		));
+		));		
 	}
 
 	public static synchronized void assertLink ( OWLOntology model, String subjectUri, String propertyUri, String objectUri )
@@ -109,13 +109,13 @@ public class OwlApiUtils
 	
 	public static synchronized void assertAnnotationData ( OWLOntology model, String subjectUri, String propertyUri, String propertyValue ) 
 	{
-		assertAnnotationData ( model, subjectUri, propertyUri, propertyValue );
+		assertAnnotationData ( model, subjectUri, propertyUri, propertyValue, null );
 	}
 
 	
 	public static synchronized void assertAnnotationData ( OWLOntology model, String subjectUri, String propertyUri, String propertyValue, String dataTypeUri )
 	{
-		checkNonNullTriple ( "assertAnnotationLink", subjectUri, propertyUri, propertyValue, dataTypeUri );
+		checkNonNullTriple ( "assertAnnotationData", subjectUri, propertyUri, propertyValue, dataTypeUri );
 		OWLOntologyManager owlMgr = model.getOWLOntologyManager ();
 		OWLDataFactory owlFactory = owlMgr.getOWLDataFactory ();
 		

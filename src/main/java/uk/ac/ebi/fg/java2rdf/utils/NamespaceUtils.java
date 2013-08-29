@@ -3,8 +3,6 @@
  */
 package uk.ac.ebi.fg.java2rdf.utils;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;

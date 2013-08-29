@@ -2,13 +2,12 @@ package uk.ac.ebi.fg.biosd.biosd2rdf.java2rdf.mapping;
 
 import static org.apache.commons.lang.StringUtils.trimToNull;
 import static uk.ac.ebi.fg.java2rdf.utils.Java2RdfUtils.hashUriSignature;
+import static uk.ac.ebi.fg.java2rdf.utils.Java2RdfUtils.urlEncode;
 import static uk.ac.ebi.fg.java2rdf.utils.NamespaceUtils.ns;
-import uk.ac.ebi.fg.biosd.model.organizational.MSI;
 import uk.ac.ebi.fg.core_model.organizational.Organization;
 import uk.ac.ebi.fg.java2rdf.mapping.BeanRdfMapper;
 import uk.ac.ebi.fg.java2rdf.mapping.properties.CompositePropRdfMapper;
 import uk.ac.ebi.fg.java2rdf.mapping.properties.OwlDatatypePropRdfMapper;
-import static uk.ac.ebi.fg.java2rdf.utils.Java2RdfUtils.urlEncode;
 
 /**
  * TODO: Comment me!
@@ -27,7 +26,7 @@ public class OrganizationRdfMapper extends BeanRdfMapper<Organization>
 			/* TODO:
 			 * ebi-terms:OrganizationReference := 
   		 *   subClassOf ( 'is bearer of' (BFO_0000053) some 'role' (BFO_0000023) )
-  		 *   subClassOf schema.org:Organization  dcterms:Agent, foaf:Organization
+  		 *   ebi-terms:Organization := subClassOf ( schema.org:Organization, dcterms:Agent, foaf:Organization )
 			 * 
 			 */
 			ns ( "ebi-terms", "ContactOrganization" ), 
@@ -48,7 +47,11 @@ public class OrganizationRdfMapper extends BeanRdfMapper<Organization>
 		// also foaf properties
 
 		this.addPropertyMapper ( "email", new OwlDatatypePropRdfMapper<Organization, String> ( ns ( "sch", "email" ) ) );
-		this.addPropertyMapper ( "name", new OwlDatatypePropRdfMapper<Organization, String> ( ns ( "sch", "name" ) ) );
+		this.addPropertyMapper ( "name", new CompositePropRdfMapper<> ( 
+			new OwlDatatypePropRdfMapper<Organization, String> ( ns ( "sch", "name" ) ),
+			new OwlDatatypePropRdfMapper<Organization, String> ( ns ( "dc-terms", "title" ) ),
+			new OwlDatatypePropRdfMapper<Organization, String> ( ns ( "rdfs", "label" ) )
+		));
 		this.addPropertyMapper ( "description", new CompositePropRdfMapper<> (
 			new OwlDatatypePropRdfMapper<Organization, String> ( ns ( "sch", "description" ) ),
 			new OwlDatatypePropRdfMapper<Organization, String> ( ns ( "dc-terms", "description" ) ),

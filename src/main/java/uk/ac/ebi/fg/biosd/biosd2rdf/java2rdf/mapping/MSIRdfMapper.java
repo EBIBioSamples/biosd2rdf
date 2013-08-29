@@ -1,5 +1,6 @@
 package uk.ac.ebi.fg.biosd.biosd2rdf.java2rdf.mapping;
 
+import static uk.ac.ebi.fg.java2rdf.utils.Java2RdfUtils.urlEncode;
 import static uk.ac.ebi.fg.java2rdf.utils.NamespaceUtils.ns;
 
 import org.apache.commons.lang.StringUtils;
@@ -20,8 +21,6 @@ import uk.ac.ebi.fg.java2rdf.mapping.properties.OwlDatatypePropRdfMapper;
 import uk.ac.ebi.fg.java2rdf.mapping.properties.OwlObjPropRdfMapper;
 import uk.ac.ebi.fg.java2rdf.mapping.urigen.RdfUriGenerator;
 
-import static uk.ac.ebi.fg.java2rdf.utils.Java2RdfUtils.urlEncode;
-
 
 /**
  * Maps the submission of a SampleTab file to the BioSD database. 
@@ -32,6 +31,7 @@ import static uk.ac.ebi.fg.java2rdf.utils.Java2RdfUtils.urlEncode;
  */
 public class MSIRdfMapper extends BeanRdfMapper<MSI>
 {
+	@SuppressWarnings ( "unchecked" )
 	public MSIRdfMapper ()
 	{
 		super ( 
@@ -43,6 +43,9 @@ public class MSIRdfMapper extends BeanRdfMapper<MSI>
 					return ns ( "biosd", "msi/" + urlEncode ( msi.getAcc () ) );
 				}
 		});
+
+		this.addPropertyMapper ( "acc", new OwlDatatypePropRdfMapper<MSI, String> ( ns ( "dc-terms", "identifier" ) ) );
+		
 		this.addPropertyMapper ( "title", new CompositePropRdfMapper<> (  
 			new OwlDatatypePropRdfMapper<MSI, String> ( ns ( "dc-terms", "title" ) ), 
 			new OwlDatatypePropRdfMapper<MSI, String> ( ns ( "rdfs", "label" ) ) 
@@ -80,7 +83,6 @@ public class MSIRdfMapper extends BeanRdfMapper<MSI>
 	}
 
 	@Override
-	@SuppressWarnings ( { "rawtypes", "unchecked" } )
 	public boolean map ( MSI msi )
 	{
 		try

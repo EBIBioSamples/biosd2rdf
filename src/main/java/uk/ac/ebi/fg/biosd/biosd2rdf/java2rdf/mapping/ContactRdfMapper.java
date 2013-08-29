@@ -3,14 +3,13 @@ package uk.ac.ebi.fg.biosd.biosd2rdf.java2rdf.mapping;
 import static org.apache.commons.lang.StringUtils.trimToEmpty;
 import static org.apache.commons.lang.StringUtils.trimToNull;
 import static uk.ac.ebi.fg.java2rdf.utils.Java2RdfUtils.hashUriSignature;
+import static uk.ac.ebi.fg.java2rdf.utils.Java2RdfUtils.urlEncode;
 import static uk.ac.ebi.fg.java2rdf.utils.NamespaceUtils.ns;
 import uk.ac.ebi.fg.core_model.organizational.Contact;
 import uk.ac.ebi.fg.java2rdf.mapping.BeanRdfMapper;
 import uk.ac.ebi.fg.java2rdf.mapping.RdfMappingException;
 import uk.ac.ebi.fg.java2rdf.mapping.properties.OwlDatatypePropRdfMapper;
 import uk.ac.ebi.fg.java2rdf.utils.OwlApiUtils;
-
-import static uk.ac.ebi.fg.java2rdf.utils.Java2RdfUtils.urlEncode;
 
 /**
  * TODO: Comment me!
@@ -29,7 +28,7 @@ public class ContactRdfMapper extends BeanRdfMapper<Contact>
 			/* TODO:
 			 * ebi-terms:ContactPerson := 
   		 *   subClassOf ( 'is bearer of' (BFO_0000053) some 'contact representative role' (OBI_0001687) )
-  		 *   subClassOf schema.org:Person, dcterms:Agent, foaf:Person
+  		 *   ebi-terms:Person := subClassOf ( schema.org:Person, dcterms:Agent, foaf:Person )
 			 * 
 			 */
 			ns ( "ebi-terms", "ContactPerson" ), // TODO: See Schema design doc

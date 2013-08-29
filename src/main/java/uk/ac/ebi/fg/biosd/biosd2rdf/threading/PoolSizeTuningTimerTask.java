@@ -1,14 +1,14 @@
 package uk.ac.ebi.fg.biosd.biosd2rdf.threading;
 
+import static java.lang.Math.max;
+import static java.lang.Math.min;
+import static java.lang.Math.round;
+
 import java.util.Timer;
 import java.util.TimerTask;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import static java.lang.Math.max;
-import static java.lang.Math.min;
-import static java.lang.Math.round;
 
 
 /**
@@ -22,13 +22,13 @@ import static java.lang.Math.round;
 public abstract class PoolSizeTuningTimerTask extends TimerTask
 {
 	private int minThreads = 5, maxThreads = 200, maxThreadIncr = 50, minThreadIncr = 5;
-	private int threadIncr = 20;
 	private double threadDeltaTolerance = 10d/100d;
+	private int threadIncr;
 	
-	private int periodMins = 10;
+	private int periodMins = 5;
 
-	private int prevThreads = getThreadPoolSize ();
-	private long prevThroughput = 0, prevCompletedTasks = 0;
+	private int prevThreads;
+	private long prevThroughput, prevCompletedTasks;
 	
 	private Timer poolSizeTunerTimer = new Timer ( "BioSdXport Thread Pool Size Optimiser" );
 	
@@ -36,7 +36,7 @@ public abstract class PoolSizeTuningTimerTask extends TimerTask
 
 
 	@Override
-	public void run ()
+	public synchronized void run ()
 	{
 		final long curCompletedTasks = getCompletedTasks ();
 		final long curThru = curCompletedTasks - prevCompletedTasks;
@@ -106,6 +106,7 @@ public abstract class PoolSizeTuningTimerTask extends TimerTask
 	
 	public void start ()
 	{
+		initVariables ();
 		poolSizeTunerTimer.scheduleAtFixedRate ( this, 1000 * 60 * periodMins, 1000 * 60 * periodMins );
 	}
 	
@@ -113,4 +114,13 @@ public abstract class PoolSizeTuningTimerTask extends TimerTask
 	{
 		poolSizeTunerTimer.cancel ();
 	}
+	
+	private synchronized void initVariables ()
+	{
+		threadIncr = 20;
+
+		prevThreads = getThreadPoolSize ();
+		prevThroughput = 0; prevCompletedTasks = 0;
+	}
+	
 }

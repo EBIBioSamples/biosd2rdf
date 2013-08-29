@@ -48,12 +48,18 @@ public class OwlObjPropRdfMapper<T, PT> extends URIProvidedPropertyRdfMapper<T, 
 		{
 			RdfMapperFactory mapFactory = this.getMapperFactory ();
 			
-			// TODO: can we avoid to keep recomputing this?
+			// TODO: can we avoid to keep recomputing these
+			//
+			
+			// This is necessary, cause source/pval may be swapped by InversePropRdfMapper
+			String subjUri = mapFactory.getUri ( source );
+			if ( subjUri == null ) return false;
+
 			String objUri = mapFactory.getUri ( propValue );
 			if ( objUri == null ) return false;
 			
 			OwlApiUtils.assertLink ( this.getMapperFactory ().getKnowledgeBase (), 
-				mapFactory.getUri ( source ), this.getTargetPropertyUri (), objUri );
+				subjUri, this.getTargetPropertyUri (), objUri );
 
 			// Don't use targetMapper, we need to trace this visit.
 			return mapFactory.map ( propValue );
