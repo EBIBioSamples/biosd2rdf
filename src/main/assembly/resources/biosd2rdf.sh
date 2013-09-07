@@ -10,7 +10,8 @@ fi
 
 # These are passed to the JVM. they're appended, so that you can predefine your stuff via export OPTS=...
 # on my laptop: OPTS="$OPTS -Xms4G -Xmx8G -XX:PermSize=256m -XX:MaxPermSize=512m"
-OPTS="$OPTS -Xms16G -Xmx32G -XX:PermSize=512m -XX:MaxPermSize=1G"
+# OPTS="$OPTS -Xms16G -Xmx32G -XX:PermSize=512m -XX:MaxPermSize=1G"
+OPTS="$OPTS -Xms12G -Xmx24G -XX:PermSize=512m -XX:MaxPermSize=1G"
 
 # We always work with universal text encoding.
 OPTS="$OPTS -Dfile.encoding=UTF-8"

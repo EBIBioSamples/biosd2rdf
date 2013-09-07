@@ -35,7 +35,7 @@ public class MSIRdfMapper extends BeanRdfMapper<MSI>
 	public MSIRdfMapper ()
 	{
 		super ( 
-			ns ( "biosd", "Submission" ), // TODO: is-a iao:document 
+			ns ( "biosd-terms", "BiosamplesSubmission" ), // is-a iao:document 
 			new RdfUriGenerator<MSI>() 
 			{
 				@Override
@@ -73,11 +73,11 @@ public class MSIRdfMapper extends BeanRdfMapper<MSI>
 		
 		// TODO: sub-property of ( (dc-terms:creator union dc-terms:contributor ) and ( schema.org:author union schema.org:contributor ) ) 
 		this.addPropertyMapper ( "contacts", new CollectionPropRdfMapper<MSI, Contact> ( 
-			new OwlObjPropRdfMapper<MSI, Contact> ( ns ( "ebi-terms", "has-knowledgeable-person" ) ) )
+			new OwlObjPropRdfMapper<MSI, Contact> ( ns ( "biosd-terms", "has-knowledgeable-person" ) ) )
 		);
 
 		this.addPropertyMapper ( "organizations", new CollectionPropRdfMapper<MSI, Organization> ( 
-			new OwlObjPropRdfMapper<MSI, Organization> ( ns ( "ebi-terms", "has-knowledgeable-organization" ) ) )
+			new OwlObjPropRdfMapper<MSI, Organization> ( ns ( "biosd-terms", "has-knowledgeable-organization" ) ) )
 		);
 
 	}

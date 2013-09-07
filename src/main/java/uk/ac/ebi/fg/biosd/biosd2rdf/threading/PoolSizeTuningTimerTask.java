@@ -25,18 +25,18 @@ public abstract class PoolSizeTuningTimerTask extends TimerTask
 	private double threadDeltaTolerance = 10d/100d;
 	private int threadIncr;
 	
-	private int periodMins = 5;
+	private int periodMins = 10;
 
 	private int prevThreads;
 	private long prevThroughput, prevCompletedTasks;
 	
-	private Timer poolSizeTunerTimer = new Timer ( "BioSdXport Thread Pool Size Optimiser" );
+	private Timer poolSizeTunerTimer = null;
 	
 	protected Logger log = LoggerFactory.getLogger ( this.getClass () );
 
 
 	@Override
-	public synchronized void run ()
+	public void run ()
 	{
 		final long curCompletedTasks = getCompletedTasks ();
 		final long curThru = curCompletedTasks - prevCompletedTasks;
@@ -107,6 +107,7 @@ public abstract class PoolSizeTuningTimerTask extends TimerTask
 	public void start ()
 	{
 		initVariables ();
+		poolSizeTunerTimer = new Timer ( "Task Pool Size Optimiser" );
 		poolSizeTunerTimer.scheduleAtFixedRate ( this, 1000 * 60 * periodMins, 1000 * 60 * periodMins );
 	}
 	
@@ -115,7 +116,7 @@ public abstract class PoolSizeTuningTimerTask extends TimerTask
 		poolSizeTunerTimer.cancel ();
 	}
 	
-	private synchronized void initVariables ()
+	private void initVariables ()
 	{
 		threadIncr = 20;
 

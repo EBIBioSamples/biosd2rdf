@@ -25,7 +25,8 @@ public class PublicationRdfMapper extends BeanRdfMapper<Publication>
 	public PublicationRdfMapper ()
 	{
 		super (
-			ns ( "obo", "IAO_0000311" ), // publication TODO: foaf:document, fabio:work
+			// publication, ebi_terms.owl additionally defines this subclass of: foaf:document, fabio:work
+			ns ( "obo", "IAO_0000311" ), 
 			new RdfUriGenerator<Publication>() {
 				@Override public String getUri ( Publication pub ) 
 				{
@@ -62,7 +63,7 @@ public class PublicationRdfMapper extends BeanRdfMapper<Publication>
 		this.addPropertyMapper ( "pubmedId", new OwlDatatypePropRdfMapper<Publication, String> ( ns ( "fabio", "hasPubMedId" ) ) );
 		this.addPropertyMapper ( "DOI", new OwlDatatypePropRdfMapper<Publication, String> ( ns ( "prism", "doi" ) ) );
 		// TODO: a sub-property of dc-elems:creator and of owl:dataProperty
-		this.addPropertyMapper ( "authorList", new OwlDatatypePropRdfMapper<Publication, String> ( ns ( "ebi-terms", "has-authors-list" ) ) );
+		this.addPropertyMapper ( "authorList", new OwlDatatypePropRdfMapper<Publication, String> ( ns ( "biosd-terms", "has-authors-list" ) ) );
 		this.addPropertyMapper ( "year", new PublicationYearRdfMapper () );
 	}
 }

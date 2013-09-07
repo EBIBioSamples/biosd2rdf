@@ -8,16 +8,18 @@
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 @prefix obo: <http://purl.obolibrary.org/obo/>.
 @prefix biosd: <http://rdf.ebi.ac.uk/resource/biosamples/>.
-@prefix biosd-terms: <http://rdf.ebi.ac.uk/terms/biosd/>.
-@prefix ebi-terms: <http://rdf.ebi.ac.uk/terms/>.
+## WARNING: for some reason, Virtuoso doesn't like names with dashes when loading VOID
+@prefix biosdterms: <http://rdf.ebi.ac.uk/terms/biosd/>.
+@prefix ebiterms: <http://rdf.ebi.ac.uk/terms/>.
 @prefix schema: <http://schema.org/>.
 
 ## your VoID description
 <http://rdf.ebi.ac.uk/dataset/biosamples/${biosd.version}/dataset-void.ttl> a void:DatasetDescription;
      dcterms:title "BioSD RDF VOID document"^^xsd:string ;
      dcterms:description "VOID for the EBI Biosamples Database RDF data set"^^xsd:string;
-     dcterms:creator biosd:biosamplesTeam; 
-     dcterms:creator biosd:marcoBrandizi;
+     dcterms:creator 
+       biosd:biosamplesTeam, 
+       biosd:marcoBrandizi;
      dcterms:created "${biosd.creation-date}"^^xsd:date;
      foaf:primaryTopic <http://rdf.ebi.ac.uk/dataset/biosamples/${biosd.version}>;
      foaf:topic
@@ -28,14 +30,14 @@
 .
 ## your dataset description
 <http://rdf.ebi.ac.uk/dataset/biosamples/${biosd.version}> a void:Dataset;
-     dcterms:title "EBI Biosamples Database"^^xsd:string ;
-     dcterms:description """RDF representation of the EBI Biosample Database"""^^xsd:string ;
-     foaf:homepage <http://rdf.ebi.ac.uk/dataset/biosamples> ;
-     dcterms:license <http://www.ebi.ac.uk/Information/termsofuse.html> ; ## TODO: check this
-     void:uriSpace "http://rdf.ebi.ac.uk/resource/biosamples"^^xsd:string ;
+     dcterms:title "EBI Biosamples Database"^^xsd:string;
+     dcterms:description """RDF representation of the EBI Biosample Database"""^^xsd:string;
+     foaf:homepage <http://rdf.ebi.ac.uk/dataset/biosamples>;
+     dcterms:license <http://www.ebi.ac.uk/Information/termsofuse.html>; ## TODO: check this
+     void:uriSpace "http://rdf.ebi.ac.uk/resource/biosamples"^^xsd:string;
      dcterms:publisher biosd:biosamplesTeam;
      dcterms:publisher biosd:biomedBridgesOrg;
-     pav:importedFrom <http://www.ebi.ac.uk/biosamples> ; ## TODO: check pav:importedFrom expectations
+     pav:importedFrom <http://www.ebi.ac.uk/biosamples>; ## TODO: check pav:importedFrom expectations
      pav:importedBy biosd:biosamplesTeam;
      dcterms:subject 
        obo:OBI_0000747, ## 'material sample'
@@ -43,10 +45,10 @@
      	 <http://edamontology.org/topic_3071>, ## edam:'Biological data resources'
      	 <http://purl.bioontology.org/ontology/MESH/D019992> ## mesh:'Databases as Topic'
      ;
-     void:sparqlEndpoint <http://www.ebi.ac.uk/biosd/sparql> ;
+     void:sparqlEndpoint <http://www.ebi.ac.uk/biosd/sparql>;
      void:vocabulary
-       biosd-terms:,
-       ebi-terms:,
+       biosdterms:,
+       ebiterms:,
        <http://purl.obolibrary.org/obo/obi.owl>,
        <http://www.ebi.ac.uk/efo/efo.owl>,
 		   schema:,
@@ -55,12 +57,12 @@
 			 <http://purl.org/spar/fabio/> ## TODO, needs to be reviewed, maybe we'll use something else
      ;                         
      pav:version "${biosd.version}";
-     pav:previousVersion <http://rdf.ebi.ac.uk/dataset/biosamples/${biosd.previous-version}> ;
-     void:dataDump <ftp://ftp.ebi.ac.uk/pub/databases/RDF/biosd/biosamples-rdf-${biosd.version}.tar.gz> ;
-     pav:importedOn "${biosd.creation-date}"^^xsd:date ;
+     pav:previousVersion <http://rdf.ebi.ac.uk/dataset/biosamples/${biosd.previous-version}>;
+     void:dataDump <ftp://ftp.ebi.ac.uk/pub/databases/RDF/biosd/biosamples-rdf-${biosd.version}.tar.gz>;
+     pav:importedOn "${biosd.creation-date}"^^xsd:date
 .
 
-biosd:biosamplesTeam a ebi-terms:Organization;
+biosd:biosamplesTeam a ebiterms:Organization;
   dcterms:title "Biosamples Team at the European Bioinformatics Institute (EMBL-EBI)";
   schema:name "Biosamples Team at the European Bioinformatics Institute (EMBL-EBI)";
   rdfs:label "Biosamples Team at the European Bioinformatics Institute (EMBL-EBI)";
@@ -68,13 +70,13 @@ biosd:biosamplesTeam a ebi-terms:Organization;
 	foaf:homepage <http://www.ebi.ac.uk>
 .
 
-biosd:marcoBrandizi a ebi-terms:Person;
+biosd:marcoBrandizi a ebiterms:Person;
   dcterms:title "Marco Brandizi";
   schema:name "Marco Brandizi";
   rdfs:label "Marco Brandizi";
 	schema:firstName "Marco";
 	schema:givenName "Brandizi";
 	schema:memberOf biosd:biosamplesTeam;
-	foaf:mbox <email:brandizi@ebi.ac.uk>;
+	foaf:mbox <mailto:brandizi@ebi.ac.uk>;
 	foaf:homepage <http://www.marcobrandizi.info>
 .

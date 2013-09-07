@@ -23,7 +23,7 @@ public class BioSampleGroupRdfMapper extends BeanRdfMapper<BioSampleGroup>
 	public BioSampleGroupRdfMapper ()
 	{
 		super ( 
-			// TODO: we need to subclass this from iao:document_part (and maybe a sio:collection too)
+			// it's a subclass of iao:document_part and sio:collection too.
 			ns ( "biosd-terms", "SampleGroup" ), 
 			new RdfUriGenerator<BioSampleGroup> () {
 				@Override public String getUri ( BioSampleGroup sg ) {

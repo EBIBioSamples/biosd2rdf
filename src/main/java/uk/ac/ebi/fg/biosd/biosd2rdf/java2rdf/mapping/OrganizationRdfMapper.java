@@ -29,7 +29,7 @@ public class OrganizationRdfMapper extends BeanRdfMapper<Organization>
   		 *   ebi-terms:Organization := subClassOf ( schema.org:Organization, dcterms:Agent, foaf:Organization )
 			 * 
 			 */
-			ns ( "ebi-terms", "ContactOrganization" ), 
+			ns ( "biosd-terms", "ContactOrganization" ), 
 			new MSIEquippedRdfUriGenerator<Organization>()
 			{
 				@Override public String getUri ( Organization org ) 
@@ -63,10 +63,10 @@ public class OrganizationRdfMapper extends BeanRdfMapper<Organization>
 		// TODO: not possible for the moment, requires the ability to associate multiple mappers to the bean property: 
 		// this.setPropertyMapper ( new OwlDatatypePropRdfMapper<Organization, String> ( "name", ns ( "dc-terms", "title" ) ) );
 
-		// ebi-terms:has-address-line (subprop of dc:description/rdfs:comment)
+		// TODO: ebi-terms:has-address-line (subprop of dc:description/rdfs:comment)
 		// TODO: possibly more annotations to be considered: 
 		//   http://answers.semanticweb.com/questions/298/how-can-you-represent-physical-addresses-in-foaf
-		this.addPropertyMapper ( "address", new OwlDatatypePropRdfMapper<Organization, String> ( ns ( "ebi-terms", "has-address-line" ) ) );
+		this.addPropertyMapper ( "address", new OwlDatatypePropRdfMapper<Organization, String> ( ns ( "biosd-terms", "has-address-line" ) ) );
 		
 		// TODO: requires a special mapper that goes from string to URIs, without involving bean classes or URI generators
 		// this.setPropertyMapper ( new OwlObjPropRdfMapper<Organization, String> ( "URI", ns ( "rdfs", "seeAlso" ) ) );

@@ -217,7 +217,7 @@ public class BioSdExportService
 		notificationTimer.scheduleAtFixedRate ( new TimerTask() {
 			@Override
 			public void run () {
-				log.info ( "" + busyTasks + " expoter(s) still running, " + completedTasks + " completed, please wait" );
+				log.info ( "" + busyTasks + " task(s) still running, " + completedTasks + " completed, please wait" );
 			}
 		}, 60000, 60000 );
 

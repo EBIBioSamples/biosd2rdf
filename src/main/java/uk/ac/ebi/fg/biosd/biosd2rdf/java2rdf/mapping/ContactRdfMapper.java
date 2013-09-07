@@ -31,7 +31,7 @@ public class ContactRdfMapper extends BeanRdfMapper<Contact>
   		 *   ebi-terms:Person := subClassOf ( schema.org:Person, dcterms:Agent, foaf:Person )
 			 * 
 			 */
-			ns ( "ebi-terms", "ContactPerson" ), // TODO: See Schema design doc
+			ns ( "biosd-terms", "ContactPerson" ), // TODO: See Schema design doc
 			new MSIEquippedRdfUriGenerator<Contact> () 
 			{
 				@Override public String getUri ( Contact cnt ) 
@@ -60,13 +60,13 @@ public class ContactRdfMapper extends BeanRdfMapper<Contact>
 		this.addPropertyMapper ( "phone", new OwlDatatypePropRdfMapper<Contact, String> ( ns ( "sch", "telephone" ) ) );
 		this.addPropertyMapper ( "phone", new OwlDatatypePropRdfMapper<Contact, String> ( ns ( "sch", "faxNumber" ) ) );
 		
-		// ebi-terms:has-address-line (subprop of dc:description/rdfs:comment)
+		// biosd-terms:has-address-line (subprop of dc:description/rdfs:comment)
 		// TODO: possibly more annotations to be considered: 
 		//   http://answers.semanticweb.com/questions/298/how-can-you-represent-physical-addresses-in-foaf
-		this.addPropertyMapper ( "address", new OwlDatatypePropRdfMapper<Contact, String> ( ns ( "ebi-terms", "has-address-line" ) ) );
+		this.addPropertyMapper ( "address", new OwlDatatypePropRdfMapper<Contact, String> ( ns ( "biosd-terms", "has-address-line" ) ) );
 		
-		// ebi-terms:has-affiliation-line (subprop of dc:description/rdfs:comment)
-		this.addPropertyMapper ( "affiliation", new OwlDatatypePropRdfMapper<Contact, String> ( ns ( "ebi-terms", "has-affiliation-line" ) ) );
+		// biosd-terms:has-affiliation-line (subprop of dc:description/rdfs:comment)
+		this.addPropertyMapper ( "affiliation", new OwlDatatypePropRdfMapper<Contact, String> ( ns ( "biosd-terms", "has-affiliation-line" ) ) );
 		
 		// TODO: requires a special mapper that goes from string to URIs, without involving bean classes or URI generators
 		// this.setPropertyMapper ( new OwlObjPropRdfMapper<Contact, String> ( "url", ns ( "rdfs", "seeAlso" ) ) );

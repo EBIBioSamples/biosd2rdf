@@ -46,7 +46,7 @@ public class BiosdVoidCmd
 
 			args = cli.getArgs ();
 			
-			String tplPath = cli.getOptionValue ( 't', "./biosd_void_template.ttl" );
+			String tplPath = cli.getOptionValue ( 't', "./rdf/biosd_void_template.ttl" );
 			String propPath = cli.getOptionValue ( 'p' );
 			
 			Properties props;
@@ -113,7 +113,7 @@ public class BiosdVoidCmd
 		Options opts = new Options ();
 		
 		opts.addOption ( OptionBuilder
-			.withDescription ( "Template file (default is ./biosd_void_template.ttl" )
+			.withDescription ( "Template file (default is ./rdf/biosd_void_template.ttl" )
 			.hasArg ().withArgName ( "<path>" )
 			.withLongOpt ( "template" )
 			.create ( 't' )

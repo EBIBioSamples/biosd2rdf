@@ -139,7 +139,7 @@ public class ExpPropValueRdfMapper<T extends Accessible> extends PropertyRdfMapp
 			
 			// Define the link to the type
 			String attributeLinkUri = pval instanceof BioCharacteristicValue  
-				? ns ( "ebi-terms", "has-bio-characteristic" ) // TODO: needs to be defined as sub-property of obo:IAO_0000136 (is_about) 
+				? ns ( "biosd-terms", "has-bio-characteristic" ) // sub-property of obo:IAO_0000136 (is_about) 
 				: ns ( "obo", "IAO_0000136" );	// is about
 				
 			// Now we have either *** sample has-biocharacteristic valUri ***, or *** sample is-about valUri ***, depending on 
