@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<catalog prefer="public" xmlns="urn:oasis:names:tc:entity:xmlns:xml:catalog">
+    <uri id="Imports Wizard Entry" name="http://purl.org/spar/fabio/" uri="http://eelst.cs.unibo.it/apps/LODE/source?url=http://purl.org/spar/fabio"/>
+    <uri id="Imports Wizard Entry" name="http://purl.obolibrary.org/obo/iao/iao-main.owl" uri="http://purl.obolibrary.org/obo/iao/2011-05-09/iao-main.owl"/>
+    <uri id="Imports Wizard Entry" name="http://schema.org/" uri="http://schema.org/docs/schemaorg.owl"/>
+    <uri id="Imports Wizard Entry" name="http://xmlns.com/foaf/0.1/" uri="http://xmlns.com/foaf/spec/index.rdf"/>
+    <uri id="Imports Wizard Entry" name="http://purl.obolibrary.org/obo/obi.owl" uri="http://svn.code.sf.net/p/obi/code/releases/2012-07-01/merged/merged-obi-comments.owl"/>
+    <group id="Folder Repository, directory=, recursive=true, Auto-Update=true, version=2" prefer="public" xml:base="">
+        <uri id="Automatically generated entry, Timestamp=1378492905282" name="http://purl.obolibrary.org/obo/" uri="ext/iao-main.owl"/>
+        <uri id="Automatically generated entry, Timestamp=1378492905282" name="http://purl.obolibrary.org/obo/obi.owl" uri="ext/merged-obi-comments.owl"/>
+        <uri id="Automatically generated entry, Timestamp=1378492905282" name="http://schema.org/" uri="ext/schemaorg.owl"/>
+        <uri id="Automatically generated entry, Timestamp=1378492905282" name="http://semanticscience.org/ontology/sio.owl" uri="ext/sio.owl"/>
+        <uri id="Automatically generated entry, Timestamp=1378492905282" name="http://www.w3.org/2002/07/owl" uri="ebi_terms.owl"/>
+    </group>
+</catalog>
