@@ -71,7 +71,7 @@ public class BioSdOntologyTermResolver
 			// Try to resolve the type instead of the value
 			return ontoTermDiscoverer.getOntologyTermUriAsASCII ( pvalTypeLabel, null );
 		
-		// Same for dates
+		// TODO: Same for dates
 
 		// OK, we have a value, no ontology term attached, no URI, no number, no date, try to resolve the value string
 		return ontoTermDiscoverer.getOntologyTermUriAsASCII ( pvalLabel, pvalTypeLabel );

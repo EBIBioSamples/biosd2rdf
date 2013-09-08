@@ -19,7 +19,7 @@ import org.slf4j.LoggerFactory;
  * @author Marco Brandizi
  *
  */
-public abstract class PoolSizeTuningTimerTask extends TimerTask
+public abstract class PoolSizeTuner
 {
 	private int minThreads = 5, maxThreads = 200, maxThreadIncr = 50, minThreadIncr = 5;
 	private double threadDeltaTolerance = 10d/100d;
@@ -34,9 +34,7 @@ public abstract class PoolSizeTuningTimerTask extends TimerTask
 	
 	protected Logger log = LoggerFactory.getLogger ( this.getClass () );
 
-
-	@Override
-	public void run ()
+	private void run ()
 	{
 		final long curCompletedTasks = getCompletedTasks ();
 		final long curThru = curCompletedTasks - prevCompletedTasks;
@@ -106,14 +104,29 @@ public abstract class PoolSizeTuningTimerTask extends TimerTask
 	
 	public void start ()
 	{
+		log.trace ( "Starting the thread pool tuner" );
+		this.stop (); // Be sure it's off
 		initVariables ();
 		poolSizeTunerTimer = new Timer ( "Task Pool Size Optimiser" );
-		poolSizeTunerTimer.scheduleAtFixedRate ( this, 1000 * 60 * periodMins, 1000 * 60 * periodMins );
+		poolSizeTunerTimer.scheduleAtFixedRate
+		( 
+			new TimerTask() 
+			{
+				@Override
+				public void run () {
+					PoolSizeTuner.this.run ();
+				}
+			}, 
+			1000 * 60 * periodMins, 1000 * 60 * periodMins 
+		);
 	}
 	
 	public void stop ()
 	{
+		if ( poolSizeTunerTimer == null ) return; 
 		poolSizeTunerTimer.cancel ();
+		poolSizeTunerTimer = null;
+		log.trace ( "Thread pool tuner stopped" );
 	}
 	
 	private void initVariables ()

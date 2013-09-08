@@ -2,6 +2,7 @@ package uk.ac.ebi.fg.biosd.biosd2rdf.threading;
 
 import javax.persistence.EntityManager;
 
+import org.apache.commons.lang.math.RandomUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,6 +51,7 @@ public class BioSdExportTask implements Runnable
 		em = Resources.getInstance ().getEntityManagerFactory ().createEntityManager ();
 		IdentifiableDAO<MSI> msiDao = new IdentifiableDAO<MSI> ( MSI.class, em );
 		MSI msi = msiDao.find ( msiId );
+
 		if ( msi == null ) 
 		{
 			this.exitCode = 1;
@@ -64,6 +66,8 @@ public class BioSdExportTask implements Runnable
 		try
 		{
 			rdfMapFactory.map ( msi );
+			/* DEBUG log.info ( "Here I should export {}, having a nap instead", msi.getAcc () );
+			Thread.sleep ( RandomUtils.nextLong () % 10000 ); */
 		} 
 		catch ( Exception ex ) 
 		{

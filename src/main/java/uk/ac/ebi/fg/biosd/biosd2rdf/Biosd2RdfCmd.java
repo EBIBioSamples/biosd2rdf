@@ -28,7 +28,7 @@ import uk.ac.ebi.fg.core_model.resources.Resources;
 public class Biosd2RdfCmd
 {
 	
-	public static void main ( String[] args ) throws Throwable
+	public static void main ( String... args )
 	{
 		int exCode = 0;
 		BioSdExportService exportService = null; 

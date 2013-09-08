@@ -43,13 +43,7 @@
 		<dependency>
 		  <groupId>uk.ac.ebi</groupId>
 		  <artifactId>jutils</artifactId>
-		  <version>2.0</version>
-		  <exclusions>
-		  	<exclusion>
-		  		<artifactId>persistence-api</artifactId>
-		  		<groupId>javax.persistence</groupId>
-		  	</exclusion>
-		  </exclusions>
+		  <version>3.0</version>
 		</dependency>
 	
 		<dependency>
@@ -133,7 +127,13 @@
 	    <artifactId>junit</artifactId>
 	    <version>4.10</version>
 	  </dependency>
-	  
+
+		<dependency>
+			<groupId>uk.ac.ebi.fg</groupId>
+			<artifactId>biosd_loader</artifactId>
+			<version>1.0-SNAPSHOT</version>
+			<scope>test</scope>
+		</dependency>
 
   </dependencies>
 

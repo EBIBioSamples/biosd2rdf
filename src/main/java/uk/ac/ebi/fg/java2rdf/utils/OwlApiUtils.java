@@ -7,6 +7,8 @@ import org.semanticweb.owlapi.model.OWLDatatype;
 import org.semanticweb.owlapi.model.OWLLiteral;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import uk.ac.ebi.fg.java2rdf.mapping.RdfMappingException;
 
@@ -19,6 +21,10 @@ import uk.ac.ebi.fg.java2rdf.mapping.RdfMappingException;
  */
 public class OwlApiUtils
 {
+	private static Logger log = LoggerFactory.getLogger ( OwlApiUtils.class );
+	
+	private static final boolean DEBUG_FLAG = false;
+	
 	
 	public static synchronized void assertData ( OWLOntology model, String subjectUri, String propertyUri, String propertyValue )
 	{
@@ -28,6 +34,8 @@ public class OwlApiUtils
 	public static synchronized void assertData ( OWLOntology model, String subjectUri, String propertyUri, String propertyValue, String dataTypeUri )
 	{
 		checkNonNullTriple ( "assertData", subjectUri, propertyUri, propertyValue, dataTypeUri );
+		if ( DEBUG_FLAG ) return;
+		
 		OWLOntologyManager owlMgr = model.getOWLOntologyManager ();
 		OWLDataFactory owlFactory = owlMgr.getOWLDataFactory ();
 		
@@ -50,6 +58,8 @@ public class OwlApiUtils
 	public static synchronized void assertLink ( OWLOntology model, String subjectUri, String propertyUri, String objectUri )
 	{
 		checkNonNullTriple ( "assertLink", subjectUri, propertyUri, objectUri, null );
+		if ( DEBUG_FLAG ) return;
+
 		OWLOntologyManager owlMgr = model.getOWLOntologyManager ();
 		OWLDataFactory owlFactory = owlMgr.getOWLDataFactory ();
 
@@ -66,8 +76,11 @@ public class OwlApiUtils
 			throw new RdfMappingException ( String.format ( 
 				"assertIndividual ( '%s', '%s' ): cannot accept null paramters",
 				individualUri, classUri
-			)); 
-		
+		)); 
+
+		log.trace ( "doing assertClass ( '{}', '{}' )", individualUri, classUri ); 
+		if ( DEBUG_FLAG ) return;
+
 		OWLOntologyManager owlMgr = model.getOWLOntologyManager ();
 		OWLDataFactory owlFactory = owlMgr.getOWLDataFactory ();
 				
@@ -83,7 +96,10 @@ public class OwlApiUtils
 			throw new RdfMappingException ( String.format ( 
 				"assertClass ( '%s', '%s' ): cannot accept null paramters",
 				classUri, superClassUri
-			)); 
+		)); 
+		
+		log.trace ( "doing assertClass ( '{}', '{}' )", classUri, superClassUri );
+		if ( DEBUG_FLAG ) return;
 		
 		OWLOntologyManager owlMgr = model.getOWLOntologyManager ();
 		OWLDataFactory owlFactory = owlMgr.getOWLDataFactory ();
@@ -97,6 +113,8 @@ public class OwlApiUtils
 	public static synchronized void assertAnnotationLink ( OWLOntology model, String subjectUri, String propertyUri, String objectUri )
 	{
 		checkNonNullTriple ( "assertAnnotationLink", subjectUri, propertyUri, objectUri, null );
+		if ( DEBUG_FLAG ) return;
+		
 		OWLOntologyManager owlMgr = model.getOWLOntologyManager ();
 		OWLDataFactory owlFactory = owlMgr.getOWLDataFactory ();
 		
@@ -116,6 +134,8 @@ public class OwlApiUtils
 	public static synchronized void assertAnnotationData ( OWLOntology model, String subjectUri, String propertyUri, String propertyValue, String dataTypeUri )
 	{
 		checkNonNullTriple ( "assertAnnotationData", subjectUri, propertyUri, propertyValue, dataTypeUri );
+		if ( DEBUG_FLAG ) return;
+		
 		OWLOntologyManager owlMgr = model.getOWLOntologyManager ();
 		OWLDataFactory owlFactory = owlMgr.getOWLDataFactory ();
 		
@@ -135,7 +155,7 @@ public class OwlApiUtils
 		));
 	}
 	
-	private static synchronized void checkNonNullTriple ( String methodName, String subjectUri, String propertyUri, String objectValueOrUri, String dataTypeUri )
+	private static void checkNonNullTriple ( String methodName, String subjectUri, String propertyUri, String objectValueOrUri, String dataTypeUri )
 	{
 		if ( StringUtils.trimToNull ( subjectUri ) == null 
 				|| StringUtils.trimToNull ( propertyUri ) == null || StringUtils.trimToNull ( objectValueOrUri ) == null 
@@ -150,5 +170,9 @@ public class OwlApiUtils
 					"Cannot assert an RDF triple with null elements: %s ( '%s', '%s', '%s', '%s' )", 
 					methodName, subjectUri, propertyUri, StringUtils.abbreviate ( objectValueOrUri, 255 ), dataTypeUri ));
 		}
+		
+		log.trace ( "doing {} ( '{}', '{}', '{}' )", new String [] { 
+			methodName, subjectUri, propertyUri, StringUtils.abbreviate ( objectValueOrUri, 50 ) } 
+		);
 	}
 }

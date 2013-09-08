@@ -35,6 +35,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import uk.ac.ebi.fg.biosd.biosd2rdf.java2rdf.mapping.BioSdRfMapperFactory;
+import uk.ac.ebi.fg.biosd.model.organizational.MSI;
 import uk.ac.ebi.fg.core_model.resources.Resources;
 import uk.ac.ebi.utils.memory.MemoryUtils;
 
@@ -72,7 +73,7 @@ public class BioSdExportService
 		}
 	};
 	
-	private PoolSizeTuningTimerTask poolSizeTunerTimerTask = null;
+	private PoolSizeTuner poolSizeTuner = null;
 
 	public BioSdExportService ( String outputPath )
 	{
@@ -92,11 +93,11 @@ public class BioSdExportService
 
 	private void submit ( final BioSdExportTask exportTask )
 	{
-		// This will dynamically tune the thread pool size
+		// This will tune the thread pool size dynamically
 		//
-		if ( this.poolSizeTunerTimerTask == null )
+		if ( this.poolSizeTuner == null )
 		{
-			poolSizeTunerTimerTask = new PoolSizeTuningTimerTask () 
+			poolSizeTuner = new PoolSizeTuner () 
 			{
 				@Override
 				protected void setThreadPoolSize ( int size ) 
@@ -118,9 +119,9 @@ public class BioSdExportService
 					return completedTasks;
 				}
 			};
-
-			poolSizeTunerTimerTask.start ();
-		}
+			poolSizeTuner.start ();
+			
+		} // poolSizeTuner check
 		
 		// This will flush the triples to the disk when the memory is too full
 		MemoryUtils.checkMemory ( this.memFlushAction, 15d / 100d );
@@ -137,7 +138,12 @@ public class BioSdExportService
 				catch ( InterruptedException ex ) {
 					throw new RuntimeException ( "Internal error: " + ex.getMessage (), ex );
 			}
-
+			busyTasks++;
+			log.info ( 
+				"Submitted: " + exportTask.getMSI ().getAcc () + ", " + busyTasks + " task(s) running, " 
+				+ completedTasks + " completed, please wait" 
+			);
+	
 			// Now submit a new task, decorated with release code
 			executor.submit ( new Runnable() 
 			{
@@ -169,7 +175,6 @@ public class BioSdExportService
 								Thread.currentThread ().getName () + " released, " + busyTasks + " task(s) running, " 
 								+ completedTasks + ", completed" 
 							);
-							submissionLock.notifyAll ();
 						}
 						finally {
 							submissionLock.unlock ();
@@ -178,14 +183,7 @@ public class BioSdExportService
 					} // run().finally
 				} // run()
 			}); // decorated runnable
-			
-			busyTasks++;
-			log.info ( 
-				"Submitted: " + exportTask.getMSI ().getAcc () + ", " + busyTasks + " task(s) running, " 
-				+ completedTasks + " completed, please wait" 
-			);
-			
-		} // service submissionLock.lock()
+		} // try on submissionLock  
 		finally {
 			submissionLock.unlock ();
 		}
@@ -194,6 +192,11 @@ public class BioSdExportService
 	
 	public void submit ( Long msiId ) {
 		submit ( new BioSdExportTask ( rdfMapFactory, msiId ) );
+	}
+
+	/** Used mainly for testing purposes. */
+	public void submit ( MSI msi ) {
+		submit ( new BioSdExportTask ( rdfMapFactory, msi ) );
 	}
 
 
@@ -253,7 +256,7 @@ public class BioSdExportService
 			if ( this.onto.isEmpty () ) return; 
 		
 			// Don't measure/change the throughput while I'm idle
-			if ( this.poolSizeTunerTimerTask != null ) poolSizeTunerTimerTask.stop ();
+			if ( this.poolSizeTuner != null ) poolSizeTuner.stop ();
 			
 			String outp = null;
 			if ( this.outputPath != null )
@@ -300,7 +303,7 @@ public class BioSdExportService
 			this.outputCounter++;
 			
 			// Restart dynamic thread pool size optimisation if it was stopped
-			if ( kbout != null && this.poolSizeTunerTimerTask != null ) poolSizeTunerTimerTask.start ();
+			if ( kbout != null && this.poolSizeTuner != null ) poolSizeTuner.start ();
 		}
 	} // flushKnowledgeBase
 	
@@ -308,7 +311,7 @@ public class BioSdExportService
 	@Override
 	protected void finalize () throws Throwable
 	{
-		this.poolSizeTunerTimerTask.stop ();
+		if ( poolSizeTuner != null ) this.poolSizeTuner.stop ();
 		super.finalize ();
 	}
 }

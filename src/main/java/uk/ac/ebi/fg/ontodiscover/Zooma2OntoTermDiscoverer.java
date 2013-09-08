@@ -18,9 +18,9 @@ import uk.ac.ebi.fgpt.zooma.search.ZOOMASearchClient;
 
 public class Zooma2OntoTermDiscoverer extends OntologyTermDiscoverer
 {
-	ZOOMASearchClient zoomaClient;
+	private ZOOMASearchClient zoomaClient;
 	
-	Logger log = LoggerFactory.getLogger ( this.getClass () );
+	private Logger log = LoggerFactory.getLogger ( this.getClass () );
 	
 	public Zooma2OntoTermDiscoverer () 
 	{
