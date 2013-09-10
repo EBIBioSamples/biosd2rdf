@@ -23,30 +23,31 @@ public class ExporterTest
 	/**
 	 * Loads mock-up SampleTab submissions and then export them via the multi-threaded exporter.
 	 */
-	@Test @Ignore ( "Too time-consuming, used for manual tests" )
+	@Test @Ignore ( "Temporary disabled" )
 	public void testExporter ()
 	{
 		Persister persister = new Persister ();
 		
-		for ( long id = 1; id <= 100; id++ )
+		for ( long id = 1; id <= 50; id++ )
 		{
 			TestModel tm = new TestModel ( "test." + id + "." );
 			persister.persist ( tm.msi );
-			log.debug ( "{} persisted", tm.msi.getAcc () );
+			log.info ( "{} persisted", tm.msi.getAcc () );
 		}
 		
+		System.setProperty ( "biosd.test_mode", "true" );
 		Biosd2RdfCmd.main ( "-o", "target/biosd_test.owl" );
 	}
 	
 	/**
 	 * Creates mock-up SampleTab submissions and export them, without involving any relational DB.
 	 */
-	@Test
+	@Test @Ignore ( "Temporary disabled" )
 	public void testNoDbExport ()
 	{
 		BioSdExportService xservice = new BioSdExportService ( "target/biosd_nodb_test.owl" );
 		
-		for ( long id = 1; id <= 100; id++ )
+		for ( long id = 1; id <= 50; id++ )
 		{
 			TestModel tm = new TestModel ( "test." + id + "." );
 			log.debug ( "Exporting {}", tm.msi.getAcc () );
@@ -55,6 +56,16 @@ public class ExporterTest
 		
 		xservice.waitAllFinished ();
 		xservice.flushKnowledgeBase ();
+	}
+
+	/**
+	 * Exports whatever it finds in the POM-configured DB
+	 */
+	@Test
+	public void testExporterFromExistingDb ()
+	{
+		System.setProperty ( "biosd.test_mode", "true" );
+		Biosd2RdfCmd.main ( "-o", "target/biosd_test.owl" );
 	}
 
 }

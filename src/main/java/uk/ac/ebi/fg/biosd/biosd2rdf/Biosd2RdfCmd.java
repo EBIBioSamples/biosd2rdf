@@ -78,8 +78,11 @@ public class Biosd2RdfCmd
 
 				if ( exportService != null ) exportService.flushKnowledgeBase ();
 			
-			}// exitCode	
-			System.exit ( exCode );
+			}// exitCode
+			
+			// This is needed to prevent JUnit to fail.
+			if ( !"true".equals ( System.getProperty ( "biosd.test_mode" ) ) )
+				System.exit ( exCode );
 		}
 	}
 	

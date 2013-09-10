@@ -1,0 +1,286 @@
+@prefix : <http://www.w3.org/2002/07/owl#> .
+@prefix obo: <http://purl.obolibrary.org/obo/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix xml: <http://www.w3.org/XML/1998/namespace> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix schema: <http://schema.org/> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix biosdterms: <http://rdf.ebi.ac.uk/terms/biosd/> .
+@base <http://rdf.ebi.ac.uk/terms/biosd/> .
+
+<http://rdf.ebi.ac.uk/terms/biosd/> rdf:type :Ontology ;
+                                    
+                                    :imports obo:obi.owl ,
+                                             <http://purl.obolibrary.org/obo/iao/iao-main.owl> ,
+                                             <http://purl.org/spar/fabio/> ,
+                                             schema: ,
+                                             <http://semanticscience.org/ontology/sio.owl> ,
+                                             <http://xmlns.com/foaf/0.1/> .
+
+
+#################################################################
+#
+#    Annotation properties
+#
+#################################################################
+
+
+###  http://rdf.ebi.ac.uk/terms/biosd/has-address-line
+
+biosdterms:has-address-line rdf:type :AnnotationProperty ;
+                            
+                            rdfs:label "postal address"@en ;
+                            
+                            obo:IAO_0000115 "A postal address in the form of simple text (i.e., string). This can be used for those cases where it's too complicated to achieve a proper structure for an address."@en ;
+                            
+                            rdfs:subPropertyOf dcterms:description ,
+                                               rdfs:comment .
+
+
+
+###  http://rdf.ebi.ac.uk/terms/biosd/has-affiliation-line
+
+biosdterms:has-affiliation-line rdf:type :AnnotationProperty ;
+                                
+                                rdfs:label "affiliation"@en ;
+                                
+                                obo:IAO_0000115 "An affiliation description for a person (e.g., department+university), in the form of simple text (i.e., string). This can be used for those cases where it's too complicated to achieve a proper structure for an affiliation."@en ;
+                                
+                                rdfs:subPropertyOf dcterms:description ,
+                                                   rdfs:comment .
+
+
+
+###  http://rdf.ebi.ac.uk/terms/biosd/has-authors-list
+
+biosdterms:has-authors-list rdf:type :AnnotationProperty ;
+                            
+                            rdfs:label "authors list"@en ;
+                            
+                            obo:IAO_0000115 "The list of authors of a publication or document, in the form of a simple text (i.e., a string). This can be used for those cases where extracting a proper list of authors (e.g., from a database record) is too complicated."@en ;
+                            
+                            rdfs:domain obo:IAO_0000311 ;
+                            
+                            rdfs:subPropertyOf dcterms:description ;
+                            
+                            rdfs:domain <http://purl.org/spar/fabio/Work> ;
+                            
+                            rdfs:subPropertyOf rdfs:comment ;
+                            
+                            rdfs:domain <http://xmlns.com/foaf/0.1/Document> .
+
+
+
+###  http://rdf.ebi.ac.uk/terms/biosd/has-knowledgeable-organization
+
+biosdterms:has-knowledgeable-organization rdf:type :AnnotationProperty ;
+                                          
+                                          rdfs:label "has knowledgeable organization"@en ;
+                                          
+                                          obo:IAO_0000115 "An organization that is somehow involved with the subject of this relation, for example because it is its creator, or the maintainer, or alike."@en ;
+                                          
+                                          rdfs:subPropertyOf dcterms:contributor .
+
+
+
+###  http://rdf.ebi.ac.uk/terms/biosd/has-knowledgeable-person
+
+biosdterms:has-knowledgeable-person rdf:type :AnnotationProperty ;
+                                    
+                                    rdfs:label "has knowledgeable person"@en ;
+                                    
+                                    obo:IAO_0000115 "A person that is somehow involved with the subject of this relation, for example because he/she is its creator, or the maintainer, or alike."@en ;
+                                    
+                                    rdfs:subPropertyOf dcterms:contributor .
+
+
+
+
+
+#################################################################
+#
+#    Object Properties
+#
+#################################################################
+
+
+###  http://rdf.ebi.ac.uk/terms/biosd/has-bio-characteristic
+
+biosdterms:has-bio-characteristic rdf:type :ObjectProperty ;
+                                  
+                                  rdfs:label "biological characteristic"@en ;
+                                  
+                                  obo:IAO_0000115 "Relates a biological sample to a biological property that it has, such as the disease state or the organism it derives from. This correponds to the characteristic column in formats such as SampleTab or MAGE-TAB and, because of that, it's a not-too-formal associations. For instance, an association to mus-musculus might mean  either that the samle is a mouse, or that it is a part of a mouse."@en ;
+                                  
+                                  rdfs:subPropertyOf obo:IAO_0000136 ;
+                                  
+                                  rdfs:domain [ rdf:type :Class ;
+                                                :unionOf ( obo:OBI_0000747
+                                                           biosdterms:SampleGroup
+                                                         )
+                                              ] .
+
+
+
+###  http://rdf.ebi.ac.uk/terms/biosd/has-knowledgeable-organization
+
+biosdterms:has-knowledgeable-organization rdf:type :ObjectProperty ;
+                                          
+                                          rdfs:label "has knowledgeable organization"@en ;
+                                          
+                                          obo:IAO_0000115 "An organization that is somehow involved with the subject of this relation, for example because it is its creator, or the maintainer, or alike."@en ;
+                                          
+                                          rdfs:subPropertyOf schema:contributor .
+
+
+
+###  http://rdf.ebi.ac.uk/terms/biosd/has-knowledgeable-person
+
+biosdterms:has-knowledgeable-person rdf:type :ObjectProperty ;
+                                    
+                                    rdfs:label "has knowledgeable person"@en ;
+                                    
+                                    obo:IAO_0000115 "A person that is somehow involved with the subject of this relation, for example because he/she is its creator, or the maintainer, or alike."@en ;
+                                    
+                                    rdfs:subPropertyOf schema:contributor .
+
+
+
+###  http://schema.org/contributor
+
+schema:contributor rdf:type :ObjectProperty .
+
+
+
+
+
+#################################################################
+#
+#    Data properties
+#
+#################################################################
+
+
+###  http://rdf.ebi.ac.uk/terms/biosd/has-address-line
+
+biosdterms:has-address-line rdf:type :DatatypeProperty ;
+                            
+                            rdfs:label "postal address"@en ;
+                            
+                            obo:IAO_0000115 "A postal address in the form of simple text (i.e., string). This can be used for those cases where it's too complicated to achieve a proper structure for an address."@en ;
+                            
+                            rdfs:subPropertyOf schema:description ;
+                            
+                            rdfs:range xsd:string .
+
+
+
+###  http://rdf.ebi.ac.uk/terms/biosd/has-affiliation-line
+
+biosdterms:has-affiliation-line rdf:type :DatatypeProperty ;
+                                
+                                rdfs:label "affiliation"@en ;
+                                
+                                obo:IAO_0000115 "An affiliation description for a person (e.g., department+university), in the form of simple text (i.e., string). This can be used for those cases where it's too complicated to achieve a proper structure for an affiliation."@en ;
+                                
+                                rdfs:subPropertyOf schema:description ;
+                                
+                                rdfs:range xsd:string .
+
+
+
+###  http://rdf.ebi.ac.uk/terms/biosd/has-authors-list
+
+biosdterms:has-authors-list rdf:type :DatatypeProperty ;
+                            
+                            rdfs:label "authors list"@en ;
+                            
+                            obo:IAO_0000115 "The list of authors of a publication or document, in the form of a simple text (i.e., a string). This can be used for those cases where extracting a proper list of authors (e.g., from a database record) is too complicated."@en ;
+                            
+                            rdfs:subPropertyOf schema:description ;
+                            
+                            rdfs:range xsd:string .
+
+
+
+
+
+#################################################################
+#
+#    Classes
+#
+#################################################################
+
+
+###  http://purl.obolibrary.org/obo/IAO_0000311
+
+obo:IAO_0000311 rdfs:subClassOf <http://purl.org/spar/fabio/Work> ,
+                                <http://xmlns.com/foaf/0.1/Document> .
+
+
+
+###  http://rdf.ebi.ac.uk/terms/biosd/BiosamplesSubmission
+
+biosdterms:BiosamplesSubmission rdf:type :Class ;
+                                
+                                rdfs:label "Biosamples Database submission"@en ;
+                                
+                                rdfs:subClassOf obo:IAO_0000310 ,
+                                                <http://purl.org/spar/fabio/Work> ;
+                                
+                                obo:IAO_0000115 "A chunk of data that is submitted into the Biosamples Database, typically defined in a single document, such as a SampleTab file."@en .
+
+
+
+###  http://rdf.ebi.ac.uk/terms/biosd/ContactOrganization
+
+biosdterms:ContactOrganization rdf:type :Class ;
+                               
+                               rdfs:label "contact organization"@en ;
+                               
+                               rdfs:subClassOf schema:Organization ,
+                                               <http://xmlns.com/foaf/0.1/Organization> ,
+                                               [ rdf:type :Restriction ;
+                                                 :onProperty obo:BFO_0000053 ;
+                                                 :someValuesFrom obo:BFO_0000023
+                                               ] ;
+                               
+                               obo:IAO_0000115 "An organization having some role, such as being a reference organization for the submission of an experimental data-set."@en .
+
+
+
+###  http://rdf.ebi.ac.uk/terms/biosd/ContactPerson
+
+biosdterms:ContactPerson rdf:type :Class ;
+                         
+                         rdfs:label "contact person"@en ;
+                         
+                         rdfs:subClassOf schema:Person ,
+                                         <http://xmlns.com/foaf/0.1/Person> ,
+                                         [ rdf:type :Restriction ;
+                                           :onProperty obo:BFO_0000053 ;
+                                           :someValuesFrom obo:OBI_0001687
+                                         ] ;
+                         
+                         obo:IAO_0000115 "A person that is a reference contact for some entity, such as an experimental data-set."@en .
+
+
+
+###  http://rdf.ebi.ac.uk/terms/biosd/SampleGroup
+
+biosdterms:SampleGroup rdf:type :Class ;
+                       
+                       rdfs:label "biosample group"@en ;
+                       
+                       rdfs:subClassOf obo:IAO_0000314 ,
+                                       <http://semanticscience.org/resource/SIO_000616> ;
+                       
+                       obo:IAO_0000115 "A collection of biological samples stored in the EBI Biosamples database. Sample membership to a group is assigned by submitters or via automatic tools (i.e., it's a fiat relationship)."@en .
+
+
+
+
+###  Generated by the OWL API (version 3.4.2) http://owlapi.sourceforge.net
+

@@ -21,6 +21,7 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 import javax.persistence.EntityManager;
+import javax.persistence.Query;
 
 import org.apache.commons.io.FilenameUtils;
 import org.semanticweb.owlapi.apibinding.OWLManager;
@@ -51,7 +52,7 @@ public class BioSdExportService
 	private OWLOntology onto;
 	private BioSdRfMapperFactory rdfMapFactory;
 
-	private int threadPoolSize = 40;
+	private int threadPoolSize = 25;
 	private ExecutorService executor = Executors.newFixedThreadPool ( threadPoolSize ); 
 
 	private int busyTasks = 0;
@@ -207,7 +208,8 @@ public class BioSdExportService
 		Random rnd = new Random ( System.currentTimeMillis () );
 		sampleSize /= 100d;
 		
-		for ( Long id: (List<Long>) em.createQuery ( "SELECT id FROM MSI" ).getResultList () )
+		Query q = em.createQuery ( "SELECT id FROM MSI" ).setHint ( "org.hibernate.readOnly", true );
+		for ( Long id: (List<Long>) q.getResultList () )
 		{
 			if ( rnd.nextDouble () >= sampleSize ) continue;
 			submit ( id );

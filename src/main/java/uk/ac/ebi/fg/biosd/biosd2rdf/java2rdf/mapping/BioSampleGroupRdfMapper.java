@@ -2,8 +2,14 @@ package uk.ac.ebi.fg.biosd.biosd2rdf.java2rdf.mapping;
 
 import static uk.ac.ebi.fg.java2rdf.utils.Java2RdfUtils.urlEncode;
 import static uk.ac.ebi.fg.java2rdf.utils.NamespaceUtils.ns;
+
+import org.apache.commons.lang.StringUtils;
+
 import uk.ac.ebi.fg.biosd.model.expgraph.BioSample;
 import uk.ac.ebi.fg.biosd.model.organizational.BioSampleGroup;
+import uk.ac.ebi.fg.core_model.expgraph.properties.BioCharacteristicType;
+import uk.ac.ebi.fg.core_model.expgraph.properties.BioCharacteristicValue;
+import uk.ac.ebi.fg.core_model.expgraph.properties.ExperimentalPropertyType;
 import uk.ac.ebi.fg.core_model.expgraph.properties.ExperimentalPropertyValue;
 import uk.ac.ebi.fg.java2rdf.mapping.BeanRdfMapper;
 import uk.ac.ebi.fg.java2rdf.mapping.properties.CollectionPropRdfMapper;
@@ -24,7 +30,8 @@ public class BioSampleGroupRdfMapper extends BeanRdfMapper<BioSampleGroup>
 	{
 		super ( 
 			// it's a subclass of iao:document_part and sio:collection too.
-			ns ( "biosd-terms", "SampleGroup" ), 
+			ns ( "biosd-terms", "SampleGroup" ),
+			// The MSI's accession is passed to the property value mapper
 			new RdfUriGenerator<BioSampleGroup> () {
 				@Override public String getUri ( BioSampleGroup sg ) {
 					return ns ( "biosd", "sample-group/" + urlEncode ( sg.getAcc () ) );
@@ -39,5 +46,29 @@ public class BioSampleGroupRdfMapper extends BeanRdfMapper<BioSampleGroup>
 		);
 		// TODO: more
 	}
+	
+	@Override
+	public boolean map ( BioSampleGroup sg )
+	{
+		// Do you have a name? (names will be used for dcterms:title and rdfs:label
+		// 
+		for ( ExperimentalPropertyValue<?> pval: sg.getPropertyValues () ) 
+		{
+			String pvalLabel = StringUtils.trimToNull ( pval.getTermText () );
+			ExperimentalPropertyType ptype = pval.getType ();
+			if ( pvalLabel == null ) continue;
+			if ( ptype == null ) continue;
+			String typeLabel = StringUtils.trimToNull ( ptype.getTermText () );
+			if ( "name".equals ( typeLabel ) ) return super.map ( sg );
+		}
+
+		// You don't! Take the accession!
+		BioCharacteristicType ntype = new BioCharacteristicType ( "name" );
+		BioCharacteristicValue nval = new BioCharacteristicValue ( "Sample " + sg.getAcc (), ntype );
+		sg.addPropertyValue ( nval );
+		
+		return super.map ( sg );
+	}
+	
 }
 

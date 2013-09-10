@@ -3,6 +3,7 @@
  */
 package uk.ac.ebi.fg.java2rdf.mapping;
 
+
 /**
  * TODO: COMMENT ME AGAIN!
  * 
@@ -16,7 +17,7 @@ package uk.ac.ebi.fg.java2rdf.mapping;
 public abstract class RdfMapper<T>
 {
 	private RdfMapperFactory mapperFactory;
-
+	
 	public RdfMapperFactory getMapperFactory () {
 		return mapperFactory;
 	}

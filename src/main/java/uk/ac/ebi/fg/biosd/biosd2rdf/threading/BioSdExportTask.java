@@ -1,5 +1,9 @@
 package uk.ac.ebi.fg.biosd.biosd2rdf.threading;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Properties;
+
 import javax.persistence.EntityManager;
 
 import org.apache.commons.lang.math.RandomUtils;
@@ -49,8 +53,7 @@ public class BioSdExportTask implements Runnable
 		this ( rdfMapFactory );
 
 		em = Resources.getInstance ().getEntityManagerFactory ().createEntityManager ();
-		IdentifiableDAO<MSI> msiDao = new IdentifiableDAO<MSI> ( MSI.class, em );
-		MSI msi = msiDao.find ( msiId );
+		MSI msi = em.find ( MSI.class, msiId, new HashMap<String, Object> () { { put ( "org.hibernate.readOnly", true ); } } );
 
 		if ( msi == null ) 
 		{

@@ -42,7 +42,7 @@
   </root>
 
 	<logger name = "uk.ac.ebi.fg.biosd.biosd2rdf" level = "ALL" />
-  <logger name = "uk.ac.ebi.fg.biosd.biosd2rdf.utils" level="ALL" />
-  <logger name = "uk.ac.ebi.fg.ontodiscover" level="ALL"/>
-	  
+  <logger name = "uk.ac.ebi.fg.biosd.biosd2rdf.utils" level = "ALL" />
+  <logger name = "uk.ac.ebi.fg.ontodiscover" level = "ALL" />
+	<logger name = "org.hibernate.SQL" level = "DEBUG" />	  
 </configuration>
