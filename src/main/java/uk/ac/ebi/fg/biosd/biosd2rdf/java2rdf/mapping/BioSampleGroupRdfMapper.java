@@ -3,6 +3,9 @@ package uk.ac.ebi.fg.biosd.biosd2rdf.java2rdf.mapping;
 import static uk.ac.ebi.fg.java2rdf.utils.Java2RdfUtils.urlEncode;
 import static uk.ac.ebi.fg.java2rdf.utils.NamespaceUtils.ns;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.apache.commons.lang.StringUtils;
 
 import uk.ac.ebi.fg.biosd.model.expgraph.BioSample;
@@ -33,7 +36,7 @@ public class BioSampleGroupRdfMapper extends BeanRdfMapper<BioSampleGroup>
 			ns ( "biosd-terms", "SampleGroup" ),
 			// The MSI's accession is passed to the property value mapper
 			new RdfUriGenerator<BioSampleGroup> () {
-				@Override public String getUri ( BioSampleGroup sg ) {
+				@Override public String getUri ( BioSampleGroup sg, Map<String, Object> params ) {
 					return ns ( "biosd", "sample-group/" + urlEncode ( sg.getAcc () ) );
 			}});
 		this.addPropertyMapper ( "acc", new OwlDatatypePropRdfMapper<BioSampleGroup, String> ( ns ( "dc-terms", "identifier" ) ) );
@@ -48,8 +51,10 @@ public class BioSampleGroupRdfMapper extends BeanRdfMapper<BioSampleGroup>
 	}
 	
 	@Override
-	public boolean map ( BioSampleGroup sg )
+	public boolean map ( BioSampleGroup sg, Map<String, Object> params )
 	{
+		if ( sg == null ) return false;
+		
 		// Do you have a name? (names will be used for dcterms:title and rdfs:label
 		// 
 		for ( ExperimentalPropertyValue<?> pval: sg.getPropertyValues () ) 
@@ -59,7 +64,8 @@ public class BioSampleGroupRdfMapper extends BeanRdfMapper<BioSampleGroup>
 			if ( pvalLabel == null ) continue;
 			if ( ptype == null ) continue;
 			String typeLabel = StringUtils.trimToNull ( ptype.getTermText () );
-			if ( "name".equals ( typeLabel ) ) return super.map ( sg );
+			if ( "name".equalsIgnoreCase ( typeLabel ) || "Sample Name".equalsIgnoreCase ( typeLabel ) ) 
+				return super.map ( sg, params );
 		}
 
 		// You don't! Take the accession!
@@ -67,7 +73,7 @@ public class BioSampleGroupRdfMapper extends BeanRdfMapper<BioSampleGroup>
 		BioCharacteristicValue nval = new BioCharacteristicValue ( "Sample " + sg.getAcc (), ntype );
 		sg.addPropertyValue ( nval );
 		
-		return super.map ( sg );
+		return super.map ( sg, params );
 	}
 	
 }

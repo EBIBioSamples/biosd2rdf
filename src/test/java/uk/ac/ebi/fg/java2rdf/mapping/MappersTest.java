@@ -4,6 +4,7 @@ import static uk.ac.ebi.fg.java2rdf.utils.NamespaceUtils.ns;
 
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import org.coode.owlapi.turtle.TurtleOntologyFormat;
@@ -85,9 +86,9 @@ public class MappersTest
 	{
 		{
 			// How beans of F type generates URI identifiers
-			this.setRdfUriGenerator ( new RdfUriGenerator<F>() {
+			this.setRdfUriGenerator ( new RdfUriGenerator<F> () {
 				@Override
-				public String getUri ( Foo source ) {
+				public String getUri ( F source, Map<String, Object> params ) {
 					return FOONS + source.getName ().toLowerCase ().replace ( ' ', '_' );
 				}
 			});
@@ -136,7 +137,7 @@ public class MappersTest
 			this.setMapper ( Foo.class, new BeanRdfMapper<Foo> ( FOONS + "FooChild" ) {{
 				this.setRdfUriGenerator ( new RdfUriGenerator<Foo>() {
 					@Override
-					public String getUri ( Foo source ) {
+					public String getUri ( Foo source, Map<String, Object> params ) {
 						return FOONS + source.getName ().toLowerCase ().replace ( ' ', '_' );
 					}
 				});

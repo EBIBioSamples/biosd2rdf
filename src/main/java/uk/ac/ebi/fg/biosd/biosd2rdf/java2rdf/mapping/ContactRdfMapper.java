@@ -5,10 +5,14 @@ import static org.apache.commons.lang.StringUtils.trimToNull;
 import static uk.ac.ebi.fg.java2rdf.utils.Java2RdfUtils.hashUriSignature;
 import static uk.ac.ebi.fg.java2rdf.utils.Java2RdfUtils.urlEncode;
 import static uk.ac.ebi.fg.java2rdf.utils.NamespaceUtils.ns;
+
+import java.util.Map;
+
 import uk.ac.ebi.fg.core_model.organizational.Contact;
 import uk.ac.ebi.fg.java2rdf.mapping.BeanRdfMapper;
 import uk.ac.ebi.fg.java2rdf.mapping.RdfMappingException;
 import uk.ac.ebi.fg.java2rdf.mapping.properties.OwlDatatypePropRdfMapper;
+import uk.ac.ebi.fg.java2rdf.mapping.urigen.RdfUriGenerator;
 import uk.ac.ebi.fg.java2rdf.utils.OwlApiUtils;
 
 /**
@@ -32,9 +36,9 @@ public class ContactRdfMapper extends BeanRdfMapper<Contact>
 			 * 
 			 */
 			ns ( "biosd-terms", "ContactPerson" ), // TODO: See Schema design doc
-			new MSIEquippedRdfUriGenerator<Contact> () 
+			new RdfUriGenerator<Contact> () 
 			{
-				@Override public String getUri ( Contact cnt ) 
+				@Override public String getUri ( Contact cnt, Map<String, Object> params ) 
 				{
 					String nameLine = trimToEmpty ( cnt.getFirstName () ) 
 						+ trimToEmpty ( cnt.getMidInitials () ) 
@@ -42,7 +46,9 @@ public class ContactRdfMapper extends BeanRdfMapper<Contact>
 					nameLine = trimToNull ( nameLine );
 					
 					String email = trimToNull ( cnt.getEmail () );
-					String id = email != null ? hashUriSignature ( email ) : urlEncode ( getMsiAcc () ) + "/" + hashUriSignature ( nameLine );    
+					String id = email != null 
+						? hashUriSignature ( email ) 
+						: urlEncode ( (String) params.get ( "msiAccession" ) ) + "/" + hashUriSignature ( nameLine );    
 					
 					return ns ( "biosd", "ref-contact/" + id );
 			}}
@@ -76,11 +82,11 @@ public class ContactRdfMapper extends BeanRdfMapper<Contact>
 	}
 
 	@Override
-	public boolean map ( Contact cnt )
+	public boolean map ( Contact cnt, Map<String, Object> params )
 	{
 		try
 		{
-			if ( super.map ( cnt ) ) return false;
+			if ( super.map ( cnt, params ) ) return false;
 			
 			String nameLine = trimToEmpty ( cnt.getFirstName () ) 
 				+ trimToEmpty ( cnt.getMidInitials () ) 

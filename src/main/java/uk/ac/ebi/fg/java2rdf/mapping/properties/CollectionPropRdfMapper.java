@@ -4,6 +4,7 @@
 package uk.ac.ebi.fg.java2rdf.mapping.properties;
 
 import java.util.Collection;
+import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
 
@@ -41,14 +42,14 @@ public class CollectionPropRdfMapper<T, PT> extends PropertyRdfMapper<T, Collect
 	 *  
 	 */
 	@Override
-	public boolean map ( T source, Collection<PT> propValues )
+	public boolean map ( T source, Collection<PT> propValues, Map<String, Object> params )
 	{
 		try
 		{
 			if ( propValues == null || propValues.isEmpty () ) return false; 
 
 			for ( PT pvalue: propValues ) 
-				propertyMapper.map ( source, pvalue );
+				propertyMapper.map ( source, pvalue, params );
 			return true;
 		} 
 		catch ( Exception ex )

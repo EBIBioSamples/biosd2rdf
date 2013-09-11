@@ -3,6 +3,8 @@
  */
 package uk.ac.ebi.fg.java2rdf.mapping.urigen;
 
+import java.util.Map;
+
 import uk.ac.ebi.fg.java2rdf.mapping.BeanRdfMapper;
 import uk.ac.ebi.fg.java2rdf.mapping.properties.OwlDatatypePropRdfMapper;
 
@@ -24,15 +26,19 @@ public class RdfLiteralGenerator<T> extends RdfValueGenerator<T>
 {
 	/** It invokes {@link #getLiteral(Object)}, redefine that. */
 	@Override
-	public final String getValue ( T source )
+	public final String getValue ( T source, Map<String, Object> params )
 	{
-		return getLiteral ( source );
+		return getLiteral ( source, params );
 	}
 	
 	/**
 	 * Here it is where the real job happens and then {@link #getValue(Object)} is implemented as a synonym of this.
 	 */
-	public String getLiteral ( T source ) {
+	public String getLiteral ( T source, Map<String, Object> params ) {
 		return source == null ? "" : source.toString ();
+	}
+	
+	public String getLiteral ( T source ) {
+		return getLiteral ( source, null );
 	}
 }

@@ -1,5 +1,7 @@
 package uk.ac.ebi.fg.java2rdf.mapping.properties;
 
+import java.util.Map;
+
 import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.lang.StringUtils;
 
@@ -39,7 +41,7 @@ public class BeanPropRdfMapper<T, PT> extends ObjRdfMapper<T>
 	*/
 	@Override
 	@SuppressWarnings ( "unchecked" )
-	public final boolean map ( T source ) throws RdfMappingException
+	public final boolean map ( T source, Map<String, Object> params ) throws RdfMappingException
 	{
 		if ( propertyMapper == null ) return false;
 
@@ -47,7 +49,7 @@ public class BeanPropRdfMapper<T, PT> extends ObjRdfMapper<T>
 		try
 		{
 			pval = (PT) PropertyUtils.getSimpleProperty ( source, sourcePropertyName );
-			return propertyMapper.map ( source, pval );
+			return propertyMapper.map ( source, pval, params );
 		} 
 		catch ( Exception ex )
 		{

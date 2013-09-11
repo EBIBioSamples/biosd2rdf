@@ -2,6 +2,7 @@ package uk.ac.ebi.fg.java2rdf.mapping.properties;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 import uk.ac.ebi.fg.java2rdf.mapping.RdfMapperFactory;
 
@@ -37,14 +38,14 @@ public class CompositePropRdfMapper<T, PT> extends PropertyRdfMapper<T, PT>
 
 	
 	@Override
-	public boolean map ( T source, PT propValue )
+	public boolean map ( T source, PT propValue, Map<String, Object> params )
 	{
 		if ( propertyMappers == null || propertyMappers.isEmpty () ) return false;
-		if ( !super.map ( source, propValue ) ) return false;
+		if ( !super.map ( source, propValue, params ) ) return false;
 		
 		boolean result = false;
 		for ( PropertyRdfMapper<T, PT> mapper: this.propertyMappers )
-			result |= mapper.map ( source, propValue );
+			result |= mapper.map ( source, propValue, params );
 
 		return result;
 	}

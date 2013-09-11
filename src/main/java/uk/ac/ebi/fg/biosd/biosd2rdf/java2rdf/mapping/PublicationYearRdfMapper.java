@@ -2,6 +2,8 @@ package uk.ac.ebi.fg.biosd.biosd2rdf.java2rdf.mapping;
 
 import static uk.ac.ebi.fg.java2rdf.utils.NamespaceUtils.ns;
 
+import java.util.Map;
+
 import org.apache.commons.lang.StringUtils;
 import org.semanticweb.owlapi.vocab.XSDVocabulary;
 
@@ -29,7 +31,7 @@ public class PublicationYearRdfMapper extends OwlDatatypePropRdfMapper<Publicati
 	}
 	
 	@Override
-	public boolean map ( Publication source, String year )
+	public boolean map ( Publication source, String year, Map<String, Object> params )
 	{
 		try
 		{

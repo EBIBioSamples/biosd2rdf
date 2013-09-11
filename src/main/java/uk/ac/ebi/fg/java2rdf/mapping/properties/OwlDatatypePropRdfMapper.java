@@ -3,6 +3,8 @@
  */
 package uk.ac.ebi.fg.java2rdf.mapping.properties;
 
+import java.util.Map;
+
 import org.apache.commons.lang.StringUtils;
 
 import uk.ac.ebi.fg.java2rdf.mapping.BeanRdfMapper;
@@ -52,7 +54,7 @@ public class OwlDatatypePropRdfMapper<T, PT> extends URIProvidedPropertyRdfMappe
 	 * {@link BeanRdfMapper#getRdfUriGenerator()}.
 	 */
 	@Override
-	public boolean map ( T source, PT propValue )
+	public boolean map ( T source, PT propValue, Map<String, Object> params )
 	{
 		try
 		{
@@ -60,11 +62,11 @@ public class OwlDatatypePropRdfMapper<T, PT> extends URIProvidedPropertyRdfMappe
 			
 			RdfMapperFactory mapFactory = this.getMapperFactory ();
 			RdfLiteralGenerator<PT> targetValGen = this.getRdfLiteralGenerator ();
-			String targetRdfVal = targetValGen.getValue ( propValue );
+			String targetRdfVal = targetValGen.getValue ( propValue, params );
 			if ( targetRdfVal == null ) return false;
 			
 			OwlApiUtils.assertData ( this.getMapperFactory ().getKnowledgeBase (), 
-				mapFactory.getUri ( source ), this.getTargetPropertyUri (), targetRdfVal );
+				mapFactory.getUri ( source, params ), this.getTargetPropertyUri (), targetRdfVal );
 			return true;
 		} 
 		catch ( Exception ex )

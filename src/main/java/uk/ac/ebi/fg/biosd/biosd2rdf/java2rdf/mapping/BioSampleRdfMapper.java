@@ -15,6 +15,9 @@ import uk.ac.ebi.fg.java2rdf.mapping.properties.CollectionPropRdfMapper;
 import uk.ac.ebi.fg.java2rdf.mapping.properties.OwlDatatypePropRdfMapper;
 import uk.ac.ebi.fg.java2rdf.mapping.urigen.RdfUriGenerator;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Maps a BioSD sample to RDF.
  *
@@ -31,7 +34,7 @@ public class BioSampleRdfMapper extends BeanRdfMapper<BioSample>
 			ns ( "obo", "OBI_0000747" ), 
 			// The MSI's accession is passed to the property value mapper
 			new RdfUriGenerator<BioSample> () {
-				@Override public String getUri ( BioSample smp ) {
+				@Override public String getUri ( BioSample smp, Map<String, Object> params ) {
 					return ns ( "biosd", "sample/" + urlEncode ( smp.getAcc () ) );
 			}}
 		);
@@ -43,8 +46,10 @@ public class BioSampleRdfMapper extends BeanRdfMapper<BioSample>
 	}
 
 	@Override
-	public boolean map ( BioSample smp )
+	public boolean map ( BioSample smp, Map<String, Object> params )
 	{
+		if ( smp == null ) return false;
+		
 		// Do you have a name? (names will be used for dcterms:title and rdfs:label
 		// 
 		for ( ExperimentalPropertyValue<?> pval: smp.getPropertyValues () ) 
@@ -54,7 +59,8 @@ public class BioSampleRdfMapper extends BeanRdfMapper<BioSample>
 			if ( pvalLabel == null ) continue;
 			if ( ptype == null ) continue;
 			String typeLabel = StringUtils.trimToNull ( ptype.getTermText () );
-			if ( "name".equals ( typeLabel ) ) return super.map ( smp );
+			if ( "name".equalsIgnoreCase ( typeLabel ) || "Sample Name".equalsIgnoreCase ( typeLabel ) ) 
+				return super.map ( smp, params );
 		}
 
 		// You don't! Take the accession!
@@ -62,7 +68,7 @@ public class BioSampleRdfMapper extends BeanRdfMapper<BioSample>
 		BioCharacteristicValue nval = new BioCharacteristicValue ( "Sample " + smp.getAcc (), ntype );
 		smp.addPropertyValue ( nval );
 		
-		return super.map ( smp );
+		return super.map ( smp, params );
 	}
 	
 	

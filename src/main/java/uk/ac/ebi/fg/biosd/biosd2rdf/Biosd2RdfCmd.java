@@ -71,17 +71,24 @@ public class Biosd2RdfCmd
 		}
 		finally 
 		{
+			// JUnit tests needs to set-up this if they don't want to be screwed by brutal killing 
+			// of resources
+			boolean isTestingMode = "true".equals ( System.getProperty ( "biosd.test_mode" ) );
+			
 			if ( exCode != 128 ) 
 			{
-				EntityManagerFactory emf = Resources.getInstance ().getEntityManagerFactory ();
-				if ( emf != null && emf.isOpen () ) emf.close ();
+				if ( !isTestingMode ) 
+				{
+					EntityManagerFactory emf = Resources.getInstance ().getEntityManagerFactory ();
+					if ( emf != null && emf.isOpen () ) emf.close ();
+				}
 
 				if ( exportService != null ) exportService.flushKnowledgeBase ();
 			
 			}// exitCode
 			
 			// This is needed to prevent JUnit to fail.
-			if ( !"true".equals ( System.getProperty ( "biosd.test_mode" ) ) )
+			if ( !isTestingMode )
 				System.exit ( exCode );
 		}
 	}

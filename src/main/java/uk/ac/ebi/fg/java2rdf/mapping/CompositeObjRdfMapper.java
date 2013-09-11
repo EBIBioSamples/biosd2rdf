@@ -2,6 +2,7 @@ package uk.ac.ebi.fg.java2rdf.mapping;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 /**
  * TODO: Comment me!
@@ -25,13 +26,13 @@ public class CompositeObjRdfMapper<T> extends ObjRdfMapper<T>
 	}
 	
 	@Override
-	public boolean map ( T source )
+	public boolean map ( T source, Map<String, Object> params )
 	{
 		if ( mappers == null || mappers.isEmpty () ) return false;
 		
 		boolean result = false;
 		for ( ObjRdfMapper<T> mapper: mappers )
-			result |= mapper.map ( source );
+			result |= mapper.map ( source, params );
 		
 		return result;
 	}

@@ -1,5 +1,7 @@
 package uk.ac.ebi.fg.java2rdf.mapping.properties;
 
+import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,10 +36,13 @@ public abstract class PropertyRdfMapper<T, PT> extends RdfMapper<T>
 	 * 
 	 * <p>As usually, it returns true when a real addition occurs.</p>
 	 */
-	public boolean map ( T source, PT propValue )
+	public boolean map ( T source, PT propValue, Map<String, Object> params )
 	{
 		if ( propValue == null ) return false;
 		return true;
 	}
 
+	public final boolean map ( T source, PT propValue ) {
+		return map ( source, propValue, null );
+	}
 }

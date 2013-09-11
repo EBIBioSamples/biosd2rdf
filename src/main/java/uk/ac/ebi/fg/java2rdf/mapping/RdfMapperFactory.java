@@ -108,7 +108,7 @@ public class RdfMapperFactory
 	 *  
 	 * <p>TODO: AOP around the source mapper.</p>
 	 */
-	public <T> boolean map ( T source )
+	public <T> boolean map ( T source, Map<String, Object> params )
 	{
 		if ( mappers == null ) return false;
 		if ( source == null ) return false;
@@ -119,9 +119,13 @@ public class RdfMapperFactory
 			"Cannot find a mapper for " + source.getClass ().getSimpleName () );
 		
 		this.visitedObjects.add ( source );
-		return mapper.map ( source ); 
+		return mapper.map ( source, params ); 
 	}
 	
+	public final <T> boolean map ( T source ) {
+		return this.map ( source, null );
+	}
+
 	
 	public <T> RdfUriGenerator<T> getRdfUriGenerator ( Class<T> clazz ) 
 	{
@@ -139,21 +143,28 @@ public class RdfMapperFactory
 		if ( source == null ) return null; 
 		return (RdfUriGenerator<T>) this.getRdfUriGenerator ( source.getClass() );
 	}
+	
+
 
 	/**
 	 * A convenience wrapper of {@link #getRdfUriGenerator(Object)}.{@link RdfUriGenerator#getUri(Object)}.
 	 * @param source
 	 * @return
 	 */
-	public <T> String getUri ( T source ) 
+	public <T> String getUri ( T source, Map<String, Object> params ) 
 	{
 		if ( source == null ) return null; 
 		
 		RdfUriGenerator<T> uriGen = this.getRdfUriGenerator ( source );
 		if ( uriGen == null ) return null;
 		
-		return uriGen.getUri ( source );
+		return uriGen.getUri ( source, params );
 	}
+	
+	public final <T> String getUri ( T source ) {
+		return this.getUri ( source, null );
+	} 
+
 
 	/**
 	 * Marks all the beans as new, so they'll be re-visited by {@link #map(Object)}, like the first time.

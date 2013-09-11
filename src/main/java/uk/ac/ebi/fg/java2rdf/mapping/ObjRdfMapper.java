@@ -1,5 +1,7 @@
 package uk.ac.ebi.fg.java2rdf.mapping;
 
+import java.util.Map;
+
 /**
  * 
  * TODO: Comment me!
@@ -23,5 +25,10 @@ public abstract class ObjRdfMapper<T> extends RdfMapper<T>
 	 * @return true if the entity was actually mapped, or false if not, either because it was ignored for some reason (e.g., 
 	 * null URI or decision to exclude certain objects from export), or because it is a duplicate. 
 	 */
-	public abstract boolean map ( T source ); 
+	public abstract boolean map ( T source, Map<String, Object> params );
+	
+	public final boolean map ( T source )
+	{
+		return map ( source, null );
+	}
 }

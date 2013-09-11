@@ -3,6 +3,8 @@ package uk.ac.ebi.fg.biosd.biosd2rdf.java2rdf.mapping;
 import static uk.ac.ebi.fg.java2rdf.utils.Java2RdfUtils.urlEncode;
 import static uk.ac.ebi.fg.java2rdf.utils.NamespaceUtils.ns;
 
+import java.util.Map;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
 
@@ -28,7 +30,7 @@ public class PublicationRdfMapper extends BeanRdfMapper<Publication>
 			// publication, ebi_terms.owl additionally defines this subclass of: foaf:document, fabio:work
 			ns ( "obo", "IAO_0000311" ), 
 			new RdfUriGenerator<Publication>() {
-				@Override public String getUri ( Publication pub ) 
+				@Override public String getUri ( Publication pub, Map<String, Object> params ) 
 				{
 					String title = StringUtils.trimToNull ( pub.getTitle () ); if ( title == null ) return null;
 					String authorList = StringUtils.trimToNull ( pub.getAuthorList () ); if ( authorList == null ) return null;

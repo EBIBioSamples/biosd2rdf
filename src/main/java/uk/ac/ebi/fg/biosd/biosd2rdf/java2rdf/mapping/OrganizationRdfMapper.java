@@ -4,10 +4,15 @@ import static org.apache.commons.lang.StringUtils.trimToNull;
 import static uk.ac.ebi.fg.java2rdf.utils.Java2RdfUtils.hashUriSignature;
 import static uk.ac.ebi.fg.java2rdf.utils.Java2RdfUtils.urlEncode;
 import static uk.ac.ebi.fg.java2rdf.utils.NamespaceUtils.ns;
+
+import java.util.HashMap;
+import java.util.Map;
+
 import uk.ac.ebi.fg.core_model.organizational.Organization;
 import uk.ac.ebi.fg.java2rdf.mapping.BeanRdfMapper;
 import uk.ac.ebi.fg.java2rdf.mapping.properties.CompositePropRdfMapper;
 import uk.ac.ebi.fg.java2rdf.mapping.properties.OwlDatatypePropRdfMapper;
+import uk.ac.ebi.fg.java2rdf.mapping.urigen.RdfUriGenerator;
 
 /**
  * TODO: Comment me!
@@ -30,14 +35,16 @@ public class OrganizationRdfMapper extends BeanRdfMapper<Organization>
 			 * 
 			 */
 			ns ( "biosd-terms", "ContactOrganization" ), 
-			new MSIEquippedRdfUriGenerator<Organization>()
+			new RdfUriGenerator<Organization>()
 			{
-				@Override public String getUri ( Organization org ) 
+				@Override public String getUri ( Organization org, Map<String, Object> params ) 
 				{
 					String name = trimToNull ( org.getName () );
 					if ( name == null ) return null;
 					String id = trimToNull ( org.getEmail () );
-					id = id != null ? hashUriSignature ( id ) : urlEncode ( getMsiAcc () ) + "/" + hashUriSignature ( name );    
+					id = id != null 
+						? hashUriSignature ( id ) 
+						: urlEncode ( (String) params.get ( "msiAccession" ) ) + "/" + hashUriSignature ( name );    
 					
 					return ns ( "biosd", "organization/" + id );
 			}}

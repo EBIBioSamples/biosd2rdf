@@ -6,6 +6,7 @@ package uk.ac.ebi.fg.java2rdf.mapping;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -60,12 +61,12 @@ public class BeanRdfMapper<T> extends CompositeObjRdfMapper<T>
 	 * make a rdf:type statement about 'source'.
 	 */
 	@Override
-	public boolean map ( T source )
+	public boolean map ( T source, Map<String, Object> params )
 	{
 		try
 		{
-			if ( !super.map ( source )) return false;
-			String uri = getRdfUriGenerator ().getUri ( source );
+			if ( !super.map ( source, params )) return false;
+			String uri = getRdfUriGenerator ().getUri ( source, params );
 			if ( uri == null ) return false;
 			
 			RdfMapperFactory mapFactory = this.getMapperFactory ();
@@ -73,7 +74,7 @@ public class BeanRdfMapper<T> extends CompositeObjRdfMapper<T>
 			// Generates and rdf:type statement
 			String targetRdfClassUri = getTargetRdfClassUri ();
 			if ( targetRdfClassUri != null ) OwlApiUtils.assertIndividual ( mapFactory.getKnowledgeBase (), 
-					getRdfUriGenerator ().getUri ( source ), targetRdfClassUri );
+					getRdfUriGenerator ().getUri ( source, params ), targetRdfClassUri );
 			// TODO: else WARN
 			return true;
 		} 

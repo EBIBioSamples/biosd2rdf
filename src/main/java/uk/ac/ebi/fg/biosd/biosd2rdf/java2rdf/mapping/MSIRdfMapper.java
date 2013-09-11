@@ -3,6 +3,9 @@ package uk.ac.ebi.fg.biosd.biosd2rdf.java2rdf.mapping;
 import static uk.ac.ebi.fg.java2rdf.utils.Java2RdfUtils.urlEncode;
 import static uk.ac.ebi.fg.java2rdf.utils.NamespaceUtils.ns;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.apache.commons.lang.StringUtils;
 
 import uk.ac.ebi.fg.biosd.model.expgraph.BioSample;
@@ -39,7 +42,7 @@ public class MSIRdfMapper extends BeanRdfMapper<MSI>
 			new RdfUriGenerator<MSI>() 
 			{
 				@Override
-				public String getUri ( MSI msi ) { msi.getPublications ();
+				public String getUri ( MSI msi, Map<String, Object> params ) { msi.getPublications ();
 					return ns ( "biosd", "msi/" + urlEncode ( msi.getAcc () ) );
 				}
 		});
@@ -83,19 +86,19 @@ public class MSIRdfMapper extends BeanRdfMapper<MSI>
 	}
 
 	@Override
-	public boolean map ( MSI msi )
+	public boolean map ( MSI msi, Map<String, Object> params )
 	{
 		try
 		{
 			String msiAcc = StringUtils.trimToNull ( msi.getAcc () );
 			if ( msiAcc == null ) return false; 
+
+			if ( params == null ) params = new HashMap<String, Object> ();
+			params.put ( "msiAccession", msi.getAcc () );
 			
 			RdfMapperFactory mapFact = this.getMapperFactory ();
-			
-			((MSIEquippedRdfUriGenerator<Contact>) mapFact.getRdfUriGenerator ( Contact.class )).setMsiAcc ( msiAcc );
-			((MSIEquippedRdfUriGenerator<Organization>) mapFact.getRdfUriGenerator ( Organization.class )).setMsiAcc ( msiAcc );
 
-			return super.map ( msi );
+			return super.map ( msi, params );
 		} 
 		catch ( Exception ex ) {
 			throw new RdfMappingException ( String.format ( 

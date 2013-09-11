@@ -52,7 +52,7 @@ public class BioSdExportService
 	private OWLOntology onto;
 	private BioSdRfMapperFactory rdfMapFactory;
 
-	private int threadPoolSize = 25;
+	private int threadPoolSize = 40;
 	private ExecutorService executor = Executors.newFixedThreadPool ( threadPoolSize ); 
 
 	private int busyTasks = 0;

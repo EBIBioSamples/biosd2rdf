@@ -3,6 +3,8 @@
  */
 package uk.ac.ebi.fg.java2rdf.mapping.properties;
 
+import java.util.Map;
+
 import org.apache.commons.lang.StringUtils;
 
 import uk.ac.ebi.fg.java2rdf.mapping.BeanRdfMapper;
@@ -41,7 +43,7 @@ public class OwlObjPropRdfMapper<T, PT> extends URIProvidedPropertyRdfMapper<T, 
 	 * {@link #getTargetPropertyUri()}. Uses {@link RdfMapperFactory#getUri(Object)} for both the source and the target URI. 
 	 */
 	@Override
-	public boolean map ( T source, PT propValue )
+	public boolean map ( T source, PT propValue, Map<String, Object> params )
 	{
 		if ( propValue == null ) return false;
 		try
@@ -52,17 +54,17 @@ public class OwlObjPropRdfMapper<T, PT> extends URIProvidedPropertyRdfMapper<T, 
 			//
 			
 			// This is necessary, cause source/pval may be swapped by InversePropRdfMapper
-			String subjUri = mapFactory.getUri ( source );
+			String subjUri = mapFactory.getUri ( source, params );
 			if ( subjUri == null ) return false;
 
-			String objUri = mapFactory.getUri ( propValue );
+			String objUri = mapFactory.getUri ( propValue, params );
 			if ( objUri == null ) return false;
 			
 			OwlApiUtils.assertLink ( this.getMapperFactory ().getKnowledgeBase (), 
 				subjUri, this.getTargetPropertyUri (), objUri );
 
 			// Don't use targetMapper, we need to trace this visit.
-			return mapFactory.map ( propValue );
+			return mapFactory.map ( propValue, params );
 		} 
 		catch ( Exception ex )
 		{

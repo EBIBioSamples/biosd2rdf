@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 import uk.ac.ebi.fg.biosd.biosd2rdf.Biosd2RdfCmd;
 import uk.ac.ebi.fg.biosd.model.utils.test.TestModel;
 import uk.ac.ebi.fg.biosd.sampletab.persistence.Persister;
+import uk.ac.ebi.fg.core_model.resources.Resources;
 
 /**
  * TODO: Comment me!
@@ -23,7 +24,7 @@ public class ExporterTest
 	/**
 	 * Loads mock-up SampleTab submissions and then export them via the multi-threaded exporter.
 	 */
-	@Test @Ignore ( "Temporary disabled" )
+	@Test 
 	public void testExporter ()
 	{
 		Persister persister = new Persister ();
@@ -42,7 +43,7 @@ public class ExporterTest
 	/**
 	 * Creates mock-up SampleTab submissions and export them, without involving any relational DB.
 	 */
-	@Test @Ignore ( "Temporary disabled" )
+	@Test 
 	public void testNoDbExport ()
 	{
 		BioSdExportService xservice = new BioSdExportService ( "target/biosd_nodb_test.owl" );
@@ -61,7 +62,7 @@ public class ExporterTest
 	/**
 	 * Exports whatever it finds in the POM-configured DB
 	 */
-	@Test
+	@Test @Ignore ( "Not a real test" )
 	public void testExporterFromExistingDb ()
 	{
 		System.setProperty ( "biosd.test_mode", "true" );

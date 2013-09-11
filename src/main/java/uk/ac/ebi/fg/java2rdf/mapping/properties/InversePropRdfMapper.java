@@ -1,5 +1,7 @@
 package uk.ac.ebi.fg.java2rdf.mapping.properties;
 
+import java.util.Map;
+
 import uk.ac.ebi.fg.java2rdf.mapping.RdfMapperFactory;
 
 /**
@@ -23,12 +25,12 @@ public class InversePropRdfMapper<T, PT> extends PropertyRdfMapper<T, PT>
 		this.setInversePropMapper ( inversePropMapper );
 	}
 
-	public boolean map ( T source, PT propValue ) 
+	public boolean map ( T source, PT propValue, Map<String, Object> params ) 
 	{
 		if ( this.inversePropMapper == null ) return false;
 		if ( propValue == null ) return false;
 		
-		return inversePropMapper.map ( propValue, source );
+		return inversePropMapper.map ( propValue, source, params );
 	}
 
 	public PropertyRdfMapper<PT, T> getInversePropMapper ()

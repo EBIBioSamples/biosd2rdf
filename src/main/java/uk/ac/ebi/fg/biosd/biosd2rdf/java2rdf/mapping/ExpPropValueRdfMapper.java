@@ -9,6 +9,7 @@ import static uk.ac.ebi.fg.java2rdf.utils.OwlApiUtils.assertData;
 import static uk.ac.ebi.fg.java2rdf.utils.OwlApiUtils.assertIndividual;
 import static uk.ac.ebi.fg.java2rdf.utils.OwlApiUtils.assertLink;
 
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
@@ -52,7 +53,7 @@ public class ExpPropValueRdfMapper<T extends Accessible> extends PropertyRdfMapp
 	 * 
 	 */
 	@Override
-	public boolean map ( T sample, ExperimentalPropertyValue pval )
+	public boolean map ( T sample, ExperimentalPropertyValue pval, Map<String, Object> params )
 	{
 		try
 		{
@@ -95,20 +96,14 @@ public class ExpPropValueRdfMapper<T extends Accessible> extends PropertyRdfMapp
 			
 			String valUri = null, typeUri = null;
 
+			// TODO: COMMENT ME AGAIN!!!
 			// Find a suitable parent accession for properties, to establish the scope (submission, sample group, or sample itself), 
 			// under which the properties should be shared (i.e, considered the same if the labels are the same).
 			//
 			// TODO: should be correct to share among submissions, to be checked.
 			//
-			String parentAcc = sampleAcc;
-			Set<MSI> msis = sample instanceof BioSample 
-				? ((BioSample) sample).getMSIs () 
-				: sample instanceof BioSampleGroup 
-					? ((BioSampleGroup) sample).getMSIs () : null;
-			if ( msis != null && msis.size () == 1 ) {
-				String msiAcc = StringUtils.trimToNull ( msis.iterator ().next ().getAcc () );
-				if ( msiAcc != null ) parentAcc = msiAcc;  
-			}
+			String parentAcc = params == null ? null : (String) params.get ( "msiAccession" );
+			if ( parentAcc == null ) parentAcc = sampleAcc;
 			parentAcc = urlEncode ( parentAcc );
 			
 			

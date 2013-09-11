@@ -1,5 +1,7 @@
 package uk.ac.ebi.fg.java2rdf.mapping.urigen;
 
+import java.util.Map;
+
 
 /**
  * This maps a JavaBean object into a URI identifier. For example you may want to map an instance of b of Book having 
@@ -13,13 +15,18 @@ public abstract class RdfUriGenerator<T> extends RdfValueGenerator<T>
 {
 	/** It invokes {@link #getUri(Object)}, redefine that. */
 	@Override
-	public final String getValue ( T source )
+	public final String getValue ( T source, Map<String, Object> params )
 	{
-		return getUri ( source );
+		return getUri ( source, params );
 	}
 
 	/**
 	 * Here it is where the real job happens and then {@link #getValue(Object)} is implemented as a synonym of this.
 	 */
-	public abstract String getUri ( T source );
+	public abstract String getUri ( T source, Map<String, Object> params );
+
+	public final String getUri ( T source  ) {
+		return getUri ( source, null );
+	}
+
 }

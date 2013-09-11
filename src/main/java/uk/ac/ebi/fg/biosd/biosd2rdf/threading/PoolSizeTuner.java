@@ -25,7 +25,7 @@ public abstract class PoolSizeTuner
 	private double threadDeltaTolerance = 10d/100d;
 	private int threadIncr;
 	
-	private int periodMins = 10;
+	private int periodMins = 5;
 
 	private int prevThreads;
 	private long prevThroughput, prevCompletedTasks;
