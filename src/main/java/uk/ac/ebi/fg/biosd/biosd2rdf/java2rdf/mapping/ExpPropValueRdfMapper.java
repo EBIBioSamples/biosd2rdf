@@ -86,7 +86,8 @@ public class ExpPropValueRdfMapper<T extends Accessible> extends PropertyRdfMapp
 			OWLOntology onto = mapFact.getKnowledgeBase ();
 			
 			// name -> dc:title
-			if ( "name".equalsIgnoreCase ( typeLabel ) ) {
+			if ( typeLabel != null && typeLabel.toLowerCase ().matches ( "(sample |group |sample group |)?name" ) )
+			{
 				assertData ( onto, mapFact.getUri ( sample ), ns ( "dc-terms", "title" ), valLabel );
 				assertData ( onto, mapFact.getUri ( sample ), ns ( "rdfs", "label" ), valLabel );
 				return true;
@@ -113,24 +114,24 @@ public class ExpPropValueRdfMapper<T extends Accessible> extends PropertyRdfMapp
 			assertData ( onto, valUri, ns ( "rdfs", "label" ), valLabel );
 			
 			
-			// Ask Zooma if it has a known ontology term for typeLabel
-			// TODO: values and units too.
-			typeUri = otermResolver.getOntoClassUri ( pval );
+			// Define a type URI that is specific to this type and generically subclass of efo:experimental factor
+			typeUri = ns ( "biosd", "exp-prop-type/" + parentAcc + "#" + hashUriSignature (  typeLabel ) );
 			
-			if ( typeUri == null ) 
-			{
-				// else, share label+typeLabel over the same submission
-				typeUri = ns ( "biosd", "exp-prop-type/" + parentAcc + "#" + hashUriSignature (  typeLabel ) );
-				
-				// Define the Type as a new class
-				assertClass ( onto, typeUri, ns ( "efo", "EFO_0000001" ) ); // Experimental factor
-				assertAnnotationData ( onto, typeUri, ns ( "rdfs", "label" ), typeLabel );
-				assertAnnotationData ( onto, typeUri, ns ( "dc-terms", "title" ), typeLabel );
-			}
-					
+			// Define such type as a new class
+			assertClass ( onto, typeUri, ns ( "efo", "EFO_0000001" ) ); // Experimental factor
+			assertAnnotationData ( onto, typeUri, ns ( "rdfs", "label" ), typeLabel );
+			assertAnnotationData ( onto, typeUri, ns ( "dc-terms", "title" ), typeLabel );
+			
 			// So, we have: *** propValue a typeUri ***, where the type URI is either a new URI achieved from the type label (essentially 
 			// a type unknown to standard ontologies), or a proper OWL class from a standard ontology, tracked by Zooma.
 			assertIndividual ( onto, valUri, typeUri );
+
+			// Ask ontology term discoverer (eg, Zooma) if it has a known ontology term for typeLabel
+			// TODO: values and units too.
+			String discoveredTypeUri = otermResolver.getOntoClassUri ( pval );
+			// If you discovered something, add it as a type to the current property value
+			if ( discoveredTypeUri != null ) assertIndividual ( onto, valUri, discoveredTypeUri );
+			
 			
 			// Define the link to the type
 			String attributeLinkUri = pval instanceof BioCharacteristicValue  

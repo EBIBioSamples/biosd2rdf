@@ -44,36 +44,14 @@ public class Zooma2OntoTermDiscoverer extends OntologyTermDiscoverer
 			Property zprop = typeLabel == null 
 				? new SimpleUntypedProperty ( valueLabel ) 
 				: new SimpleTypedProperty ( typeLabel, valueLabel ); 
-			Map<AnnotationSummary, Float> zresult = zoomaClient.searchZOOMA ( zprop, 250, typeLabel == null );
+			Map<AnnotationSummary, Float> zresult = zoomaClient.searchZOOMA ( zprop, 190, typeLabel == null );
 			
 			if ( zresult == null || zresult.size () == 0 ) return null;
-
-// TODO: remove, now Zooma returns results in score-decreasing order
-//		// Sort results by score
-//		// 
-//		@SuppressWarnings ( "unchecked" )
-//		Map.Entry<AnnotationSummary, Float>[] zresultIdx = new Map.Entry [ zresult.size () ];
-//		zresultIdx = zresult.entrySet ().toArray ( zresultIdx );
+			AnnotationSummary zsum = zresult.keySet ().iterator ().next ();
 			
-//		Arrays.sort ( zresultIdx, new Comparator<Map.Entry<AnnotationSummary, Float>>() 
-//		{
-//			@Override
-//			public int compare ( Entry<AnnotationSummary, Float> e1, Entry<AnnotationSummary, Float> e2 )
-//			{
-//				if ( e1 == null ) return e2 == null ? 0 : -1;
-//				if ( e2 == null ) return +1;
-//				
-//				return e1.getValue ().compareTo ( e2.getValue () );
-//			}
-//		});
-//		
-//		// Get the best scored. 
-//		AnnotationSummary zsummary = zresultIdx [ 0 ].getKey ();
-			AnnotationSummary zsummary = zresult.keySet ().iterator ().next ();
-			Collection<URI> semTags = zsummary.getSemanticTags ();
-
 			// TODO: the case they're more than one refers to multiple terms used to describe the label, it's rare, but 
 			// might be worth to consider it too somehow
+			Collection<URI> semTags = zsum.getSemanticTags ();
 			if ( semTags == null || semTags.size () != 1 ) return null;
 
 			return semTags.iterator ().next ();

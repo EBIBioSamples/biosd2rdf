@@ -59,7 +59,7 @@ public class BioSampleRdfMapper extends BeanRdfMapper<BioSample>
 			if ( pvalLabel == null ) continue;
 			if ( ptype == null ) continue;
 			String typeLabel = StringUtils.trimToNull ( ptype.getTermText () );
-			if ( "name".equalsIgnoreCase ( typeLabel ) || "Sample Name".equalsIgnoreCase ( typeLabel ) ) 
+			if ( "name".equalsIgnoreCase ( typeLabel ) || "sample name".equalsIgnoreCase ( typeLabel ) ) 
 				return super.map ( smp, params );
 		}
 

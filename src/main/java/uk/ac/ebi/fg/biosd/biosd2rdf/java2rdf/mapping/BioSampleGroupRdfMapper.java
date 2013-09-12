@@ -64,7 +64,7 @@ public class BioSampleGroupRdfMapper extends BeanRdfMapper<BioSampleGroup>
 			if ( pvalLabel == null ) continue;
 			if ( ptype == null ) continue;
 			String typeLabel = StringUtils.trimToNull ( ptype.getTermText () );
-			if ( "name".equalsIgnoreCase ( typeLabel ) || "Sample Name".equalsIgnoreCase ( typeLabel ) ) 
+			if ( typeLabel != null && typeLabel.toLowerCase ().matches ( "(sample |group |sample group |)?name" ) ) 
 				return super.map ( sg, params );
 		}
 
