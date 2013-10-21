@@ -11,14 +11,6 @@ import java.io.OutputStream;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Random;
-import java.util.Timer;
-import java.util.TimerTask;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.locks.Condition;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
@@ -39,6 +31,7 @@ import uk.ac.ebi.fg.biosd.biosd2rdf.java2rdf.mapping.BioSdRfMapperFactory;
 import uk.ac.ebi.fg.biosd.model.organizational.MSI;
 import uk.ac.ebi.fg.core_model.resources.Resources;
 import uk.ac.ebi.utils.memory.MemoryUtils;
+import uk.ac.ebi.utils.threading.BatchService;
 
 /**
  * TODO: Comment me!
@@ -47,22 +40,12 @@ import uk.ac.ebi.utils.memory.MemoryUtils;
  * @author Marco Brandizi
  *
  */
-public class BioSdExportService
+public class BioSdExportService extends BatchService<BioSdExportTask>
 {
 	private OWLOntology onto;
 	private BioSdRfMapperFactory rdfMapFactory;
-
-	private int threadPoolSize = 40;
-	private ExecutorService executor = Executors.newFixedThreadPool ( threadPoolSize ); 
-
-	private int busyTasks = 0;
-	private long completedTasks = 0;
-	private Lock submissionLock = new ReentrantLock ();
-	private Condition freeTasksCond = submissionLock.newCondition (), noTasksCond = submissionLock.newCondition ();
 	
 	protected Logger log = LoggerFactory.getLogger ( this.getClass () );
-	
-	private int lastExitCode = 0;
 	
 	private String outputPath = null;
 	private int outputCounter = 0;
@@ -73,13 +56,23 @@ public class BioSdExportService
 			BioSdExportService.this.flushKnowledgeBase ();
 		}
 	};
-	
-	private PoolSizeTuner poolSizeTuner = null;
 
 	public BioSdExportService ( String outputPath )
 	{
+		super ( Runtime.getRuntime().availableProcessors() );
+		// super ( Runtime.getRuntime().availableProcessors(), null ); // DEBUG
 		try
 		{
+			// Sometimes I set it to null for debugging purposes
+			if ( this.poolSizeTuner != null ) 
+			{
+				this.poolSizeTuner.setPeriodMSecs ( (int) 5*60*1000 );
+				this.poolSizeTuner.setMaxThreads ( 100 );
+				this.poolSizeTuner.setMinThreads ( 5 );
+				this.poolSizeTuner.setMaxThreadIncr ( 25 );
+				this.poolSizeTuner.setMinThreadIncr ( 5 );
+			}
+			
 			this.outputPath = outputPath;
 			
 			BioSdRfMapperFactory.init (); // cause the definition of BioSD-specific namespaces
@@ -91,115 +84,25 @@ public class BioSdExportService
 			throw new RuntimeException ( "Internal error with OWL-API: " + ex.getMessage (), ex );
 		}
 	}
-
-	private void submit ( final BioSdExportTask exportTask )
-	{
-		// This will tune the thread pool size dynamically
-		//
-		if ( this.poolSizeTuner == null )
-		{
-			poolSizeTuner = new PoolSizeTuner () 
-			{
-				@Override
-				protected void setThreadPoolSize ( int size ) 
-				{
-					submissionLock.lock ();
-					threadPoolSize = size;
-					((ThreadPoolExecutor) executor ).setCorePoolSize ( size );
-					((ThreadPoolExecutor) executor ).setMaximumPoolSize ( size );
-					submissionLock.unlock ();
-				}
-				
-				@Override
-				protected int getThreadPoolSize () {
-					return threadPoolSize;
-				}
-				
-				@Override
-				protected long getCompletedTasks () {
-					return completedTasks;
-				}
-			};
-			poolSizeTuner.start ();
-			
-		} // poolSizeTuner check
-		
-		// This will flush the triples to the disk when the memory is too full
-		MemoryUtils.checkMemory ( this.memFlushAction, 15d / 100d );
-		// DEBUG if ( completedTasks > 0 && completedTasks % 20 == 0 ) flushKnowledgeBase ();
-		
-		submissionLock.lock ();
-		try
-		{
-			// Wait until the pool has available threads
-			while ( busyTasks >= threadPoolSize )
-				try {
-					freeTasksCond.await ();
-				}
-				catch ( InterruptedException ex ) {
-					throw new RuntimeException ( "Internal error: " + ex.getMessage (), ex );
-			}
-			busyTasks++;
-			log.info ( 
-				"Submitted: " + exportTask.getMSI ().getAcc () + ", " + busyTasks + " task(s) running, " 
-				+ completedTasks + " completed, please wait" 
-			);
-	
-			// Now submit a new task, decorated with release code
-			executor.submit ( new Runnable() 
-			{
-				@Override
-				public void run ()
-				{
-					try
-					{
-						Thread.currentThread ().setName ( "Xport:" + exportTask.getMSI ().getAcc () );
-						exportTask.run ();
-					} 
-					finally 
-					{
-						// Release after service run 
-						submissionLock.lock ();
-						try
-						{
-							int taskExitCode = exportTask.getExitCode ();
-							if ( taskExitCode != 0 ) {
-								if ( lastExitCode == 0 ) lastExitCode = taskExitCode; else if ( lastExitCode != taskExitCode ) lastExitCode = 1;
-							}
-							if ( --busyTasks < threadPoolSize ) 
-							{
-								freeTasksCond.signal ();
-								if ( busyTasks == 0 ) noTasksCond.signalAll ();
-							}
-							completedTasks++;
-							log.trace ( 
-								Thread.currentThread ().getName () + " released, " + busyTasks + " task(s) running, " 
-								+ completedTasks + ", completed" 
-							);
-						}
-						finally {
-							submissionLock.unlock ();
-						}
-						
-					} // run().finally
-				} // run()
-			}); // decorated runnable
-		} // try on submissionLock  
-		finally {
-			submissionLock.unlock ();
-		}
-	} // submit()
-
 	
 	public void submit ( Long msiId ) {
-		submit ( new BioSdExportTask ( rdfMapFactory, msiId ) );
+		this.submit ( new BioSdExportTask ( rdfMapFactory, msiId ) );
 	}
 
 	/** Used mainly for testing purposes. */
 	public void submit ( MSI msi ) {
-		submit ( new BioSdExportTask ( rdfMapFactory, msi ) );
+		this.submit ( new BioSdExportTask ( rdfMapFactory, msi ) );
 	}
 
+	@Override
+	public void submit ( BioSdExportTask batchServiceTask )
+	{
+		// This will flush the triples to the disk when the memory is too full
+		MemoryUtils.checkMemory ( this.memFlushAction, 15d / 100d );
+		// DEBUG if ( completedTasks > 0 && completedTasks % 20 == 0 ) flushKnowledgeBase ();
+
+		super.submit ( batchServiceTask );
+	}
 
 	@SuppressWarnings ( "unchecked" )
 	public void submitAll ( double sampleSize )
@@ -216,32 +119,7 @@ public class BioSdExportService
 		}
 	}
 
-	public void waitAllFinished ()
-	{
-		Timer notificationTimer = new Timer ( "BioSdXport Alive Notification" );
-		notificationTimer.scheduleAtFixedRate ( new TimerTask() {
-			@Override
-			public void run () {
-				log.info ( "" + busyTasks + " task(s) still running, " + completedTasks + " completed, please wait" );
-			}
-		}, 60000, 60000 );
 
-		submissionLock.lock ();
-		try 
-		{
-			while ( this.busyTasks > 0 )
-				noTasksCond.await ();
-		}	
-		catch ( InterruptedException ex ) {
-			throw new RuntimeException ( "Internal error with multi-threading: " + ex.getMessage (), ex );
-		}
-		finally 
-		{
-			submissionLock.unlock ();
-			notificationTimer.cancel ();
-		}
-	}
-	
 	
 	public void flushKnowledgeBase ()
 	{
@@ -309,11 +187,4 @@ public class BioSdExportService
 		}
 	} // flushKnowledgeBase
 	
-	
-	@Override
-	protected void finalize () throws Throwable
-	{
-		if ( poolSizeTuner != null ) this.poolSizeTuner.stop ();
-		super.finalize ();
-	}
 }

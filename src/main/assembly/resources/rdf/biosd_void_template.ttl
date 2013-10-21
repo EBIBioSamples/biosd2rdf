@@ -45,7 +45,7 @@
      	 <http://edamontology.org/topic_3071>, ## edam:'Biological data resources'
      	 <http://purl.bioontology.org/ontology/MESH/D019992> ## mesh:'Databases as Topic'
      ;
-     void:sparqlEndpoint <http://www.ebi.ac.uk/biosd/sparql>;
+     void:sparqlEndpoint <http://www.ebi.ac.uk/rdf/services/biosamples/sparql>;
      void:vocabulary
        biosdterms:,
        ebiterms:,

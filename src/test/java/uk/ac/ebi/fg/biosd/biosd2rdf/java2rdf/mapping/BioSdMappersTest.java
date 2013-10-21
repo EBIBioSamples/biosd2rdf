@@ -79,7 +79,7 @@ public class BioSdMappersTest
 		org.setAddress ( "Some Street in some Town somewhere in the Universe" );
 		org.setPhone ( "123-456-789" );
 		org.setDescription ( "A test Organisation" );
-		biosdModel.msi.addOrganization ( org );
+		biosdModel.msi.addOrganization ( org );		
 		
 		new BioSdRfMapperFactory ( onto ).map ( biosdModel.msi );
 		
@@ -87,6 +87,6 @@ public class BioSdMappersTest
 		fmt = new RDFXMLOntologyFormat ();
 		for ( Entry<String, String> nse: getNamespaces ().entrySet () )
 			fmt.setPrefix ( nse.getKey (), nse.getValue () );
-		owlMgr.saveOntology ( onto, fmt, new FileOutputStream ( new File ( "target/biosd.owl" ) ));
+		owlMgr.saveOntology ( onto, fmt, new FileOutputStream ( new File ( "target/test_model.owl" ) ));
 	}
 }

@@ -3,7 +3,6 @@ package uk.ac.ebi.fg.biosd.biosd2rdf.java2rdf.mapping;
 import static uk.ac.ebi.fg.java2rdf.utils.Java2RdfUtils.urlEncode;
 import static uk.ac.ebi.fg.java2rdf.utils.NamespaceUtils.ns;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
@@ -70,7 +69,7 @@ public class BioSampleGroupRdfMapper extends BeanRdfMapper<BioSampleGroup>
 
 		// You don't! Take the accession!
 		BioCharacteristicType ntype = new BioCharacteristicType ( "name" );
-		BioCharacteristicValue nval = new BioCharacteristicValue ( "Sample " + sg.getAcc (), ntype );
+		BioCharacteristicValue nval = new BioCharacteristicValue ( "Sample Group " + sg.getAcc (), ntype );
 		sg.addPropertyValue ( nval );
 		
 		return super.map ( sg, params );

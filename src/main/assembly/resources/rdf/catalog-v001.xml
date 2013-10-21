@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <catalog prefer="public" xmlns="urn:oasis:names:tc:entity:xmlns:xml:catalog">
+    <uri id="Imports Wizard Entry" name="http://rdf.ebi.ac.uk/dataset/biosamples" uri="file:/Users/brandizi/Documents/Work/ebi/ebi2rdf/git/biosd2rdf/target/biosd2rdf_cmdline_0.0.1-SNAPSHOT/test.owl"/>
     <uri id="Imports Wizard Entry" name="http://purl.org/spar/fabio/" uri="http://eelst.cs.unibo.it/apps/LODE/source?url=http://purl.org/spar/fabio"/>
     <uri id="Imports Wizard Entry" name="http://purl.obolibrary.org/obo/iao/iao-main.owl" uri="http://purl.obolibrary.org/obo/iao/2011-05-09/iao-main.owl"/>
     <uri id="Imports Wizard Entry" name="http://schema.org/" uri="http://schema.org/docs/schemaorg.owl"/>

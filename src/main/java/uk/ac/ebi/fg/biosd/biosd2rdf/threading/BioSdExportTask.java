@@ -1,19 +1,16 @@
 package uk.ac.ebi.fg.biosd.biosd2rdf.threading;
 
 import java.util.HashMap;
-import java.util.Map;
-import java.util.Properties;
 
 import javax.persistence.EntityManager;
 
-import org.apache.commons.lang.math.RandomUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import uk.ac.ebi.fg.biosd.biosd2rdf.java2rdf.mapping.BioSdRfMapperFactory;
 import uk.ac.ebi.fg.biosd.model.organizational.MSI;
-import uk.ac.ebi.fg.core_model.persistence.dao.hibernate.toplevel.IdentifiableDAO;
 import uk.ac.ebi.fg.core_model.resources.Resources;
+import uk.ac.ebi.utils.threading.BatchServiceTask;
 
 /**
  * TODO: Comment me!
@@ -22,11 +19,10 @@ import uk.ac.ebi.fg.core_model.resources.Resources;
  * @author Marco Brandizi
  *
  */
-public class BioSdExportTask implements Runnable
+public class BioSdExportTask extends BatchServiceTask
 {
 	private MSI msi;
 	private BioSdRfMapperFactory rdfMapFactory;
-	private int exitCode = 0;
 
 	private EntityManager em = null; 
 
@@ -34,6 +30,7 @@ public class BioSdExportTask implements Runnable
 	
 	private BioSdExportTask ( BioSdRfMapperFactory rdfMapFactory )
 	{
+		super ( "XPORT:" );
 		this.rdfMapFactory = rdfMapFactory;
 	}
 	
@@ -46,6 +43,7 @@ public class BioSdExportTask implements Runnable
 			throw new IllegalArgumentException ( "Internal error: cannot run an exporter over a null SampleTab submission" );
 		}
 		this.msi = msi;
+		this.name += msi.getAcc ();
 	}
 
 	public BioSdExportTask ( BioSdRfMapperFactory rdfMapFactory, Long msiId )
@@ -53,6 +51,8 @@ public class BioSdExportTask implements Runnable
 		this ( rdfMapFactory );
 
 		em = Resources.getInstance ().getEntityManagerFactory ().createEntityManager ();
+		
+		@SuppressWarnings ( "serial" )
 		MSI msi = em.find ( MSI.class, msiId, new HashMap<String, Object> () { { put ( "org.hibernate.readOnly", true ); } } );
 
 		if ( msi == null ) 
@@ -61,6 +61,7 @@ public class BioSdExportTask implements Runnable
 			throw new IllegalArgumentException ( "Cannot find SampleTab submission #" + msiId );
 		}
 		this.msi = msi;
+		this.name += msi.getAcc ();
 	}
 	
 	@Override
@@ -82,15 +83,4 @@ public class BioSdExportTask implements Runnable
 			if ( em != null && em.isOpen () ) em.close ();
 		}
 	}
-
-	public int getExitCode ()
-	{
-		return exitCode;
-	}
-
-	public MSI getMSI ()
-	{
-		return msi;
-	}
-	
 }

@@ -2,7 +2,6 @@ package uk.ac.ebi.fg.ontodiscover;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.Collections;
 import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;

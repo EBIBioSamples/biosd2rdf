@@ -5,7 +5,6 @@ import static uk.ac.ebi.fg.java2rdf.utils.Java2RdfUtils.hashUriSignature;
 import static uk.ac.ebi.fg.java2rdf.utils.Java2RdfUtils.urlEncode;
 import static uk.ac.ebi.fg.java2rdf.utils.NamespaceUtils.ns;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import uk.ac.ebi.fg.core_model.organizational.Organization;
