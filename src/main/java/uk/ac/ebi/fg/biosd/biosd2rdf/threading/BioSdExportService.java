@@ -28,6 +28,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import uk.ac.ebi.fg.biosd.biosd2rdf.java2rdf.mapping.BioSdRfMapperFactory;
+import uk.ac.ebi.fg.biosd.biosd2rdf.utils.XmlCharFixer;
 import uk.ac.ebi.fg.biosd.model.organizational.MSI;
 import uk.ac.ebi.fg.core_model.resources.Resources;
 import uk.ac.ebi.utils.memory.MemoryUtils;
@@ -195,7 +196,7 @@ public class BioSdExportService extends BatchService<BioSdExportTask>
 				
 				File fout = new File ( outp );
 				log.info ( "Please wait, saving triples to '" + fout.getCanonicalPath () + "'" );
-				kbout = new BufferedOutputStream ( new FileOutputStream ( outp ) );
+				kbout = new BufferedOutputStream ( new XmlCharFixer ( new FileOutputStream ( outp ) ) );
 			}
 			else 
 			{
