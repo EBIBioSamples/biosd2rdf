@@ -11,12 +11,13 @@ import uk.ac.ebi.fg.core_model.organizational.Organization;
 import uk.ac.ebi.fg.java2rdf.mapping.BeanRdfMapper;
 import uk.ac.ebi.fg.java2rdf.mapping.properties.CompositePropRdfMapper;
 import uk.ac.ebi.fg.java2rdf.mapping.properties.OwlDatatypePropRdfMapper;
+import uk.ac.ebi.fg.java2rdf.mapping.properties.UriStringPropRdfMapper;
 import uk.ac.ebi.fg.java2rdf.mapping.urigen.RdfUriGenerator;
 
 /**
- * TODO: Comment me!
- * 
- * TODO: submission dc-terms:contributor organization
+ * Maps a contact organisation in a BioSD/SampleTab submission to RDF. This will be a specific OWL class, which accounts for 
+ * the fact that there is an organisation that is somehow involved in the submission, for instance as PI, submitters or 
+ * data curators. Neither BioSD or SampleTab allows us to be more specific about such type of contact.
  *
  * <dl><dt>date</dt><dd>Jun 18, 2013</dd></dl>
  * @author Marco Brandizi
@@ -27,12 +28,6 @@ public class OrganizationRdfMapper extends BeanRdfMapper<Organization>
 	public OrganizationRdfMapper ()
 	{
 		super (
-			/* TODO:
-			 * ebi-terms:OrganizationReference := 
-  		 *   subClassOf ( 'is bearer of' (BFO_0000053) some 'role' (BFO_0000023) )
-  		 *   ebi-terms:Organization := subClassOf ( schema.org:Organization, dcterms:Agent, foaf:Organization )
-			 * 
-			 */
 			ns ( "biosd-terms", "ContactOrganization" ), 
 			new RdfUriGenerator<Organization>()
 			{
@@ -49,9 +44,6 @@ public class OrganizationRdfMapper extends BeanRdfMapper<Organization>
 			}}
 		);
 		
-		// TODO: schema.org properties, http://schema.rdfs.org/, 
-		// also foaf properties
-
 		this.addPropertyMapper ( "email", new OwlDatatypePropRdfMapper<Organization, String> ( ns ( "sch", "email" ) ) );
 		this.addPropertyMapper ( "name", new CompositePropRdfMapper<> ( 
 			new OwlDatatypePropRdfMapper<Organization, String> ( ns ( "sch", "name" ) ),
@@ -63,19 +55,8 @@ public class OrganizationRdfMapper extends BeanRdfMapper<Organization>
 			new OwlDatatypePropRdfMapper<Organization, String> ( ns ( "dc-terms", "description" ) ),
 			new OwlDatatypePropRdfMapper<Organization, String> ( ns ( "rdfs", "comment" ) ) 
 		));
-
-		
-		// TODO: also dc-terms:title/rdfs:label
-		// TODO: not possible for the moment, requires the ability to associate multiple mappers to the bean property: 
-		// this.setPropertyMapper ( new OwlDatatypePropRdfMapper<Organization, String> ( "name", ns ( "dc-terms", "title" ) ) );
-
-		// TODO: ebi-terms:has-address-line (subprop of dc:description/rdfs:comment)
-		// TODO: possibly more annotations to be considered: 
-		//   http://answers.semanticweb.com/questions/298/how-can-you-represent-physical-addresses-in-foaf
 		this.addPropertyMapper ( "address", new OwlDatatypePropRdfMapper<Organization, String> ( ns ( "biosd-terms", "has-address-line" ) ) );
-		
-		// TODO: requires a special mapper that goes from string to URIs, without involving bean classes or URI generators
-		// this.setPropertyMapper ( new OwlObjPropRdfMapper<Organization, String> ( "URI", ns ( "rdfs", "seeAlso" ) ) );
+		this.addPropertyMapper ( "url", new UriStringPropRdfMapper<Organization> ( ns ( "rdfs", "seeAlso" ) ) );
 		
 		// TODO: These need to be checked against Zooma
 		// o.getRole ();

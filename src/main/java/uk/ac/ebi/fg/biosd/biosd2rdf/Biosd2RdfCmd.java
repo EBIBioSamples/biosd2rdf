@@ -19,7 +19,8 @@ import uk.ac.ebi.fg.biosd.biosd2rdf.threading.BioSdExportService;
 import uk.ac.ebi.fg.core_model.resources.Resources;
 
 /**
- * TODO: Comment me!
+ * The entry point to the BioSD RDF exporter command line.
+ * For the moment, it only supports exports from the BioSD relational database, all the submissions, or a random subset.
  *
  * <dl><dt>date</dt><dd>17 Jul 2013</dd></dl>
  * @author Marco Brandizi
@@ -48,9 +49,12 @@ public class Biosd2RdfCmd
 			
 			double sampleSize = cli.hasOption ( 'z' ) ? Double.parseDouble ( cli.getOptionValue ( 'z' ) ) : 100d;
 
+			// submit export tasks to the thread pool executor. Here we will be put on wait when all the pool threads are
+			// busy, i.e., we'll wait most of time, until the tail of the submission table
 			exportService = new BioSdExportService ( cli.getOptionValue ( 'o' ) );
-			
 			exportService.submitAll ( sampleSize );
+			
+			// Now that all is submitted, wait that all the export tasks complete.
 			exportService.waitAllFinished ();
 		} 
 		catch ( Throwable ex ) 
@@ -82,7 +86,8 @@ public class Biosd2RdfCmd
 					EntityManagerFactory emf = Resources.getInstance ().getEntityManagerFactory ();
 					if ( emf != null && emf.isOpen () ) emf.close ();
 				}
-
+				
+				// Saves the export results in memory, either the unique chunk available, or the last one
 				if ( exportService != null ) exportService.flushKnowledgeBase ();
 			
 			}// exitCode

@@ -21,9 +21,10 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.text.StrSubstitutor;
 
 /**
- * TODO: Comment me!
+ * A simple command that generates a BioSD data set VOID document, by taking a few parameters and binding placeholders
+ * in a template file.
  * 
- * biosd_void_make.sh.sh [--template <path>] [--properties <property-file>] [output-path]
+ * Syntax is: biosd_void_make.sh.sh [--template <path>] [--properties <property-file>] [output-path]
  *
  * <dl><dt>date</dt><dd>17 Jul 2013</dd></dl>
  * @author Marco Brandizi

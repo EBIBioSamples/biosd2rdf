@@ -47,6 +47,20 @@ public class BioSdOntologyTermResolver
 	private final static RegEx COMMENT_RE = new RegEx ( "(Comment|Characteristic)\\s*\\[\\s*(.+)\\s*\\]", Pattern.CASE_INSENSITIVE );
 	private final Logger log = LoggerFactory.getLogger ( this.getClass () );
 	
+	/**
+	 * Tries to get the URI of an OWL class that the {@link ExperimentalPropertyValue} appears to be instance of. 
+	 * 
+	 * Several things are checked to do that:<ul> 
+	 * <li>if proper {@link OntologyEntry ontology entries} are attached to either the value or its 
+	 * {@link ExperimentalPropertyType type}, it uses {@link #getOntologyTermURI(Collection, String)} to fetch their
+	 * URI and returns that</li> 
+	 * <li>else, it uses the property value label, checking first that it doesn't look like a number</li>
+	 * <li>if not, it searches a URI via Zooma, using an {@link OntologyTermDiscoverer}</li>
+	 * <li>if it cannot find anything via the property value, it tries to get something from the type.</li>
+	 * </ul>
+	 * 
+	 * returns the URI found, or null in case it could not get anything sensible. The result is cached.
+	 */
 	public String getOntoClassUri ( ExperimentalPropertyValue<?> pval ) 
 	{
 		if ( pval == null ) return null;
@@ -77,7 +91,9 @@ public class BioSdOntologyTermResolver
 		return ontoTermDiscoverer.getOntologyTermUriAsASCII ( pvalLabel, pvalTypeLabel );
 	}
 	
-	
+	/**
+	 * OntoCat interface, used by {@link #getOntoClassUri(ExperimentalPropertyValue)}.
+	 */
 	private BioportalOntologyService getOntologService ()
 	{
 		if ( ontologyService != null ) return ontologyService;
@@ -102,7 +118,11 @@ public class BioSdOntologyTermResolver
 		}
 	}
 	
-	
+	/**
+	 * If oes has only one element and this contains a proper source identifier and accession, fetches the term URI via
+	 * {@link #getOntologService() OntoCAT}. The result is cached.
+	 *  
+	 */
 	public String getOntologyTermURI ( Collection<OntologyEntry> oes, String oeLabel )
 	{
 		if ( oes == null || oes.size () != 1 ) return null;
@@ -110,8 +130,10 @@ public class BioSdOntologyTermResolver
 		OntologyEntry oe = oes.iterator ().next ();
 		String oeAcc = StringUtils.trimToNull ( oe.getAcc () );
 		if ( oeAcc == null ) return ontoTermDiscoverer.getOntologyTermUriAsASCII ( oeLabel == null ? oeLabel : oe.getLabel (), null );
+		
 		ReferenceSource src = oe.getSource ();
 		if ( src == null ) return ontoTermDiscoverer.getOntologyTermUriAsASCII ( oeLabel == null ? oeLabel : oe.getLabel (), null );
+		
 		String srcAcc = StringUtils.trimToNull ( src.getAcc () );
 		if ( srcAcc == null ) return ontoTermDiscoverer.getOntologyTermUriAsASCII ( oeLabel == null ? oeLabel : oe.getLabel (), null );
 		

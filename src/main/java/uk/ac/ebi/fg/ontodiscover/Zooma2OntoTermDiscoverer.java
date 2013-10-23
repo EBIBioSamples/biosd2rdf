@@ -16,6 +16,13 @@ import uk.ac.ebi.fgpt.zooma.model.SimpleTypedProperty;
 import uk.ac.ebi.fgpt.zooma.model.SimpleUntypedProperty;
 import uk.ac.ebi.fgpt.zooma.search.ZOOMASearchClient;
 
+/**
+ * Ontology Discoverer based on <a href = 'http://www.ebi.ac.uk/fgpt/zooma/docs/'>ZOOMA2</a>.
+ *
+ * <dl><dt>date</dt><dd>23 Oct 2013</dd></dl>
+ * @author Marco Brandizi
+ *
+ */
 public class Zooma2OntoTermDiscoverer extends OntologyTermDiscoverer
 {
 	private ZOOMASearchClient zoomaClient;
@@ -33,6 +40,10 @@ public class Zooma2OntoTermDiscoverer extends OntologyTermDiscoverer
 		}
 	}
 
+	/**
+	 * Uses the top-ranked result from {@link ZOOMASearchClient}.searchZOOMA(), it sends to it a pair of value and type
+	 * label, depending on the fact that the type is null or not.  
+	 */
 	@Override
 	public URI getOntologyTermUri ( String valueLabel, String typeLabel ) throws OntologyDiscoveryException
 	{

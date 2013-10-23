@@ -93,9 +93,13 @@ public class ExpPropValueRdfMapper<T extends Accessible> extends PropertyRdfMapp
 			
 			String valUri = null, typeUri = null;
 
-			// TODO: COMMENT ME AGAIN!!!
-			// Find a suitable parent accession for properties, to establish the scope (submission, sample group, or sample itself), 
-			// under which the properties should be shared (i.e, considered the same if the labels are the same).
+			// Find a suitable parent accession for properties. If a submission accession is available for this sample,
+			// which is passed by either the MSI mapper or the Sample Group mapper, then uses such accession to build the 
+			// sample properties URIs, i.e. makes those with common labels unique within the same submission.
+			// 
+			// In the unlikely case that such MSI accession cannot be recovered here, then use the sample accession itself 
+			// as a base for property URIs and that means that each sample will have RDF-wise different properties, even
+			// when they share labels. See below for details.
 			//
 			// TODO: should be correct to share among submissions, to be checked.
 			//

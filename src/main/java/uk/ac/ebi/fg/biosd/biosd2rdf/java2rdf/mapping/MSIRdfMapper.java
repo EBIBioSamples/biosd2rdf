@@ -68,13 +68,14 @@ public class MSIRdfMapper extends BeanRdfMapper<MSI>
 			new OwlObjPropRdfMapper<MSI, BioSampleGroup> ( ns ( "obo", "IAO_0000219" ) ) ) // denotes
 		);
 		
-		// 'is about' (used in (pub, is-about, msi))
+		// 'is about', because we use an InversePropRdfMapper, this will generate (pub, is-about, msi) for every pub in 
+		// msi.getPublications()
 		this.addPropertyMapper ( "publications", new CollectionPropRdfMapper<MSI, Publication> ( 
 			new InversePropRdfMapper<MSI, Publication> ( 
 				new OwlObjPropRdfMapper<Publication, MSI> ( ns ( "obo", "IAO_0000136" ) ) ) 
 		));
 		
-		// TODO: sub-property of ( (dc-terms:creator union dc-terms:contributor ) and ( schema.org:author union schema.org:contributor ) ) 
+		// a sub-property of ( (dc-terms:creator union dc-terms:contributor ) and ( schema.org:author union schema.org:contributor ) ) 
 		this.addPropertyMapper ( "contacts", new CollectionPropRdfMapper<MSI, Contact> ( 
 			new OwlObjPropRdfMapper<MSI, Contact> ( ns ( "biosd-terms", "has-knowledgeable-person" ) ) )
 		);

@@ -11,7 +11,8 @@ import org.slf4j.LoggerFactory;
 import uk.ac.ebi.utils.memory.SimpleCache;
 
 /**
- * TODO: Comment me!
+ * A wrapper of {@link OntologyTermDiscoverer} that caches the term of a base discover. It uses a {@link SimpleCache}
+ * as caching object, so it frees entries with an LRU approach.
  *
  * <dl><dt>date</dt><dd>May 27, 2013</dd></dl>
  * @author Marco Brandizi

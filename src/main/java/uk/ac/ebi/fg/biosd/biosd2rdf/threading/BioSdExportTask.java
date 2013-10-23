@@ -13,7 +13,8 @@ import uk.ac.ebi.fg.core_model.resources.Resources;
 import uk.ac.ebi.utils.threading.BatchServiceTask;
 
 /**
- * TODO: Comment me!
+ * Exports a single SampleTab submission, using {@link BioSdRfMapperFactory} and the definitions based on the 
+ * Java2RDF framework.
  *
  * <dl><dt>date</dt><dd>19 Jul 2013</dd></dl>
  * @author Marco Brandizi

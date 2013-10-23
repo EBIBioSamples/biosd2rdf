@@ -12,13 +12,14 @@ import uk.ac.ebi.fg.core_model.organizational.Contact;
 import uk.ac.ebi.fg.java2rdf.mapping.BeanRdfMapper;
 import uk.ac.ebi.fg.java2rdf.mapping.RdfMappingException;
 import uk.ac.ebi.fg.java2rdf.mapping.properties.OwlDatatypePropRdfMapper;
+import uk.ac.ebi.fg.java2rdf.mapping.properties.UriStringPropRdfMapper;
 import uk.ac.ebi.fg.java2rdf.mapping.urigen.RdfUriGenerator;
 import uk.ac.ebi.fg.java2rdf.utils.OwlApiUtils;
 
 /**
- * TODO: Comment me!
- * 
- * TODO: submission dc-terms:contributor contact
+ * Maps a contact in a BioSD/SampleTab submission to RDF. This will be a specific OWL class, which accounts for 
+ * the fact that there is a person who is somehow involved in the submission, for instance as PI, submitter or 
+ * data curator. Neither BioSD or SampleTab allows us to be more specific about such contacts.
  *
  * <dl><dt>date</dt><dd>Jun 18, 2013</dd></dl>
  * @author Marco Brandizi
@@ -29,13 +30,7 @@ public class ContactRdfMapper extends BeanRdfMapper<Contact>
 	public ContactRdfMapper ()
 	{
 		super (
-			/* TODO:
-			 * ebi-terms:ContactPerson := 
-  		 *   subClassOf ( 'is bearer of' (BFO_0000053) some 'contact representative role' (OBI_0001687) )
-  		 *   ebi-terms:Person := subClassOf ( schema.org:Person, dcterms:Agent, foaf:Person )
-			 * 
-			 */
-			ns ( "biosd-terms", "ContactPerson" ), // TODO: See Schema design doc
+			ns ( "biosd-terms", "ContactPerson" ),
 			new RdfUriGenerator<Contact> () 
 			{
 				@Override public String getUri ( Contact cnt, Map<String, Object> params ) 
@@ -73,9 +68,7 @@ public class ContactRdfMapper extends BeanRdfMapper<Contact>
 		
 		// biosd-terms:has-affiliation-line (subprop of dc:description/rdfs:comment)
 		this.addPropertyMapper ( "affiliation", new OwlDatatypePropRdfMapper<Contact, String> ( ns ( "biosd-terms", "has-affiliation-line" ) ) );
-		
-		// TODO: requires a special mapper that goes from string to URIs, without involving bean classes or URI generators
-		// this.setPropertyMapper ( new OwlObjPropRdfMapper<Contact, String> ( "url", ns ( "rdfs", "seeAlso" ) ) );
+		this.addPropertyMapper ( "url", new UriStringPropRdfMapper<Contact> ( ns ( "rdfs", "seeAlso" ) ) );
 		
 		// TODO: These need to be checked against Zooma
 		// c.getContactRoles ();

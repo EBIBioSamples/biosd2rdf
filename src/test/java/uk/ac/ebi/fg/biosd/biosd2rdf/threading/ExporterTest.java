@@ -8,10 +8,9 @@ import org.slf4j.LoggerFactory;
 import uk.ac.ebi.fg.biosd.biosd2rdf.Biosd2RdfCmd;
 import uk.ac.ebi.fg.biosd.model.utils.test.TestModel;
 import uk.ac.ebi.fg.biosd.sampletab.persistence.Persister;
-import uk.ac.ebi.fg.core_model.resources.Resources;
 
 /**
- * TODO: Comment me!
+ * Basic tests of the BioSD exporter.
  *
  * <dl><dt>date</dt><dd>7 Sep 2013</dd></dl>
  * @author Marco Brandizi

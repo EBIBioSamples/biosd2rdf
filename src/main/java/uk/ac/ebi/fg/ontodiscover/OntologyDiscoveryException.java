@@ -1,7 +1,8 @@
 package uk.ac.ebi.fg.ontodiscover;
 
 /**
- * TODO: Comment me!
+ * Returned by {@link OntologyTermDiscoverer} and similar classes to notify about a problem with the 
+ * ontology discovering procedures.
  *
  * <dl><dt>date</dt><dd>May 27, 2013</dd></dl>
  * @author Marco Brandizi

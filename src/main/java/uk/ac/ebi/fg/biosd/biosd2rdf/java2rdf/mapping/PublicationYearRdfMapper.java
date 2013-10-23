@@ -15,11 +15,9 @@ import uk.ac.ebi.fg.java2rdf.mapping.urigen.RdfLiteralGenerator;
 import uk.ac.ebi.fg.java2rdf.utils.OwlApiUtils;
 
 /**
- * TODO: Comment me!
- *
- * TODO: Literal Generator and Data Prop mapper should be generalised, so that they can deal with
- * data type objects and literal objects from OWLAPI. Then a specialisation for the string case should be derived.  
- *
+ * A special data type property mapper that is intented to translate {@link Publication#getYear()} into
+ * a literal of type {@link XSDVocabulary#G_YEAR}. 
+ * 
  * <dl><dt>date</dt><dd>25 Jun 2013</dd></dl>
  * @author Marco Brandizi
  *

@@ -16,7 +16,7 @@ import uk.ac.ebi.fg.java2rdf.mapping.urigen.RdfUriGenerator;
 import uk.ac.ebi.fg.java2rdf.utils.Java2RdfUtils;
 
 /**
- * TODO: Comment me!
+ * Maps a publication that is associated to a BioSD/SampleTab submission to OWL/RDF.
  *
  * <dl><dt>date</dt><dd>Jun 18, 2013</dd></dl>
  * @author Marco Brandizi

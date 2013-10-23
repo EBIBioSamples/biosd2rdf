@@ -34,7 +34,12 @@ import uk.ac.ebi.utils.memory.MemoryUtils;
 import uk.ac.ebi.utils.threading.BatchService;
 
 /**
- * TODO: Comment me!
+ * An extension of {@link BatchService} to run multiple BioSD/RDF exporters in parallel, in multi-threading fashion.
+ * Here we keep a single OWL triple store, where all the threads pour their output and we flush it to a (numbered) file, 
+ * when we see that we are running out of RAM.
+ * 
+ * The parallelisation is realised on a per-submission basis, i.e. each {@link BioSdExportTask} is a thread that exports
+ * everything contained in a SampleTab submission.
  *
  * <dl><dt>date</dt><dd>19 Jul 2013</dd></dl>
  * @author Marco Brandizi
@@ -57,6 +62,16 @@ public class BioSdExportService extends BatchService<BioSdExportTask>
 		}
 	};
 
+	/**
+	 * This sets up proper parameters for {@link #getPoolSizeTuner()} and initialises the {@link #onto triple store} used
+	 * to save the exporters output.
+	 * 
+	 * outputPath is where the path of the output file to save. This will be properly numbered in case multiple files are
+	 * needed, due to memory limitations. For instance, if you send in /tmp/test.owl, you might get back 
+	 * /tmp/test1.owl, /tmp/test2.owl ecc. If this parameter is null, all the output is poured to the standard output, 
+	 * and this will likely not be a single RDF document (so it's not recommended that you use this approach).
+	 * 
+	 */
 	public BioSdExportService ( String outputPath )
 	{
 		super ( Runtime.getRuntime().availableProcessors() );
@@ -85,25 +100,41 @@ public class BioSdExportService extends BatchService<BioSdExportTask>
 		}
 	}
 	
+	/** 
+	 * Submits the task of exporting a single SampleTab submission to RDF, of which the database ID is known. This is used by 
+	 * {@link #submitAll(double)} and wraps {@link #submit(BioSdExportTask)}.  
+	 * 
+	 */
 	public void submit ( Long msiId ) {
 		this.submit ( new BioSdExportTask ( rdfMapFactory, msiId ) );
 	}
 
-	/** Used mainly for testing purposes. */
+	/** 
+	 * Submits the task of exporting a single SampleTab to RDF submission, available as {@link MSI MSI object}. 
+	 * This is used mainly for testing purposes and wraps {@link #submit(BioSdExportTask)}. 
+	 */
 	public void submit ( MSI msi ) {
 		this.submit ( new BioSdExportTask ( rdfMapFactory, msi ) );
 	}
 
+	/**
+	 * Submits a new BioSD exporter task. This will work on a single SampleTab submission and will be run as a thread in 
+	 * thread pool, managed by this service.
+	 */
 	@Override
 	public void submit ( BioSdExportTask batchServiceTask )
 	{
-		// This will flush the triples to the disk when the memory is too full
+		// This will flush the triples to the disk when the memory is too full and will also invoke the GC
 		MemoryUtils.checkMemory ( this.memFlushAction, 15d / 100d );
 		// DEBUG if ( completedTasks > 0 && completedTasks % 20 == 0 ) flushKnowledgeBase ();
 
 		super.submit ( batchServiceTask );
 	}
 
+	/**
+	 * Submits all the samples in the BioSD relational database (configured via hibernate.properties), or a random sample, 
+	 * represented by the method parameter (which ranges from 0 to 100).
+	 */
 	@SuppressWarnings ( "unchecked" )
 	public void submitAll ( double sampleSize )
 	{
@@ -120,7 +151,16 @@ public class BioSdExportService extends BatchService<BioSdExportTask>
 	}
 
 
-	
+	/**
+	 * This saves the triple store that keeps the RDF output of the exporters into the file specified by this class's 
+	 * constructor. This method should be called at the end of a sequence of submissions, after {@link #waitAllFinished()}
+	 * returns. 
+	 * 
+	 * It is also invoked when the RAM available to the JVM executing this service is running out and multiple
+	 * calls of this method will generate numbered file names (see {@link BioSdExportService}). Moreover, each invocation
+	 * empties the triple store at issue and allows the JVM free its memory for new triples. 
+	 * 
+	 */
 	public void flushKnowledgeBase ()
 	{
 		// This is the only way to avoid that multiple threads access a KB that needs to be replaced. I've experienced
@@ -135,14 +175,16 @@ public class BioSdExportService extends BatchService<BioSdExportTask>
 		{			
 			if ( this.onto.isEmpty () ) return; 
 		
-			// Don't measure/change the throughput while I'm idle
+			// Don't measure/change the throughput while I'm not actually servicing tasks
 			if ( this.poolSizeTuner != null ) poolSizeTuner.stop ();
 			
 			String outp = null;
+			// Do we really have an output path?
 			if ( this.outputPath != null )
 			{
 				if ( outputCounter > 0 ) 
 				{
+					// If it's not the first time, number the file between the name and the extension.
 					int idot = FilenameUtils.indexOfExtension ( this.outputPath );
 					outp = idot == -1 
 						? this.outputPath + "_" + outputCounter
@@ -157,6 +199,7 @@ public class BioSdExportService extends BatchService<BioSdExportTask>
 			}
 			else 
 			{
+				// no output path specified, I'm going to punish you by vomiting all on your screen...
 				if ( outputCounter == 0 ) 
 					log.info ( "Outputing in-memory tripes to the standard output" );
 				else
@@ -166,6 +209,8 @@ public class BioSdExportService extends BatchService<BioSdExportTask>
 				
 			} // if outputPath
 				
+			// RDF/XML output. TODO: make this an option?
+			// 
 			PrefixOWLOntologyFormat fmt = new RDFXMLOntologyFormat ();
 			for ( Entry<String, String> nse: getNamespaces ().entrySet () )
 				fmt.setPrefix ( nse.getKey (), nse.getValue () );
