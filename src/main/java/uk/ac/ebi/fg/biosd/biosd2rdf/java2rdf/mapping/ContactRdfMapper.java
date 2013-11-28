@@ -8,6 +8,7 @@ import static uk.ac.ebi.fg.java2rdf.utils.NamespaceUtils.ns;
 
 import java.util.Map;
 
+import uk.ac.ebi.fg.biosd.model.xref.DatabaseRefSource;
 import uk.ac.ebi.fg.core_model.organizational.Contact;
 import uk.ac.ebi.fg.java2rdf.mapping.BeanRdfMapper;
 import uk.ac.ebi.fg.java2rdf.mapping.RdfMappingException;
@@ -69,7 +70,7 @@ public class ContactRdfMapper extends BeanRdfMapper<Contact>
 		
 		// biosd-terms:has-affiliation-line (subprop of dc:description/rdfs:comment)
 		this.addPropertyMapper ( "affiliation", new OwlDatatypePropRdfMapper<Contact, String> ( ns ( "biosd-terms", "has-affiliation-line" ) ) );
-		this.addPropertyMapper ( "url", new UriStringPropRdfMapper<Contact> ( ns ( "rdfs", "seeAlso" ) ) );
+		this.addPropertyMapper ( "url", new UriStringPropRdfMapper<Contact> ( ns ( "foaf", "page" ), true ) );
 		
 		// TODO: These need to be checked against Zooma
 		// c.getContactRoles ();

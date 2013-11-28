@@ -31,6 +31,15 @@ import uk.ac.ebi.fg.java2rdf.mapping.urigen.RdfUriGenerator;
  */
 public class BioSampleRdfMapper extends BeanRdfMapper<BioSample>
 {
+	/** Used both as a regular property mapper and inside the {@link #map(BioSample, Map)} method. */
+	private final CompositePropRdfMapper<BioSample, DatabaseRefSource> dbRefMapper = 
+		new CompositePropRdfMapper<BioSample, DatabaseRefSource> ( 
+			new OwlObjPropRdfMapper<BioSample, DatabaseRefSource> ( ns ( "pav", "derivedFrom" ) ),
+			// dbrecord denotes sample
+			new InversePropRdfMapper<BioSample, DatabaseRefSource> ( 
+				new OwlObjPropRdfMapper<DatabaseRefSource, BioSample> ( ns ( "obo", "IAO_0000219" ) ) 
+	)); 
+			
 	@SuppressWarnings ( "rawtypes" )
 	public BioSampleRdfMapper ()
 	{
@@ -47,13 +56,7 @@ public class BioSampleRdfMapper extends BeanRdfMapper<BioSample>
 		this.addPropertyMapper ( "propertyValues", new CollectionPropRdfMapper<BioSample, ExperimentalPropertyValue> ( 
 			new ExpPropValueRdfMapper<BioSample> ()) 
 		);
-		this.addPropertyMapper ( "databases", new CompositePropRdfMapper<BioSample, DatabaseRefSource> ( 
-			new OwlObjPropRdfMapper<BioSample, DatabaseRefSource> ( ns ( "pav", "derivedFrom" ) ),
-			// dbrecord denotes sample
-			new InversePropRdfMapper<BioSample, DatabaseRefSource> ( 
-				new OwlObjPropRdfMapper<DatabaseRefSource, BioSample> ( ns ( "obo", "IAO_0000219" ) ) 
-			)
-		));
+		this.addPropertyMapper ( "databases", dbRefMapper );
 		// TODO: more
 	}
 
@@ -69,6 +72,9 @@ public class BioSampleRdfMapper extends BeanRdfMapper<BioSample>
 		biosdRef.setName ( "EBI Biosamples Database" );
 		biosdRef.setUrl ( "http://www.ebi.ac.uk/biosamples/sample/" + smp.getAcc () );
 		
+		// Map this manually, we don't want to risk with polluting the source model
+		dbRefMapper.map ( smp,  biosdRef );
+		
 		// Do you have a name? (names will be used for dcterms:title and rdfs:label
 		// 
 		for ( ExperimentalPropertyValue<?> pval: smp.getPropertyValues () ) 
@@ -79,7 +85,7 @@ public class BioSampleRdfMapper extends BeanRdfMapper<BioSample>
 			if ( ptype == null ) continue;
 			String typeLabel = StringUtils.trimToNull ( ptype.getTermText () );
 			if ( "name".equalsIgnoreCase ( typeLabel ) || "sample name".equalsIgnoreCase ( typeLabel ) ) 
-				return super.map ( smp, params );
+				return super.map ( smp, params ) | true;
 		}
 
 		// You don't! Take the accession!
@@ -87,9 +93,7 @@ public class BioSampleRdfMapper extends BeanRdfMapper<BioSample>
 		BioCharacteristicValue nval = new BioCharacteristicValue ( "Sample " + smp.getAcc (), ntype );
 		smp.addPropertyValue ( nval );
 		
-		return super.map ( smp, params );
+		return super.map ( smp, params ) | true;
 	}
-	
-	
 }
 

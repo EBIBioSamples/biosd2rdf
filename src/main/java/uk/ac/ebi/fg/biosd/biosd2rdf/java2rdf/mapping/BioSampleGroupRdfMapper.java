@@ -31,6 +31,15 @@ import uk.ac.ebi.fg.java2rdf.mapping.urigen.RdfUriGenerator;
  */
 public class BioSampleGroupRdfMapper extends BeanRdfMapper<BioSampleGroup>
 {
+	/** Used both as a regular property mapper and inside the {@link #map(BioSampleGroup, Map)} method. */
+  private CompositePropRdfMapper<BioSampleGroup, DatabaseRefSource> dbRefMapper =  
+  	new CompositePropRdfMapper<BioSampleGroup, DatabaseRefSource> ( 
+			new OwlObjPropRdfMapper<BioSampleGroup, DatabaseRefSource> ( ns ( "pav", "derivedFrom" ) ),
+			// dbrecord denotes sample
+			new InversePropRdfMapper<BioSampleGroup, DatabaseRefSource> ( 
+				new OwlObjPropRdfMapper<DatabaseRefSource, BioSampleGroup> ( ns ( "obo", "IAO_0000219" ) ) 
+	));
+  
 	@SuppressWarnings ( "rawtypes" )
 	public BioSampleGroupRdfMapper ()
 	{
@@ -50,13 +59,7 @@ public class BioSampleGroupRdfMapper extends BeanRdfMapper<BioSampleGroup>
 		this.addPropertyMapper ( "samples", new CollectionPropRdfMapper<BioSampleGroup, BioSample> ( 
 			new OwlObjPropRdfMapper<BioSampleGroup, BioSample> ( ns ( "obo", "IAO_0000136" ) ) )
 		);
-		this.addPropertyMapper ( "databases", new CompositePropRdfMapper<BioSampleGroup, DatabaseRefSource> ( 
-			new OwlObjPropRdfMapper<BioSampleGroup, DatabaseRefSource> ( ns ( "pav", "derivedFrom" ) ),
-			// dbrecord denotes sample
-			new InversePropRdfMapper<BioSampleGroup, DatabaseRefSource> ( 
-				new OwlObjPropRdfMapper<DatabaseRefSource, BioSampleGroup> ( ns ( "obo", "IAO_0000219" ) ) 
-			)
-		));
+		this.addPropertyMapper ( "databases", dbRefMapper );
 		
 		// TODO: more
 	}
@@ -72,6 +75,9 @@ public class BioSampleGroupRdfMapper extends BeanRdfMapper<BioSampleGroup>
 		DatabaseRefSource biosdRef = new DatabaseRefSource ( sg.getAcc (), null );
 		biosdRef.setName ( "EBI Biosamples Database" );
 		biosdRef.setUrl ( "http://www.ebi.ac.uk/biosamples/group/" + sg.getAcc () );
+
+		// Map this manually, we don't want to risk with polluting the source model
+		dbRefMapper.map ( sg,  biosdRef );
 		
 		// Do you have a name? (names will be used for dcterms:title and rdfs:label
 		// 
@@ -83,7 +89,7 @@ public class BioSampleGroupRdfMapper extends BeanRdfMapper<BioSampleGroup>
 			if ( ptype == null ) continue;
 			String typeLabel = StringUtils.trimToNull ( ptype.getTermText () );
 			if ( typeLabel != null && typeLabel.toLowerCase ().matches ( "(sample |group |sample group |)?name" ) ) 
-				return super.map ( sg, params );
+				return super.map ( sg, params ) | true;
 		}
 
 		// You don't! Take the accession!
@@ -91,7 +97,7 @@ public class BioSampleGroupRdfMapper extends BeanRdfMapper<BioSampleGroup>
 		BioCharacteristicValue nval = new BioCharacteristicValue ( "Sample Group " + sg.getAcc (), ntype );
 		sg.addPropertyValue ( nval );
 		
-		return super.map ( sg, params );
+		return super.map ( sg, params ) | true;
 	}
 	
 }

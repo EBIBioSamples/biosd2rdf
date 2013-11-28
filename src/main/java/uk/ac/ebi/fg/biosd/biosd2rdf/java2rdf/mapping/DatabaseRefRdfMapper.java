@@ -1,17 +1,19 @@
 package uk.ac.ebi.fg.biosd.biosd2rdf.java2rdf.mapping;
 
 import static uk.ac.ebi.fg.java2rdf.utils.NamespaceUtils.ns;
-import static uk.ac.ebi.fg.java2rdf.utils.OwlApiUtils.assertLink;
+import static uk.ac.ebi.fg.java2rdf.utils.OwlApiUtils.*;
 
 import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
+import org.semanticweb.owlapi.model.OWLOntology;
 
 import uk.ac.ebi.fg.biosd.model.xref.DatabaseRefSource;
 import uk.ac.ebi.fg.java2rdf.mapping.BeanRdfMapper;
 import uk.ac.ebi.fg.java2rdf.mapping.RdfMapperFactory;
 import uk.ac.ebi.fg.java2rdf.mapping.properties.CompositePropRdfMapper;
 import uk.ac.ebi.fg.java2rdf.mapping.properties.OwlDatatypePropRdfMapper;
+import uk.ac.ebi.fg.java2rdf.mapping.properties.UriStringPropRdfMapper;
 import uk.ac.ebi.fg.java2rdf.mapping.urigen.RdfUriGenerator;
 import uk.ac.ebi.fg.java2rdf.utils.Java2RdfUtils;
 
@@ -45,7 +47,7 @@ public class DatabaseRefRdfMapper extends BeanRdfMapper<DatabaseRefSource>
 		);
 
 		this.addPropertyMapper ( "acc", new OwlDatatypePropRdfMapper<DatabaseRefSource, String> ( ns ( "dc-terms", "identifier" ) ) );
-		this.addPropertyMapper ( "url", new OwlDatatypePropRdfMapper<DatabaseRefSource, String> ( ns ( "foaf", "page" ) ) );
+		this.addPropertyMapper ( "url", new UriStringPropRdfMapper<DatabaseRefSource> ( ns ( "foaf", "page" ), true ) );
 		
 		this.addPropertyMapper ( "description", new CompositePropRdfMapper<> (
 			new OwlDatatypePropRdfMapper<DatabaseRefSource, String> ( ns ( "dc-terms", "description" ) ),
@@ -53,18 +55,24 @@ public class DatabaseRefRdfMapper extends BeanRdfMapper<DatabaseRefSource>
 		));
 
 		// Contains strings like 'PRIDE' or 'ArrayExpress', so dc:source this should be the best property to represent them
-		this.addPropertyMapper ( "name", new CompositePropRdfMapper<> (  
-			new OwlDatatypePropRdfMapper<DatabaseRefSource, String> ( ns ( "dc-terms", "source" ) ), 
-			new OwlDatatypePropRdfMapper<DatabaseRefSource, String> ( ns ( "dc-terms", "title" ) ), 
-			new OwlDatatypePropRdfMapper<DatabaseRefSource, String> ( ns ( "rdfs", "label" ) ) 
-		));
+		this.addPropertyMapper ( "name",  new OwlDatatypePropRdfMapper<DatabaseRefSource, String> ( ns ( "dc-terms", "source" ) ) ); 
 	}
 
 	@Override
 	public boolean map ( DatabaseRefSource db, Map<String, Object> params )
 	{
 		if ( !super.map ( db, params ) ) return false;
-			
+		
+		RdfMapperFactory mapf = this.getMapperFactory ();
+		OWLOntology kb = mapf.getKnowledgeBase ();
+
+		// A composed string for the title
+		String title = db.getName () + ":" + db.getAcc ();
+		RdfUriGenerator<DatabaseRefSource> uriGen = this.getRdfUriGenerator ();
+		assertData ( kb, uriGen.getUri ( db, params ), ns ( "dc-terms", "title" ), title );
+		assertData ( kb, uriGen.getUri ( db, params ), ns ( "rdfs", "label" ), title );
+		
+		
 		if ( !"ArrayExpress".equalsIgnoreCase ( db.getName () ) ) return true;
 		
 		// Build a URI that points at the contents of the Gene Expression Atlas data set. 
@@ -72,15 +80,10 @@ public class DatabaseRefRdfMapper extends BeanRdfMapper<DatabaseRefSource>
 		// if the URI is actually defined. For the moment we are like: if the resource existed, it would have this URI 
 		// and that would return some RDF, when it doesn't exist you don't get any RDF back
 		//
-		
-		String acc = StringUtils.trimToNull ( db.getAcc () );
-		if ( acc == null ) return true;
-		
-		String atlasUri = "http://rdf.ebi.ac.uk/resource/atlas/" + acc;
-		
-		RdfMapperFactory mapf = this.getMapperFactory ();
-		
-		assertLink ( mapf.getKnowledgeBase (), atlasUri, ns ( "pav", "derivedFrom" ), mapf.getUri ( db, params ) );
+				
+		String atlasUri = "http://rdf.ebi.ac.uk/resource/atlas/" + db.getAcc ();
+		assertLink ( kb, atlasUri, ns ( "pav", "derivedFrom" ), mapf.getUri ( db, params ) );
+
 		return true;
 	}
 	
