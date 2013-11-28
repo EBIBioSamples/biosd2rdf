@@ -27,7 +27,7 @@ public class PublicationRdfMapper extends BeanRdfMapper<Publication>
 	public PublicationRdfMapper ()
 	{
 		super (
-			// publication, ebi_terms.owl additionally defines this subclass of: foaf:document, fabio:work
+			// publication, ebi_terms.owl additionally defines this as subclass of: foaf:document, fabio:work, bibo:Document
 			ns ( "obo", "IAO_0000311" ), 
 			new RdfUriGenerator<Publication>() {
 				@Override public String getUri ( Publication pub, Map<String, Object> params ) 
@@ -62,8 +62,14 @@ public class PublicationRdfMapper extends BeanRdfMapper<Publication>
 
 		
 		// TODO: add EDAM identifiers, which are individuals and not a data values.
-		this.addPropertyMapper ( "pubmedId", new OwlDatatypePropRdfMapper<Publication, String> ( ns ( "fabio", "hasPubMedId" ) ) );
-		this.addPropertyMapper ( "DOI", new OwlDatatypePropRdfMapper<Publication, String> ( ns ( "prism", "doi" ) ) );
+		this.addPropertyMapper ( "pubmedId", new CompositePropRdfMapper<> ( 
+			new OwlDatatypePropRdfMapper<Publication, String> ( ns ( "fabio", "hasPubMedId" ) ), 
+			new OwlDatatypePropRdfMapper<Publication, String> ( ns ( "bibo", "pmid" ) ) 
+		));
+		this.addPropertyMapper ( "DOI", new CompositePropRdfMapper<> ( 
+			new OwlDatatypePropRdfMapper<Publication, String> ( ns ( "bibo", "doi" ) ), 
+			new OwlDatatypePropRdfMapper<Publication, String> ( ns ( "prism", "doi" ) ) 
+		));
 		// TODO: a sub-property of dc-elems:creator and of owl:dataProperty
 		this.addPropertyMapper ( "authorList", new OwlDatatypePropRdfMapper<Publication, String> ( ns ( "biosd-terms", "has-authors-list" ) ) );
 		this.addPropertyMapper ( "year", new PublicationYearRdfMapper () );

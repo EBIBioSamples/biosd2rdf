@@ -11,11 +11,11 @@ import org.apache.commons.lang.StringUtils;
 import uk.ac.ebi.fg.biosd.model.expgraph.BioSample;
 import uk.ac.ebi.fg.biosd.model.organizational.BioSampleGroup;
 import uk.ac.ebi.fg.biosd.model.organizational.MSI;
+import uk.ac.ebi.fg.biosd.model.xref.DatabaseRefSource;
 import uk.ac.ebi.fg.core_model.organizational.Contact;
 import uk.ac.ebi.fg.core_model.organizational.Organization;
 import uk.ac.ebi.fg.core_model.organizational.Publication;
 import uk.ac.ebi.fg.java2rdf.mapping.BeanRdfMapper;
-import uk.ac.ebi.fg.java2rdf.mapping.RdfMapperFactory;
 import uk.ac.ebi.fg.java2rdf.mapping.RdfMappingException;
 import uk.ac.ebi.fg.java2rdf.mapping.properties.CollectionPropRdfMapper;
 import uk.ac.ebi.fg.java2rdf.mapping.properties.CompositePropRdfMapper;
@@ -58,7 +58,6 @@ public class MSIRdfMapper extends BeanRdfMapper<MSI>
 			new OwlDatatypePropRdfMapper<MSI, String> ( ns ( "rdfs", "comment" ) ) 
 		));
 		
-		// TODO: more
 		
 		this.addPropertyMapper ( "samples", new CollectionPropRdfMapper<MSI, BioSample> ( 
 			new OwlObjPropRdfMapper<MSI, BioSample> ( ns ( "obo", "IAO_0000219" ) ) ) // denotes
@@ -84,6 +83,15 @@ public class MSIRdfMapper extends BeanRdfMapper<MSI>
 			new OwlObjPropRdfMapper<MSI, Organization> ( ns ( "biosd-terms", "has-knowledgeable-organization" ) ) )
 		);
 
+		this.addPropertyMapper ( "databases", new CollectionPropRdfMapper<> ( new CompositePropRdfMapper<> ( 
+			new OwlObjPropRdfMapper<MSI, DatabaseRefSource> ( ns ( "pav", "derivedFrom" ) ),
+			// dbrecord denotes submission
+			new InversePropRdfMapper<MSI, DatabaseRefSource> ( 
+				new OwlObjPropRdfMapper<DatabaseRefSource, MSI> ( ns ( "obo", "IAO_0000219" ) ) 
+			)
+		)));
+
+		// TODO: more
 	}
 
 	@Override
@@ -96,8 +104,6 @@ public class MSIRdfMapper extends BeanRdfMapper<MSI>
 
 			if ( params == null ) params = new HashMap<String, Object> ();
 			params.put ( "msiAccession", msi.getAcc () );
-			
-			RdfMapperFactory mapFact = this.getMapperFactory ();
 
 			return super.map ( msi, params );
 		} 

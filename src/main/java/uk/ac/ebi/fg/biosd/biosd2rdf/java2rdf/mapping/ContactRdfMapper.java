@@ -43,9 +43,10 @@ public class ContactRdfMapper extends BeanRdfMapper<Contact>
 					String email = trimToNull ( cnt.getEmail () );
 					String id = email != null 
 						? hashUriSignature ( email ) 
-						: urlEncode ( (String) params.get ( "msiAccession" ) ) + "/" + hashUriSignature ( nameLine );    
+						: nameLine == null 
+						  ? null : urlEncode ( (String) params.get ( "msiAccession" ) ) + "/" + hashUriSignature ( nameLine );    
 					
-					return ns ( "biosd", "ref-contact/" + id );
+					return id == null ? null : ns ( "biosd", "ref-contact/" + id );
 			}}
 		);
 		

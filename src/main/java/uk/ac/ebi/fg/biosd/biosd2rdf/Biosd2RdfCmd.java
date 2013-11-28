@@ -41,18 +41,25 @@ public class Biosd2RdfCmd
 			cli = clparser.parse ( getOptions(), args );
 			
 			if ( cli.hasOption ( 'h' ) ) throw new ParseException ( "--help" );
+
+			exportService = new BioSdExportService ( cli.getOptionValue ( 'o' ) );
+			
 			
 			args = cli.getArgs ();
 			
 			if ( args.length > 0 )
-				throw new UnsupportedOperationException ( "The case of specified accessions is not supported yet" );
-			
-			double sampleSize = cli.hasOption ( 'z' ) ? Double.parseDouble ( cli.getOptionValue ( 'z' ) ) : 100d;
+				// Accessions of submissions to be exported come from the param
+				exportService.submitAll ( args );
+			else
+			{
+				// Or, we pick a random subset of them, or all of them. 
+				//
+				double sampleSize = cli.hasOption ( 'z' ) ? Double.parseDouble ( cli.getOptionValue ( 'z' ) ) : 100d;
 
-			// submit export tasks to the thread pool executor. Here we will be put on wait when all the pool threads are
-			// busy, i.e., we'll wait most of time, until the tail of the submission table
-			exportService = new BioSdExportService ( cli.getOptionValue ( 'o' ) );
-			exportService.submitAll ( sampleSize );
+				// submit export tasks to the thread pool executor. Here we will be put on wait when all the pool threads are
+				// busy, i.e., we'll wait most of time, until the tail of the submission table
+				exportService.submitAll ( sampleSize );
+			}
 			
 			// Now that all is submitted, wait that all the export tasks complete.
 			exportService.waitAllFinished ();

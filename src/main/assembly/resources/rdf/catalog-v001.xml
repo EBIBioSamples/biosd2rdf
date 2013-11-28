@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <catalog prefer="public" xmlns="urn:oasis:names:tc:entity:xmlns:xml:catalog">
+    <uri id="Imports Wizard Entry" name="http://purl.org/ontology/bibo/" uri="ext/bibo.owl"/>
     <uri id="Imports Wizard Entry" name="http://rdf.ebi.ac.uk/dataset/biosamples" uri="file:/Users/brandizi/Documents/Work/ebi/ebi2rdf/git/biosd2rdf/target/biosd2rdf_cmdline_0.0.1-SNAPSHOT/test.owl"/>
     <uri id="Imports Wizard Entry" name="http://purl.org/spar/fabio/" uri="http://eelst.cs.unibo.it/apps/LODE/source?url=http://purl.org/spar/fabio"/>
     <uri id="Imports Wizard Entry" name="http://purl.obolibrary.org/obo/iao/iao-main.owl" uri="http://purl.obolibrary.org/obo/iao/2011-05-09/iao-main.owl"/>
@@ -7,10 +8,11 @@
     <uri id="Imports Wizard Entry" name="http://xmlns.com/foaf/0.1/" uri="http://xmlns.com/foaf/spec/index.rdf"/>
     <uri id="Imports Wizard Entry" name="http://purl.obolibrary.org/obo/obi.owl" uri="http://svn.code.sf.net/p/obi/code/releases/2012-07-01/merged/merged-obi-comments.owl"/>
     <group id="Folder Repository, directory=, recursive=true, Auto-Update=true, version=2" prefer="public" xml:base="">
-        <uri id="Automatically generated entry, Timestamp=1382517011421" name="http://purl.obolibrary.org/obo/" uri="ext/iao-main.owl"/>
-        <uri id="Automatically generated entry, Timestamp=1382517011421" name="http://purl.obolibrary.org/obo/obi.owl" uri="ext/merged-obi-comments.owl"/>
-        <uri id="Automatically generated entry, Timestamp=1382517011421" name="http://schema.org/" uri="ext/schemaorg.owl"/>
-        <uri id="Automatically generated entry, Timestamp=1382517011421" name="http://semanticscience.org/ontology/sio.owl" uri="ext/sio.owl"/>
-        <uri id="Automatically generated entry, Timestamp=1382517011421" name="http://www.ebi.ac.uk/efo/" uri="ext/efo_inferred.owl"/>
+        <uri id="Automatically generated entry, Timestamp=1385396740193" name="http://purl.obolibrary.org/obo/" uri="ext/iao-main.owl"/>
+        <uri id="Automatically generated entry, Timestamp=1385396740193" name="http://purl.obolibrary.org/obo/obi.owl" uri="ext/merged-obi-comments.owl"/>
+        <uri id="Automatically generated entry, Timestamp=1385396740193" name="http://purl.org/ontology/bibo/" uri="ext/bibo.owl"/>
+        <uri id="Automatically generated entry, Timestamp=1385396740193" name="http://schema.org/" uri="ext/schemaorg.owl"/>
+        <uri id="Automatically generated entry, Timestamp=1385396740193" name="http://semanticscience.org/ontology/sio.owl" uri="ext/sio.owl"/>
+        <uri id="Automatically generated entry, Timestamp=1385396740193" name="http://www.ebi.ac.uk/efo/" uri="ext/efo_inferred.owl"/>
     </group>
 </catalog>

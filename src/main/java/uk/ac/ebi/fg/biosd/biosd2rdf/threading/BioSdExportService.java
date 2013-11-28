@@ -109,6 +109,10 @@ public class BioSdExportService extends BatchService<BioSdExportTask>
 	public void submit ( Long msiId ) {
 		this.submit ( new BioSdExportTask ( rdfMapFactory, msiId ) );
 	}
+	
+	public void submit ( String msiAcc ) {
+		this.submit ( new BioSdExportTask ( rdfMapFactory, msiAcc ) );
+	}
 
 	/** 
 	 * Submits the task of exporting a single SampleTab to RDF submission, available as {@link MSI MSI object}. 
@@ -118,6 +122,8 @@ public class BioSdExportService extends BatchService<BioSdExportTask>
 		this.submit ( new BioSdExportTask ( rdfMapFactory, msi ) );
 	}
 
+	
+	
 	/**
 	 * Submits a new BioSD exporter task. This will work on a single SampleTab submission and will be run as a thread in 
 	 * thread pool, managed by this service.
@@ -151,6 +157,15 @@ public class BioSdExportService extends BatchService<BioSdExportTask>
 		}
 	}
 
+	/**
+	 * Exports the SampleTab submissions having the parameter accessions. Used in the corresponding form of 
+	 * the command line, uses {@link BioSdExportTask#BioSdExportTask(BioSdRfMapperFactory, String)}.  
+	 */
+	public void submitAll ( String... msiAccs )
+	{
+		for ( String msiAcc: msiAccs ) submit ( msiAcc );
+	}
+	
 
 	/**
 	 * This saves the triple store that keeps the RDF output of the exporters into the file specified by this class's 

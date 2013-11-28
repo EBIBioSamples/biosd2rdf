@@ -10,7 +10,6 @@
 @prefix biosd: <http://rdf.ebi.ac.uk/resource/biosamples/>.
 ## WARNING: for some reason, Virtuoso doesn't like names with dashes when loading VOID
 @prefix biosdterms: <http://rdf.ebi.ac.uk/terms/biosd/>.
-@prefix ebiterms: <http://rdf.ebi.ac.uk/terms/>.
 @prefix schema: <http://schema.org/>.
 
 ## your VoID description
@@ -48,13 +47,14 @@
      void:sparqlEndpoint <http://www.ebi.ac.uk/rdf/services/biosamples/sparql>;
      void:vocabulary
        biosdterms:,
-       ebiterms:,
-       <http://purl.obolibrary.org/obo/obi.owl>,
        <http://www.ebi.ac.uk/efo/efo.owl>,
+       <http://purl.obolibrary.org/obo/obi.owl>,
+       <http://semanticscience.org/ontology/sio.owl>,
 		   schema:,
 		   dcterms:,
 			 foaf:,
-			 <http://purl.org/spar/fabio/> ## TODO, needs to be reviewed, maybe we'll use something else
+       <http://purl.org/ontology/bibo/>,
+			 <http://purl.org/spar/fabio/>
      ;                         
      pav:version "${biosd.version}";
      pav:previousVersion <http://rdf.ebi.ac.uk/dataset/biosamples/${biosd.previous-version}>;
@@ -62,15 +62,14 @@
      pav:importedOn "${biosd.creation-date}"^^xsd:date
 .
 
-biosd:biosamplesTeam a ebiterms:Organization;
+biosd:biosamplesTeam a biosdterms:ContactOrganization;
   dcterms:title "Biosamples Team at the European Bioinformatics Institute (EMBL-EBI)";
   schema:name "Biosamples Team at the European Bioinformatics Institute (EMBL-EBI)";
   rdfs:label "Biosamples Team at the European Bioinformatics Institute (EMBL-EBI)";
-	## Note: According to http://schema.org/sameAs this has nothing to do with owl:sameAs and it's the right thing to use here
-	foaf:homepage <http://www.ebi.ac.uk>
+	foaf:homepage <http://www.ebi.ac.uk/biosamples>
 .
 
-biosd:marcoBrandizi a ebiterms:Person;
+biosd:marcoBrandizi a biosdterms:ContactPerson;
   dcterms:title "Marco Brandizi";
   schema:name "Marco Brandizi";
   rdfs:label "Marco Brandizi";

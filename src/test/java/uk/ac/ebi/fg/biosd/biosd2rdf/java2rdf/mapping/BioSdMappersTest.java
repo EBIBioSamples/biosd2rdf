@@ -20,8 +20,13 @@ import org.semanticweb.owlapi.model.OWLOntologyStorageException;
 import org.semanticweb.owlapi.vocab.PrefixOWLOntologyFormat;
 
 import uk.ac.ebi.fg.biosd.model.utils.test.TestModel;
+import uk.ac.ebi.fg.biosd.model.xref.DatabaseRefSource;
+import uk.ac.ebi.fg.core_model.expgraph.properties.BioCharacteristicType;
+import uk.ac.ebi.fg.core_model.expgraph.properties.BioCharacteristicValue;
 import uk.ac.ebi.fg.core_model.expgraph.properties.ExperimentalPropertyType;
 import uk.ac.ebi.fg.core_model.expgraph.properties.ExperimentalPropertyValue;
+import uk.ac.ebi.fg.core_model.expgraph.properties.Unit;
+import uk.ac.ebi.fg.core_model.expgraph.properties.UnitDimension;
 import uk.ac.ebi.fg.core_model.organizational.Contact;
 import uk.ac.ebi.fg.core_model.organizational.Organization;
 import uk.ac.ebi.fg.core_model.organizational.Publication;
@@ -80,6 +85,32 @@ public class BioSdMappersTest
 		org.setPhone ( "123-456-789" );
 		org.setDescription ( "A test Organisation" );
 		biosdModel.msi.addOrganization ( org );		
+		
+		DatabaseRefSource db = new DatabaseRefSource ( "E-GEOD-12040", null );
+		db.setName ( "ArrayExpress" );
+		db.setUrl ( "http://www.ebi.ac.uk/arrayexpress/experiments/E-GEOD-12040" );
+		biosdModel.msi.addDatabase ( db );
+		
+		// This should generate specific statements about the value and the unit.
+		biosdModel.cv5.setTermText ( "2.5" );
+		biosdModel.cv5.setUnit ( new Unit ( "percent", null ) );
+
+		// The URI for this is given explictly and we expect the exported use this.
+		Unit uoUnit = new Unit ( "weeks", new UnitDimension ( "Time" ) );
+		uoUnit.addOntologyTerm ( new OntologyEntry ( "UO_0000034", new ReferenceSource ( "UO", null ) ) );
+		BioCharacteristicValue age = new BioCharacteristicValue ( "2-5", new BioCharacteristicType ( "Age" ) );
+		age.setUnit ( uoUnit );
+		biosdModel.smp1.addPropertyValue ( age );
+
+		// This should solve to grams and not to the prefix giga-
+		Unit gUnit = new Unit ( "g", null );
+		BioCharacteristicValue weight = new BioCharacteristicValue ( "250", new BioCharacteristicType ( "Weight" ) );
+		weight.setUnit ( gUnit );
+		biosdModel.smp1.addPropertyValue ( weight );
+		
+		
+		// Zooma should solve this into EFO_0004950 and the value should be an xsd:dateTime
+		biosdModel.smp1.addPropertyValue ( new BioCharacteristicValue ( "31/12/2012", new BioCharacteristicType ( "Date of Birth" ) ) );
 		
 		new BioSdRfMapperFactory ( onto ).map ( biosdModel.msi );
 		

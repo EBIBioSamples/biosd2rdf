@@ -14,6 +14,7 @@
                                     
                                     :imports obo:obi.owl ,
                                              <http://purl.obolibrary.org/obo/iao/iao-main.owl> ,
+                                             <http://purl.org/ontology/bibo/> ,
                                              <http://purl.org/spar/fabio/> ,
                                              schema: ,
                                              <http://semanticscience.org/ontology/sio.owl> ,
@@ -35,8 +36,7 @@ biosdterms:has-address-line rdf:type :AnnotationProperty ;
                             
                             obo:IAO_0000115 "A postal address in the form of simple text (i.e., string). This can be used for those cases where it's too complicated to achieve a proper structure for an address."@en ;
                             
-                            rdfs:subPropertyOf dcterms:description ,
-                                               rdfs:comment .
+                            rdfs:subPropertyOf rdfs:comment .
 
 
 
@@ -48,8 +48,7 @@ biosdterms:has-affiliation-line rdf:type :AnnotationProperty ;
                                 
                                 obo:IAO_0000115 "An affiliation description for a person (e.g., department+university), in the form of simple text (i.e., string). This can be used for those cases where it's too complicated to achieve a proper structure for an affiliation."@en ;
                                 
-                                rdfs:subPropertyOf dcterms:description ,
-                                                   rdfs:comment .
+                                rdfs:subPropertyOf rdfs:comment .
 
 
 
@@ -61,11 +60,8 @@ biosdterms:has-authors-list rdf:type :AnnotationProperty ;
                             
                             obo:IAO_0000115 "The list of authors of a publication or document, in the form of a simple text (i.e., a string). This can be used for those cases where extracting a proper list of authors (e.g., from a database record) is too complicated."@en ;
                             
-                            rdfs:domain obo:IAO_0000311 ;
-                            
-                            rdfs:subPropertyOf dcterms:description ;
-                            
-                            rdfs:domain <http://purl.org/spar/fabio/Work> ;
+                            rdfs:domain obo:IAO_0000311 ,
+                                        <http://purl.org/spar/fabio/Work> ;
                             
                             rdfs:subPropertyOf rdfs:comment ;
                             
@@ -79,9 +75,7 @@ biosdterms:has-knowledgeable-organization rdf:type :AnnotationProperty ;
                                           
                                           rdfs:label "has knowledgeable organization"@en ;
                                           
-                                          obo:IAO_0000115 "An organization that is somehow involved with the subject of this relation, for example because it is its creator, or the maintainer, or alike."@en ;
-                                          
-                                          rdfs:subPropertyOf dcterms:contributor .
+                                          obo:IAO_0000115 "An organization that is somehow involved with the subject of this relation, for example because it is its creator, or the maintainer, or alike."@en .
 
 
 
@@ -91,9 +85,7 @@ biosdterms:has-knowledgeable-person rdf:type :AnnotationProperty ;
                                     
                                     rdfs:label "has knowledgeable person"@en ;
                                     
-                                    obo:IAO_0000115 "A person that is somehow involved with the subject of this relation, for example because he/she is its creator, or the maintainer, or alike."@en ;
-                                    
-                                    rdfs:subPropertyOf dcterms:contributor .
+                                    obo:IAO_0000115 "A person that is somehow involved with the subject of this relation, for example because he/she is its creator, or the maintainer, or alike."@en .
 
 
 
@@ -114,7 +106,8 @@ biosdterms:has-bio-characteristic rdf:type :ObjectProperty ;
                                   
                                   obo:IAO_0000115 "Relates a biological sample to a biological property that it has, such as the disease state or the organism it derives from. This correponds to the characteristic column in formats such as SampleTab or MAGE-TAB and, because of that, it's a not-too-formal associations. For instance, an association to mus-musculus might mean  either that the samle is a mouse, or that it is a part of a mouse."@en ;
                                   
-                                  rdfs:subPropertyOf obo:IAO_0000136 ;
+                                  rdfs:subPropertyOf obo:IAO_0000136 ,
+                                                     <http://semanticscience.org/resource/SIO_000008> ;
                                   
                                   rdfs:domain [ rdf:type :Class ;
                                                 :unionOf ( obo:OBI_0000747
@@ -132,7 +125,8 @@ biosdterms:has-knowledgeable-organization rdf:type :ObjectProperty ;
                                           
                                           obo:IAO_0000115 "An organization that is somehow involved with the subject of this relation, for example because it is its creator, or the maintainer, or alike."@en ;
                                           
-                                          rdfs:subPropertyOf schema:contributor .
+                                          rdfs:subPropertyOf dcterms:contributor ,
+                                                             schema:contributor .
 
 
 
@@ -144,7 +138,8 @@ biosdterms:has-knowledgeable-person rdf:type :ObjectProperty ;
                                     
                                     obo:IAO_0000115 "A person that is somehow involved with the subject of this relation, for example because he/she is its creator, or the maintainer, or alike."@en ;
                                     
-                                    rdfs:subPropertyOf schema:contributor .
+                                    rdfs:subPropertyOf dcterms:contributor ,
+                                                       schema:contributor .
 
 
 
@@ -171,7 +166,8 @@ biosdterms:has-address-line rdf:type :DatatypeProperty ;
                             
                             obo:IAO_0000115 "A postal address in the form of simple text (i.e., string). This can be used for those cases where it's too complicated to achieve a proper structure for an address."@en ;
                             
-                            rdfs:subPropertyOf schema:description ;
+                            rdfs:subPropertyOf dcterms:description ,
+                                               schema:description ;
                             
                             rdfs:range xsd:string .
 
@@ -185,7 +181,8 @@ biosdterms:has-affiliation-line rdf:type :DatatypeProperty ;
                                 
                                 obo:IAO_0000115 "An affiliation description for a person (e.g., department+university), in the form of simple text (i.e., string). This can be used for those cases where it's too complicated to achieve a proper structure for an affiliation."@en ;
                                 
-                                rdfs:subPropertyOf schema:description ;
+                                rdfs:subPropertyOf dcterms:description ,
+                                                   schema:description ;
                                 
                                 rdfs:range xsd:string .
 
@@ -199,9 +196,34 @@ biosdterms:has-authors-list rdf:type :DatatypeProperty ;
                             
                             obo:IAO_0000115 "The list of authors of a publication or document, in the form of a simple text (i.e., a string). This can be used for those cases where extracting a proper list of authors (e.g., from a database record) is too complicated."@en ;
                             
-                            rdfs:subPropertyOf schema:description ;
+                            rdfs:subPropertyOf dcterms:description ,
+                                               schema:description ;
                             
                             rdfs:range xsd:string .
+
+
+
+###  http://rdf.ebi.ac.uk/terms/biosd/has-high-value
+
+biosdterms:has-high-value rdf:type :DatatypeProperty ;
+                          
+                          rdfs:label "has high value"@en ;
+                          
+                          obo:IAO_0000115 "A high end value for those structures that admit one, such as intervals (eg, SIO_000944)."@en ;
+                          
+                          rdfs:subPropertyOf <http://semanticscience.org/resource/SIO_000300> .
+
+
+
+###  http://rdf.ebi.ac.uk/terms/biosd/has-low-value
+
+biosdterms:has-low-value rdf:type :DatatypeProperty ;
+                         
+                         rdfs:label "has low value"@en ;
+                         
+                         obo:IAO_0000115 "A low end value for those structures that admit one, such as intervals (eg, SIO_000944)."@en ;
+                         
+                         rdfs:subPropertyOf <http://semanticscience.org/resource/SIO_000300> .
 
 
 
@@ -216,7 +238,8 @@ biosdterms:has-authors-list rdf:type :DatatypeProperty ;
 
 ###  http://purl.obolibrary.org/obo/IAO_0000311
 
-obo:IAO_0000311 rdfs:subClassOf <http://purl.org/spar/fabio/Work> ,
+obo:IAO_0000311 rdfs:subClassOf <http://purl.org/ontology/bibo/Document> ,
+                                <http://purl.org/spar/fabio/Work> ,
                                 <http://xmlns.com/foaf/0.1/Document> .
 
 
@@ -268,6 +291,34 @@ biosdterms:ContactPerson rdf:type :Class ;
 
 
 
+###  http://rdf.ebi.ac.uk/terms/biosd/RepositoryWebRecord
+
+biosdterms:RepositoryWebRecord rdf:type :Class ;
+                               
+                               rdfs:label "Repository Web Record"@en ;
+                               
+                               rdfs:subClassOf obo:IAO_0000310 ,
+                                               <http://semanticscience.org/resource/SIO_000088> ,
+                                               <http://xmlns.com/foaf/0.1/Document> ;
+                               
+                               obo:IAO_0000115 "A web page in a repository that represents a record about an entity, such as a biological sample or an experiment."@en .
+
+
+
+###  http://rdf.ebi.ac.uk/terms/biosd/Sample
+
+biosdterms:Sample rdf:type :Class ;
+                  
+                  rdfs:label "Biosample"@en ;
+                  
+                  rdfs:subClassOf obo:OBI_0000747 ;
+                  
+                  obo:IAO_0000115 "A biological sample stored in the EBI Biosamples database."@en ;
+                  
+                  rdfs:comment "TODO: an axiom to state that the origin of a biosample is BioSD (use the same individual used in Void)."@en .
+
+
+
 ###  http://rdf.ebi.ac.uk/terms/biosd/SampleGroup
 
 biosdterms:SampleGroup rdf:type :Class ;
@@ -277,7 +328,9 @@ biosdterms:SampleGroup rdf:type :Class ;
                        rdfs:subClassOf obo:IAO_0000314 ,
                                        <http://semanticscience.org/resource/SIO_000616> ;
                        
-                       obo:IAO_0000115 "A collection of biological samples stored in the EBI Biosamples database. Sample membership to a group is assigned by submitters or via automatic tools (i.e., it's a fiat relationship)."@en .
+                       obo:IAO_0000115 "A collection of biological samples stored in the EBI Biosamples database. Sample membership to a group is assigned by submitters or via automatic tools (i.e., it's a fiat relationship)."@en ;
+                       
+                       rdfs:comment "TODO: an axiom to state that the origin of a biosample group is BioSD (use the same individual used in Void)."@en .
 
 
 

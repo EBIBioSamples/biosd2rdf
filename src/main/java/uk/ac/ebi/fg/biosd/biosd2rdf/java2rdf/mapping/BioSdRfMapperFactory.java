@@ -7,6 +7,7 @@ import org.semanticweb.owlapi.model.OWLOntology;
 import uk.ac.ebi.fg.biosd.model.expgraph.BioSample;
 import uk.ac.ebi.fg.biosd.model.organizational.BioSampleGroup;
 import uk.ac.ebi.fg.biosd.model.organizational.MSI;
+import uk.ac.ebi.fg.biosd.model.xref.DatabaseRefSource;
 import uk.ac.ebi.fg.core_model.organizational.Contact;
 import uk.ac.ebi.fg.core_model.organizational.Organization;
 import uk.ac.ebi.fg.core_model.organizational.Publication;
@@ -35,8 +36,11 @@ public class BioSdRfMapperFactory extends RdfMapperFactory
 		registerNs ( "efo",			 				"http://www.ebi.ac.uk/efo/" );
 		registerNs ( "fabio",						"http://purl.org/spar/fabio/" ); // Biblio ontology
 		registerNs ( "prism", 					"http://prismstandard.org/namespaces/basic/2.0/" ); // top-level for fabio
+		registerNs ( "bibo", 						"http://purl.org/ontology/bibo/" ); // The Bibliographic ontology
 		registerNs ( "sch",							"http://schema.org/" );
 		registerNs ( "foaf",						"http://xmlns.com/foaf/0.1/" );
+		registerNs ( "pav", 						"http://purl.org/pav/2.0/" );
+		registerNs ( "sio",							"http://semanticscience.org/resource/" );
 	}
 	
 	{
@@ -46,6 +50,7 @@ public class BioSdRfMapperFactory extends RdfMapperFactory
 		setMapper ( Publication.class, new PublicationRdfMapper () );
 		setMapper ( Contact.class, new ContactRdfMapper () );
 		setMapper ( Organization.class, new OrganizationRdfMapper () );
+		setMapper ( DatabaseRefSource.class, new DatabaseRefRdfMapper () );
 	}
 	
 	public BioSdRfMapperFactory () {

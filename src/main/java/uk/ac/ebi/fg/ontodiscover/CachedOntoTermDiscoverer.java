@@ -59,8 +59,7 @@ public class CachedOntoTermDiscoverer extends OntologyTermDiscoverer
   	if ( ( valueLabel = StringUtils.trimToNull ( valueLabel ) ) == null ) return null;
   	valueLabel = valueLabel.toLowerCase ();
   	
-  	if ( ( typeLabel = StringUtils.trimToEmpty ( typeLabel ) ).isEmpty () ) return null;
-  	typeLabel = typeLabel.toLowerCase ();
+  	typeLabel = StringUtils.trimToEmpty ( typeLabel ).toLowerCase ();
   	
   	// The class name is added to further minimise the small chance that someone synchronise on this same entry 
   	String cacheEntry = this.getClass ().getName() + ":" + valueLabel + ":" + typeLabel;

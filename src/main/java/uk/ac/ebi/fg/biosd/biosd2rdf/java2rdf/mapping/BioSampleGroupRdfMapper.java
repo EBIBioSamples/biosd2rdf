@@ -9,12 +9,15 @@ import org.apache.commons.lang.StringUtils;
 
 import uk.ac.ebi.fg.biosd.model.expgraph.BioSample;
 import uk.ac.ebi.fg.biosd.model.organizational.BioSampleGroup;
+import uk.ac.ebi.fg.biosd.model.xref.DatabaseRefSource;
 import uk.ac.ebi.fg.core_model.expgraph.properties.BioCharacteristicType;
 import uk.ac.ebi.fg.core_model.expgraph.properties.BioCharacteristicValue;
 import uk.ac.ebi.fg.core_model.expgraph.properties.ExperimentalPropertyType;
 import uk.ac.ebi.fg.core_model.expgraph.properties.ExperimentalPropertyValue;
 import uk.ac.ebi.fg.java2rdf.mapping.BeanRdfMapper;
 import uk.ac.ebi.fg.java2rdf.mapping.properties.CollectionPropRdfMapper;
+import uk.ac.ebi.fg.java2rdf.mapping.properties.CompositePropRdfMapper;
+import uk.ac.ebi.fg.java2rdf.mapping.properties.InversePropRdfMapper;
 import uk.ac.ebi.fg.java2rdf.mapping.properties.OwlDatatypePropRdfMapper;
 import uk.ac.ebi.fg.java2rdf.mapping.properties.OwlObjPropRdfMapper;
 import uk.ac.ebi.fg.java2rdf.mapping.urigen.RdfUriGenerator;
@@ -46,6 +49,14 @@ public class BioSampleGroupRdfMapper extends BeanRdfMapper<BioSampleGroup>
 		this.addPropertyMapper ( "samples", new CollectionPropRdfMapper<BioSampleGroup, BioSample> ( 
 			new OwlObjPropRdfMapper<BioSampleGroup, BioSample> ( ns ( "obo", "IAO_0000136" ) ) )
 		);
+		this.addPropertyMapper ( "databases", new CompositePropRdfMapper<BioSampleGroup, DatabaseRefSource> ( 
+			new OwlObjPropRdfMapper<BioSampleGroup, DatabaseRefSource> ( ns ( "pav", "derivedFrom" ) ),
+			// dbrecord denotes sample
+			new InversePropRdfMapper<BioSampleGroup, DatabaseRefSource> ( 
+				new OwlObjPropRdfMapper<DatabaseRefSource, BioSampleGroup> ( ns ( "obo", "IAO_0000219" ) ) 
+			)
+		));
+		
 		// TODO: more
 	}
 	
@@ -53,6 +64,13 @@ public class BioSampleGroupRdfMapper extends BeanRdfMapper<BioSampleGroup>
 	public boolean map ( BioSampleGroup sg, Map<String, Object> params )
 	{
 		if ( sg == null ) return false;
+
+		// Quite obviously, BioSD has no representation of a web page record, but we'd better add this, just in case
+		// we want to show the external non-RDF records and provide with the corresponding links. 
+		// The quickest way to achieve that is to send this Java object to its RDF mapper.
+		DatabaseRefSource biosdRef = new DatabaseRefSource ( sg.getAcc (), null );
+		biosdRef.setName ( "EBI Biosamples Database" );
+		biosdRef.setUrl ( "http://www.ebi.ac.uk/biosamples/group/" + sg.getAcc () );
 		
 		// Do you have a name? (names will be used for dcterms:title and rdfs:label
 		// 

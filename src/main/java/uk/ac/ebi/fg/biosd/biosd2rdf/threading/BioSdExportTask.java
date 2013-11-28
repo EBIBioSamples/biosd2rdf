@@ -1,8 +1,11 @@
 package uk.ac.ebi.fg.biosd.biosd2rdf.threading;
 
 import java.util.HashMap;
+import java.util.List;
 
 import javax.persistence.EntityManager;
+import javax.persistence.LockModeType;
+import javax.persistence.Query;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -64,7 +67,31 @@ public class BioSdExportTask extends BatchServiceTask
 		this.msi = msi;
 		this.name += msi.getAcc ();
 	}
-	
+
+	/**
+	 * Submits a SampleTab submission having the parameter accession. Used in the command line form: 'export acc...'
+	 */
+	public BioSdExportTask ( BioSdRfMapperFactory rdfMapFactory, String msiAcc )
+	{
+		this ( rdfMapFactory );
+
+		em = Resources.getInstance ().getEntityManagerFactory ().createEntityManager ();
+		
+		Query q = em.createQuery ( "FROM MSI WHERE acc = :acc" );
+		q.setParameter ( "acc", msiAcc );
+		q.setHint("org.hibernate.readOnly", true);
+		
+		List<MSI> msis = (List<MSI>) q.getResultList ();
+
+		if ( msis == null || msis.isEmpty () ) 
+		{
+			this.exitCode = 1;
+			throw new IllegalArgumentException ( "Cannot find SampleTab submission #" + msiAcc );
+		}
+		this.msi = msis.iterator ().next ();
+		this.name += this.msi.getAcc ();
+	}
+
 	@Override
 	public void run ()
 	{

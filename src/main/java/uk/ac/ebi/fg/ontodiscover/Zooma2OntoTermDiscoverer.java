@@ -55,7 +55,7 @@ public class Zooma2OntoTermDiscoverer extends OntologyTermDiscoverer
 			Property zprop = typeLabel == null 
 				? new SimpleUntypedProperty ( valueLabel ) 
 				: new SimpleTypedProperty ( typeLabel, valueLabel ); 
-			Map<AnnotationSummary, Float> zresult = zoomaClient.searchZOOMA ( zprop, 190, typeLabel == null );
+			Map<AnnotationSummary, Float> zresult = zoomaClient.searchZOOMA ( zprop, 200, typeLabel == null );
 			
 			if ( zresult == null || zresult.size () == 0 ) return null;
 			AnnotationSummary zsum = zresult.keySet ().iterator ().next ();
