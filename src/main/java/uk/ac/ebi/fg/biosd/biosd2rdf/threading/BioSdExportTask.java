@@ -4,11 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import javax.persistence.EntityManager;
-import javax.persistence.LockModeType;
 import javax.persistence.Query;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import uk.ac.ebi.fg.biosd.biosd2rdf.java2rdf.mapping.BioSdRfMapperFactory;
 import uk.ac.ebi.fg.biosd.model.organizational.MSI;
@@ -29,8 +25,6 @@ public class BioSdExportTask extends BatchServiceTask
 	private BioSdRfMapperFactory rdfMapFactory;
 
 	private EntityManager em = null; 
-
-	protected Logger log = LoggerFactory.getLogger ( this.getClass () );
 	
 	private BioSdExportTask ( BioSdRfMapperFactory rdfMapFactory )
 	{
@@ -81,6 +75,7 @@ public class BioSdExportTask extends BatchServiceTask
 		q.setParameter ( "acc", msiAcc );
 		q.setHint("org.hibernate.readOnly", true);
 		
+		@SuppressWarnings ( "unchecked" )
 		List<MSI> msis = (List<MSI>) q.getResultList ();
 
 		if ( msis == null || msis.isEmpty () ) 

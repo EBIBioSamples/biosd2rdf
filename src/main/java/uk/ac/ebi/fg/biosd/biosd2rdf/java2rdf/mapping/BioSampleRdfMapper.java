@@ -3,6 +3,8 @@ package uk.ac.ebi.fg.biosd.biosd2rdf.java2rdf.mapping;
 import static uk.ac.ebi.fg.java2rdf.utils.Java2RdfUtils.urlEncode;
 import static uk.ac.ebi.fg.java2rdf.utils.NamespaceUtils.ns;
 
+import java.util.Map;
+
 import org.apache.commons.lang.StringUtils;
 
 import uk.ac.ebi.fg.biosd.model.expgraph.BioSample;
@@ -19,8 +21,6 @@ import uk.ac.ebi.fg.java2rdf.mapping.properties.OwlDatatypePropRdfMapper;
 import uk.ac.ebi.fg.java2rdf.mapping.properties.OwlObjPropRdfMapper;
 import uk.ac.ebi.fg.java2rdf.mapping.urigen.RdfUriGenerator;
 
-import java.util.Map;
-
 /**
  * Maps a BioSD sample to RDF. <a href = 'http://www.ebi.ac.uk/rdf/documentation/biosamples'>Here</a> you can find 
  * examples of what this class produces. 
@@ -31,6 +31,7 @@ import java.util.Map;
  */
 public class BioSampleRdfMapper extends BeanRdfMapper<BioSample>
 {
+	@SuppressWarnings ( "rawtypes" )
 	public BioSampleRdfMapper ()
 	{
 		super ( 

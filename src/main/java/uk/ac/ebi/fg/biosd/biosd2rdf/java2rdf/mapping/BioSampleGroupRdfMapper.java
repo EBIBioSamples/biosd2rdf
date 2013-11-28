@@ -31,6 +31,7 @@ import uk.ac.ebi.fg.java2rdf.mapping.urigen.RdfUriGenerator;
  */
 public class BioSampleGroupRdfMapper extends BeanRdfMapper<BioSampleGroup>
 {
+	@SuppressWarnings ( "rawtypes" )
 	public BioSampleGroupRdfMapper ()
 	{
 		super ( 

@@ -34,7 +34,6 @@ import uk.ac.ebi.fg.java2rdf.mapping.urigen.RdfUriGenerator;
  */
 public class MSIRdfMapper extends BeanRdfMapper<MSI>
 {
-	@SuppressWarnings ( "unchecked" )
 	public MSIRdfMapper ()
 	{
 		super ( 

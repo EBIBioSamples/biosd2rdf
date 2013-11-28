@@ -9,16 +9,14 @@ import static uk.ac.ebi.fg.java2rdf.utils.OwlApiUtils.assertData;
 import static uk.ac.ebi.fg.java2rdf.utils.OwlApiUtils.assertIndividual;
 import static uk.ac.ebi.fg.java2rdf.utils.OwlApiUtils.assertLink;
 
-
 import java.text.ParseException;
 import java.util.Date;
 import java.util.Map;
 
-import org.apache.cxf.xjc.runtime.DataTypeAdapter;
-
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.commons.lang3.time.DateUtils;
+import org.apache.cxf.xjc.runtime.DataTypeAdapter;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.vocab.XSDVocabulary;
 

@@ -1,5 +1,8 @@
 package uk.ac.ebi.fg.biosd.biosd2rdf.java2rdf.mapping;
 
+import static uk.ac.ebi.fg.java2rdf.utils.NamespaceUtils.ns;
+import static uk.ac.ebi.fg.java2rdf.utils.OwlApiUtils.assertLink;
+
 import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
@@ -11,10 +14,6 @@ import uk.ac.ebi.fg.java2rdf.mapping.properties.CompositePropRdfMapper;
 import uk.ac.ebi.fg.java2rdf.mapping.properties.OwlDatatypePropRdfMapper;
 import uk.ac.ebi.fg.java2rdf.mapping.urigen.RdfUriGenerator;
 import uk.ac.ebi.fg.java2rdf.utils.Java2RdfUtils;
-
-import static uk.ac.ebi.fg.java2rdf.utils.NamespaceUtils.ns;
-
-import static uk.ac.ebi.fg.java2rdf.utils.OwlApiUtils.*;
 
 /**
  * TODO: Comment me!
