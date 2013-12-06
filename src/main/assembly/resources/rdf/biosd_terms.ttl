@@ -110,7 +110,7 @@ biosdterms:has-bio-characteristic rdf:type :ObjectProperty ;
                                                      <http://semanticscience.org/resource/SIO_000008> ;
                                   
                                   rdfs:domain [ rdf:type :Class ;
-                                                :unionOf ( obo:OBI_0000747
+                                                :unionOf ( biosdterms:Sample
                                                            biosdterms:SampleGroup
                                                          )
                                               ] .
@@ -196,34 +196,38 @@ biosdterms:has-authors-list rdf:type :DatatypeProperty ;
                             
                             obo:IAO_0000115 "The list of authors of a publication or document, in the form of a simple text (i.e., a string). This can be used for those cases where extracting a proper list of authors (e.g., from a database record) is too complicated."@en ;
                             
-                            rdfs:subPropertyOf dcterms:description ,
-                                               schema:description ;
+                            rdfs:subPropertyOf dcterms:description ;
                             
-                            rdfs:range xsd:string .
+                            rdfs:domain <http://purl.org/ontology/bibo/Document> ,
+                                        <http://purl.org/spar/fabio/Work> ;
+                            
+                            rdfs:subPropertyOf schema:description ;
+                            
+                            rdfs:range xsd:string ;
+                            
+                            rdfs:domain <http://xmlns.com/foaf/0.1/Document> .
 
 
 
 ###  http://rdf.ebi.ac.uk/terms/biosd/has-high-value
 
-biosdterms:has-high-value rdf:type :DatatypeProperty ;
+biosdterms:has-high-value rdf:type :DatatypeProperty ,
+                                   :FunctionalProperty ;
                           
                           rdfs:label "has high value"@en ;
                           
-                          obo:IAO_0000115 "A high end value for those structures that admit one, such as intervals (eg, SIO_000944)."@en ;
-                          
-                          rdfs:subPropertyOf <http://semanticscience.org/resource/SIO_000300> .
+                          obo:IAO_0000115 "A high end value for those structures that admit one, such as intervals (eg, SIO_000944)."@en .
 
 
 
 ###  http://rdf.ebi.ac.uk/terms/biosd/has-low-value
 
-biosdterms:has-low-value rdf:type :DatatypeProperty ;
+biosdterms:has-low-value rdf:type :DatatypeProperty ,
+                                  :FunctionalProperty ;
                          
                          rdfs:label "has low value"@en ;
                          
-                         obo:IAO_0000115 "A low end value for those structures that admit one, such as intervals (eg, SIO_000944)."@en ;
-                         
-                         rdfs:subPropertyOf <http://semanticscience.org/resource/SIO_000300> .
+                         obo:IAO_0000115 "A low end value for those structures that admit one, such as intervals (eg, SIO_000944)."@en .
 
 
 
@@ -251,7 +255,9 @@ biosdterms:BiosamplesSubmission rdf:type :Class ;
                                 rdfs:label "Biosamples Database submission"@en ;
                                 
                                 rdfs:subClassOf obo:IAO_0000310 ,
-                                                <http://purl.org/spar/fabio/Work> ;
+                                                <http://purl.org/ontology/bibo/Document> ,
+                                                <http://purl.org/spar/fabio/Work> ,
+                                                <http://xmlns.com/foaf/0.1/Document> ;
                                 
                                 obo:IAO_0000115 "A chunk of data that is submitted into the Biosamples Database, typically defined in a single document, such as a SampleTab file."@en .
 
@@ -298,6 +304,8 @@ biosdterms:RepositoryWebRecord rdf:type :Class ;
                                rdfs:label "Repository Web Record"@en ;
                                
                                rdfs:subClassOf obo:IAO_0000310 ,
+                                               <http://purl.org/ontology/bibo/Document> ,
+                                               <http://purl.org/spar/fabio/Work> ,
                                                <http://semanticscience.org/resource/SIO_000088> ,
                                                <http://xmlns.com/foaf/0.1/Document> ;
                                

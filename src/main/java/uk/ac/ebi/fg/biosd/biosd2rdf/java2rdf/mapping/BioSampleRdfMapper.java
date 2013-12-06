@@ -32,6 +32,7 @@ import uk.ac.ebi.fg.java2rdf.mapping.urigen.RdfUriGenerator;
 public class BioSampleRdfMapper extends BeanRdfMapper<BioSample>
 {
 	/** Used both as a regular property mapper and inside the {@link #map(BioSample, Map)} method. */
+	// TODO: it seems that derivedFrom is not created 
 	private final CompositePropRdfMapper<BioSample, DatabaseRefSource> dbRefMapper = 
 		new CompositePropRdfMapper<BioSample, DatabaseRefSource> ( 
 			new OwlObjPropRdfMapper<BioSample, DatabaseRefSource> ( ns ( "pav", "derivedFrom" ) ),

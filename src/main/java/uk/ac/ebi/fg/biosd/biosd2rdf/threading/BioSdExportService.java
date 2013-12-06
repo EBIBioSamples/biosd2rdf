@@ -128,7 +128,7 @@ public class BioSdExportService extends BatchService<BioSdExportTask>
 	public void submit ( BioSdExportTask batchServiceTask )
 	{
 		// This will flush the triples to the disk when the memory is too full and will also invoke the GC
-		MemoryUtils.checkMemory ( this.memFlushAction, 15d / 100d );
+		MemoryUtils.checkMemory ( this.memFlushAction, 30d / 100d );
 		// DEBUG if ( completedTasks > 0 && completedTasks % 20 == 0 ) flushKnowledgeBase ();
 
 		super.submit ( batchServiceTask );
