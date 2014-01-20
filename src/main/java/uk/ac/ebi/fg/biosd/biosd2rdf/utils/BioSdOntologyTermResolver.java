@@ -74,7 +74,7 @@ public class BioSdOntologyTermResolver
 		
 		// First, see if it has a defined OE 
 		String uri = getOntologyTermURI ( pval.getOntologyTerms (), pval.getTermText () );
-		if ( uri != null ) return null;
+		if ( uri != null ) return uri;
 		
 		String pvalLabel = pval.getTermText ();
 		ExperimentalPropertyType ptype = pval.getType ();

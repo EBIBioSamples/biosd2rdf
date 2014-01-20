@@ -4,7 +4,6 @@ import static uk.ac.ebi.fg.java2rdf.utils.Java2RdfUtils.hashUriSignature;
 import static uk.ac.ebi.fg.java2rdf.utils.Java2RdfUtils.urlEncode;
 import static uk.ac.ebi.fg.java2rdf.utils.NamespaceUtils.ns;
 import static uk.ac.ebi.fg.java2rdf.utils.OwlApiUtils.assertAnnotationData;
-import static uk.ac.ebi.fg.java2rdf.utils.OwlApiUtils.assertClass;
 import static uk.ac.ebi.fg.java2rdf.utils.OwlApiUtils.assertData;
 import static uk.ac.ebi.fg.java2rdf.utils.OwlApiUtils.assertIndividual;
 import static uk.ac.ebi.fg.java2rdf.utils.OwlApiUtils.assertLink;
@@ -63,7 +62,7 @@ public class ExpPropValueRdfMapper<T extends Accessible> extends PropertyRdfMapp
 			{
 				this.unitLabel =  StringUtils.trimToNull ( u.getTermText () );
 			
-				// See if the unit object has an explicity ontology term attached
+				// See if the unit object has an explicit ontology term attached
 				this.unitClassUri = otermResolver.getOntologyTermURI ( u.getOntologyTerms (), this.unitLabel );
 				
 				if ( this.unitClassUri == null )
@@ -147,7 +146,7 @@ public class ExpPropValueRdfMapper<T extends Accessible> extends PropertyRdfMapp
 			{
 				// As usually, we have a (recyclable) unit individual, which is an instance of a unit class.
 				// I'd like to use unitClassUri + prefix for this, but it's recommended not to use other's namespaces
-				// TODO: experiment with OWL2 punning?
+				// TODO: experiment OWL2 punning?
 				//
 				String unitInstUri = ns ( "biosd", "unit#" + Java2RdfUtils.hashUriSignature ( this.unitClassUri ) );
 				assertLink ( onto, pvalUri, ns ( "sio", "SIO_000221" ), unitInstUri ); // 'has unit'
@@ -281,29 +280,31 @@ public class ExpPropValueRdfMapper<T extends Accessible> extends PropertyRdfMapp
 			//typeUri = ns ( "biosd", "exp-prop-type/" + parentAcc + "#" + hashUriSignature (  typeLabel ) );
 			typeUri = ns ( "biosd", "exp-prop-type/" + parentAcc + "#" + pvalHash );
 			
+			// Bottom line: it's an experimental factor
+			assertIndividual ( onto, valUri, ns ( "efo", "EFO_0000001" ) );
 			
-			// Define such type as a new class
-			assertClass ( onto, typeUri, ns ( "efo", "EFO_0000001" ) ); // Experimental factor
+			// Another basic fact: it has a type defined as per the original data
+			assertLink ( onto, valUri, ns ( "biosd-terms", "has-bio-characteristic-type" ), typeUri );
+			assertIndividual ( onto, typeUri, ns ( "efo", "EFO_0000001" ) ); // Experimental factor
 			assertAnnotationData ( onto, typeUri, ns ( "rdfs", "label" ), typeLabel );
 			assertAnnotationData ( onto, typeUri, ns ( "dc-terms", "title" ), typeLabel );
-			
-			// And assert that the property value is generically an instance of experimental factor
-			assertIndividual ( onto, valUri, typeUri );
 
-			// Now, additionally ask to the ontology term discoverer (eg, Zooma) if it has a known ontology term for typeLabel
+			// Now, see if Zooma has something more to say
 			String discoveredTypeUri = otermResolver.getOntoClassUri ( pval, vcomp.isNumberOrDate () );
 
-			// If you discovered something, state something more specific about the property value
-			if ( discoveredTypeUri != null ) {
-				assertIndividual ( onto, valUri, discoveredTypeUri ); // let's be redundant, for when we don't have inference
-				assertClass ( onto, typeUri, discoveredTypeUri );
+			// And in case it has, state that as additional types TODO: only one of such type is for the moment available, 
+			// it makes sense to take the first ones top-ranked by Zooma. 
+			if( discoveredTypeUri != null )
+			{
+				String typeUri1 = typeUri + ":1";
+				assertLink ( onto, valUri, ns ( "biosd-terms", "has-bio-characteristic-type" ), typeUri1 );
+				assertIndividual ( onto, typeUri1, discoveredTypeUri );
 			}
-			
 			
 			// Establish how to link the prop value to the sample
 			String attributeLinkUri = pval instanceof BioCharacteristicValue  
-				? ns ( "biosd-terms", "has-bio-characteristic" ) // sub-property of obo:IAO_0000136 (is_about) 
-				: ns ( "obo", "IAO_0000136" );	// is about
+				? ns ( "biosd-terms", "has-bio-characteristic" ) // sub-property of sio:SIO_000008 ('has attribute') 
+				: ns ( "sio", "SIO_000332" );	// is about
 				
 			// Now we have either *** sample has-biocharacteristic valUri ***, or *** sample is-about valUri ***, depending on 
 			// the Java type. As said above, biosd:has-biocharacteristic is a subproperty of iao:is-about anyway.

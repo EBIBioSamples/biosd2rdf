@@ -8,7 +8,6 @@ import static uk.ac.ebi.fg.java2rdf.utils.NamespaceUtils.ns;
 
 import java.util.Map;
 
-import uk.ac.ebi.fg.biosd.model.xref.DatabaseRefSource;
 import uk.ac.ebi.fg.core_model.organizational.Contact;
 import uk.ac.ebi.fg.java2rdf.mapping.BeanRdfMapper;
 import uk.ac.ebi.fg.java2rdf.mapping.RdfMappingException;

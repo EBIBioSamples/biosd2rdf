@@ -90,6 +90,12 @@ public class BioSdMappersTest
 		db.setName ( "ArrayExpress" );
 		db.setUrl ( "http://www.ebi.ac.uk/arrayexpress/experiments/E-GEOD-12040" );
 		biosdModel.msi.addDatabase ( db );
+
+		DatabaseRefSource db1 = new DatabaseRefSource ( "E-GEOD-12040-smp1", null );
+		db1.setName ( "ArrayExpress" );
+		db1.setUrl ( "http://www.ebi.ac.uk/arrayexpress/experiments/E-GEOD-12040/smp1" );
+		biosdModel.smp1.addDatabase ( db1 );
+
 		
 		// This should generate specific statements about the value and the unit.
 		biosdModel.cv5.setTermText ( "2.5" );

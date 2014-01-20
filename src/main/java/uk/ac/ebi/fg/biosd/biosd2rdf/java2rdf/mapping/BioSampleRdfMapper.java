@@ -32,14 +32,14 @@ import uk.ac.ebi.fg.java2rdf.mapping.urigen.RdfUriGenerator;
 public class BioSampleRdfMapper extends BeanRdfMapper<BioSample>
 {
 	/** Used both as a regular property mapper and inside the {@link #map(BioSample, Map)} method. */
-	// TODO: it seems that derivedFrom is not created 
-	private final CompositePropRdfMapper<BioSample, DatabaseRefSource> dbRefMapper = 
-		new CompositePropRdfMapper<BioSample, DatabaseRefSource> ( 
+	private final CollectionPropRdfMapper<BioSample, DatabaseRefSource> dbRefMapper = 
+		new CollectionPropRdfMapper<> ( new CompositePropRdfMapper<> ( 
 			new OwlObjPropRdfMapper<BioSample, DatabaseRefSource> ( ns ( "pav", "derivedFrom" ) ),
-			// dbrecord denotes sample
+			// dbrecord denotes submission
 			new InversePropRdfMapper<BioSample, DatabaseRefSource> ( 
 				new OwlObjPropRdfMapper<DatabaseRefSource, BioSample> ( ns ( "obo", "IAO_0000219" ) ) 
-	)); 
+			)
+	));
 			
 	@SuppressWarnings ( "rawtypes" )
 	public BioSampleRdfMapper ()
@@ -73,8 +73,10 @@ public class BioSampleRdfMapper extends BeanRdfMapper<BioSample>
 		biosdRef.setName ( "EBI Biosamples Database" );
 		biosdRef.setUrl ( "http://www.ebi.ac.uk/biosamples/sample/" + smp.getAcc () );
 		
-		// Map this manually, we don't want to risk with polluting the source model
-		dbRefMapper.map ( smp,  biosdRef );
+		smp.addDatabase ( biosdRef );
+
+		// Map this manually, we noticed it doesn't work if we just add it to the sample.
+		// TODO: remove dbRefMapper.map ( smp,  biosdRef );
 		
 		// Do you have a name? (names will be used for dcterms:title and rdfs:label
 		// 

@@ -69,9 +69,10 @@ public class MSIRdfMapper extends BeanRdfMapper<MSI>
 		// 'is about', because we use an InversePropRdfMapper, this will generate (pub, is-about, msi) for every pub in 
 		// msi.getPublications()
 		this.addPropertyMapper ( "publications", new CollectionPropRdfMapper<MSI, Publication> ( 
-			new InversePropRdfMapper<MSI, Publication> ( 
-				new OwlObjPropRdfMapper<Publication, MSI> ( ns ( "obo", "IAO_0000136" ) ) ) 
-		));
+			new InversePropRdfMapper<MSI, Publication> ( new CompositePropRdfMapper<Publication, MSI> ( 
+				new OwlObjPropRdfMapper<Publication, MSI> ( ns ( "obo", "IAO_0000136" ) ), // is about
+				new OwlObjPropRdfMapper<Publication, MSI> ( ns ( "sio", "SIO_000332" ) ) // is about 
+		))));
 		
 		// a sub-property of ( (dc-terms:creator union dc-terms:contributor ) and ( schema.org:author union schema.org:contributor ) ) 
 		this.addPropertyMapper ( "contacts", new CollectionPropRdfMapper<MSI, Contact> ( 

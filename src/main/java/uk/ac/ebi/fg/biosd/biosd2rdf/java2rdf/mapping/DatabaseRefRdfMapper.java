@@ -1,7 +1,8 @@
 package uk.ac.ebi.fg.biosd.biosd2rdf.java2rdf.mapping;
 
 import static uk.ac.ebi.fg.java2rdf.utils.NamespaceUtils.ns;
-import static uk.ac.ebi.fg.java2rdf.utils.OwlApiUtils.*;
+import static uk.ac.ebi.fg.java2rdf.utils.OwlApiUtils.assertData;
+import static uk.ac.ebi.fg.java2rdf.utils.OwlApiUtils.assertLink;
 
 import java.util.Map;
 

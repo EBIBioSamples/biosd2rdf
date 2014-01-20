@@ -1,7 +1,6 @@
 package uk.ac.ebi.fg.biosd.biosd2rdf;
 
 import static java.lang.System.err;
-import static java.lang.System.out;
 
 import java.io.PrintWriter;
 
@@ -108,13 +107,13 @@ public class Biosd2RdfCmd
 	
 	private static void printUsage ()
 	{
-		out.println ();
+		err.println ();
 
-		out.println ( "\n\n *** BioSD RDF Exporter ***" );
-		out.println ( "\nExports from the BioSD relational database to RDF files." );
+		err.println ( "\n\n *** BioSD RDF Exporter ***" );
+		err.println ( "\nExports from the BioSD relational database to RDF files." );
 		
-		out.println ( "Syntax:" );
-		out.println ( "\n\tbiosd2rdf.sh [options] msi-acc...\n\n" );
+		err.println ( "Syntax:" );
+		err.println ( "\n\tbiosd2rdf.sh [options] msi-acc...\n\n" );
 
 		err.println ( "\nOptions:" );
 		
@@ -122,7 +121,7 @@ public class Biosd2RdfCmd
 		PrintWriter pw = new PrintWriter ( err, true );
 		helpFormatter.printOptions ( pw, 100, getOptions (), 2, 4 );
 		
-		out.println ( "\nSee also hibernate.properites for the configuration of the target database.\n" );
+		err.println ( "\nSee also hibernate.properites for the configuration of the target database.\n" );
 	}
 	
 	@SuppressWarnings ( { "static-access" } )

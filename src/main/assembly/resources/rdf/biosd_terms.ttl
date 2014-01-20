@@ -61,6 +61,7 @@ biosdterms:has-authors-list rdf:type :AnnotationProperty ;
                             obo:IAO_0000115 "The list of authors of a publication or document, in the form of a simple text (i.e., a string). This can be used for those cases where extracting a proper list of authors (e.g., from a database record) is too complicated."@en ;
                             
                             rdfs:domain obo:IAO_0000311 ,
+                                        <http://purl.org/ontology/bibo/Document> ,
                                         <http://purl.org/spar/fabio/Work> ;
                             
                             rdfs:subPropertyOf rdfs:comment ;
@@ -104,16 +105,31 @@ biosdterms:has-bio-characteristic rdf:type :ObjectProperty ;
                                   
                                   rdfs:label "biological characteristic"@en ;
                                   
+                                  obo:IAO_0000116 "PLEASE NOTE: This cannot be iao:is about, since that assumes the domain is an ICE, which is not always true in BioSD (when the subject is a sample)."@en ;
+                                  
                                   obo:IAO_0000115 "Relates a biological sample to a biological property that it has, such as the disease state or the organism it derives from. This correponds to the characteristic column in formats such as SampleTab or MAGE-TAB and, because of that, it's a not-too-formal associations. For instance, an association to mus-musculus might mean  either that the samle is a mouse, or that it is a part of a mouse."@en ;
                                   
-                                  rdfs:subPropertyOf obo:IAO_0000136 ,
-                                                     <http://semanticscience.org/resource/SIO_000008> ;
+                                  rdfs:subPropertyOf <http://semanticscience.org/resource/SIO_000008> ;
                                   
                                   rdfs:domain [ rdf:type :Class ;
                                                 :unionOf ( biosdterms:Sample
                                                            biosdterms:SampleGroup
                                                          )
                                               ] .
+
+
+
+###  http://rdf.ebi.ac.uk/terms/biosd/has-bio-characteristic-type
+
+biosdterms:has-bio-characteristic-type rdf:type :ObjectProperty ;
+                                       
+                                       rdfs:label "biological characteristic type"@en ;
+                                       
+                                       obo:IAO_0000116 "PLEASE NOTE: This cannot be iao:is about, since that assumes the domain is an ICE, which is not always true in BioSD."@en ;
+                                       
+                                       obo:IAO_0000115 "The type of a biological characteristic. This usually comes from data file annotations, for instance, one has a '10C' attribute value, of type x, where x is an instance of 'temperature', or 'mus-musculus 123' attribute value, of type x, where x is an instance of the class mus-musculus."@en ;
+                                       
+                                       rdfs:subPropertyOf <http://semanticscience.org/resource/SIO_000332> .
 
 
 
@@ -196,16 +212,10 @@ biosdterms:has-authors-list rdf:type :DatatypeProperty ;
                             
                             obo:IAO_0000115 "The list of authors of a publication or document, in the form of a simple text (i.e., a string). This can be used for those cases where extracting a proper list of authors (e.g., from a database record) is too complicated."@en ;
                             
-                            rdfs:subPropertyOf dcterms:description ;
+                            rdfs:subPropertyOf dcterms:description ,
+                                               schema:description ;
                             
-                            rdfs:domain <http://purl.org/ontology/bibo/Document> ,
-                                        <http://purl.org/spar/fabio/Work> ;
-                            
-                            rdfs:subPropertyOf schema:description ;
-                            
-                            rdfs:range xsd:string ;
-                            
-                            rdfs:domain <http://xmlns.com/foaf/0.1/Document> .
+                            rdfs:range xsd:string .
 
 
 

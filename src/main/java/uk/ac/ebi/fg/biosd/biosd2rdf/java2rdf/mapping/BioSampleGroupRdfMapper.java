@@ -32,14 +32,15 @@ import uk.ac.ebi.fg.java2rdf.mapping.urigen.RdfUriGenerator;
 public class BioSampleGroupRdfMapper extends BeanRdfMapper<BioSampleGroup>
 {
 	/** Used both as a regular property mapper and inside the {@link #map(BioSampleGroup, Map)} method. */
-  private CompositePropRdfMapper<BioSampleGroup, DatabaseRefSource> dbRefMapper =  
-  	new CompositePropRdfMapper<BioSampleGroup, DatabaseRefSource> ( 
+	private final CollectionPropRdfMapper<BioSampleGroup, DatabaseRefSource> dbRefMapper = 
+		new CollectionPropRdfMapper<> ( new CompositePropRdfMapper<> ( 
 			new OwlObjPropRdfMapper<BioSampleGroup, DatabaseRefSource> ( ns ( "pav", "derivedFrom" ) ),
-			// dbrecord denotes sample
+			// dbrecord denotes submission
 			new InversePropRdfMapper<BioSampleGroup, DatabaseRefSource> ( 
 				new OwlObjPropRdfMapper<DatabaseRefSource, BioSampleGroup> ( ns ( "obo", "IAO_0000219" ) ) 
+			)
 	));
-  
+	  
 	@SuppressWarnings ( "rawtypes" )
 	public BioSampleGroupRdfMapper ()
 	{
@@ -55,10 +56,9 @@ public class BioSampleGroupRdfMapper extends BeanRdfMapper<BioSampleGroup>
 		this.addPropertyMapper ( "propertyValues", new CollectionPropRdfMapper<BioSampleGroup, ExperimentalPropertyValue> ( 
 			new ExpPropValueRdfMapper<BioSampleGroup> ()) 
 		);
-		// is_about, TODO: probably needs 'sio:has member' too.
-		this.addPropertyMapper ( "samples", new CollectionPropRdfMapper<BioSampleGroup, BioSample> ( 
-			new OwlObjPropRdfMapper<BioSampleGroup, BioSample> ( ns ( "obo", "IAO_0000136" ) ) )
-		);
+		this.addPropertyMapper ( "samples", new CollectionPropRdfMapper<BioSampleGroup, BioSample> (
+			new OwlObjPropRdfMapper<BioSampleGroup, BioSample> ( ns ( "sio", "SIO_000059" ) ) // has member
+		));
 		this.addPropertyMapper ( "databases", dbRefMapper );
 		
 		// TODO: more
@@ -76,8 +76,10 @@ public class BioSampleGroupRdfMapper extends BeanRdfMapper<BioSampleGroup>
 		biosdRef.setName ( "EBI Biosamples Database" );
 		biosdRef.setUrl ( "http://www.ebi.ac.uk/biosamples/group/" + sg.getAcc () );
 
-		// Map this manually, we don't want to risk with polluting the source model
-		dbRefMapper.map ( sg,  biosdRef );
+		sg.addDatabase ( biosdRef );
+		
+		// Map this manually, we noticed it doesn't work if we just add it to the sample.
+		// TODO REMOVE dbRefMapper.map ( sg, Collections.singleton ( biosdRef ) );
 		
 		// Do you have a name? (names will be used for dcterms:title and rdfs:label
 		// 
