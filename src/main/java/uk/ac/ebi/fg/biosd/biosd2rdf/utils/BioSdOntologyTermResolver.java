@@ -88,7 +88,13 @@ public class BioSdOntologyTermResolver
 		if ( isNumberOrDate ) return ontoTermDiscoverer.getOntologyTermUriAsASCII ( pvalTypeLabel, null );
 
 		// OK, we have a value, no ontology term attached, no URI, no number, no date, try to resolve the value string
-		return ontoTermDiscoverer.getOntologyTermUriAsASCII ( pvalLabel, pvalTypeLabel );
+
+		// First use both value and type labels
+		uri = ontoTermDiscoverer.getOntologyTermUriAsASCII ( pvalLabel, pvalTypeLabel );
+		if ( uri != null ) return uri;
+		
+		// If failed, try type-only as well, this should allow to catch stuff like 'del(7herc2-mkrn3)13frdni', 'gene symbol'
+		return ontoTermDiscoverer.getOntologyTermUriAsASCII ( pvalTypeLabel, null );
 	}
 	
 	

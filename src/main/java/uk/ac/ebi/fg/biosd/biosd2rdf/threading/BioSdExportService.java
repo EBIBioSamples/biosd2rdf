@@ -16,6 +16,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
 import org.apache.commons.io.FilenameUtils;
+import org.coode.owlapi.turtle.TurtleOntologyFormat;
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.io.RDFXMLOntologyFormat;
 import org.semanticweb.owlapi.model.IRI;
@@ -221,9 +222,9 @@ public class BioSdExportService extends BatchService<BioSdExportTask>
 				
 			} // if outputPath
 				
-			// RDF/XML output. TODO: make this an option?
+			// TODO: make this an option?
 			// 
-			PrefixOWLOntologyFormat fmt = new RDFXMLOntologyFormat ();
+			PrefixOWLOntologyFormat fmt = new TurtleOntologyFormat ();
 			for ( Entry<String, String> nse: getNamespaces ().entrySet () )
 				fmt.setPrefix ( nse.getKey (), nse.getValue () );
 			onto.getOWLOntologyManager ().saveOntology ( this.onto, fmt, kbout );
@@ -240,7 +241,7 @@ public class BioSdExportService extends BatchService<BioSdExportTask>
 			this.outputCounter++;
 			
 			// Restart dynamic thread pool size optimisation if it was stopped
-			if ( kbout != null && this.poolSizeTuner != null ) poolSizeTuner.start ();
+			if ( this.poolSizeTuner != null ) poolSizeTuner.start ();
 		}
 	} // flushKnowledgeBase
 	

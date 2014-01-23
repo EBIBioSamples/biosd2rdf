@@ -27,11 +27,21 @@ import uk.ac.ebi.fg.core_model.resources.Resources;
  */
 public class Biosd2RdfCmd
 {
+	private static int exCode = 0;
+	private static BioSdExportService exportService = null;
 	
 	public static void main ( String... args )
 	{
-		int exCode = 0;
-		BioSdExportService exportService = null; 
+		// Add a termination handler, unless we're doing JUnit testing (invoked explicitly in such a case)
+		if ( !"true".equals ( System.getProperty ( "biosd.test_mode" ) ) )
+			Runtime.getRuntime ().addShutdownHook ( new Thread ( new Runnable() {
+				@Override
+				public void run ()
+				{
+					terminationHandler ();
+				}
+			}));
+				
 		CommandLine cli = null;
 		
 		try
@@ -42,7 +52,6 @@ public class Biosd2RdfCmd
 			if ( cli.hasOption ( 'h' ) ) throw new ParseException ( "--help" );
 
 			exportService = new BioSdExportService ( cli.getOptionValue ( 'o' ) );
-			
 			
 			args = cli.getArgs ();
 			
@@ -83,26 +92,32 @@ public class Biosd2RdfCmd
 		{
 			// JUnit tests needs to set-up this if they don't want to be screwed by brutal killing 
 			// of resources
-			boolean isTestingMode = "true".equals ( System.getProperty ( "biosd.test_mode" ) );
-			
-			if ( exCode != 128 ) 
-			{
-				if ( !isTestingMode ) 
-				{
-					EntityManagerFactory emf = Resources.getInstance ().getEntityManagerFactory ();
-					if ( emf != null && emf.isOpen () ) emf.close ();
-				}
-				
-				// Saves the export results in memory, either the unique chunk available, or the last one
-				if ( exportService != null ) exportService.flushKnowledgeBase ();
-			
-			}// exitCode
-			
-			// This is needed to prevent JUnit to fail.
-			if ( !isTestingMode )
+			if ( "true".equals ( System.getProperty ( "biosd.test_mode" ) ) ) 
+				terminationHandler ();
+			else
 				System.exit ( exCode );
 		}
 	}
+	 
+	/**
+	 * Last operations, before JVM shutdown (or the end of a JUnit test). Closes the entity manager factory, flushes
+	 * the in-memory triples to file/standard output.
+	 * 
+	 */
+	private static void terminationHandler ()
+	{
+		if ( exCode == 128 ) return; // --help option
+		
+		if ( !"true".equals ( System.getProperty ( "biosd.test_mode" ) ) ) 
+		{
+			EntityManagerFactory emf = Resources.getInstance ().getEntityManagerFactory ();
+			if ( emf != null && emf.isOpen () ) emf.close ();
+		}
+		
+		// Saves the export results in memory, either the unique chunk available, or the last one
+		if ( exportService != null ) exportService.flushKnowledgeBase ();
+	}
+	
 	
 	
 	private static void printUsage ()
