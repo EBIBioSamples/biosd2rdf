@@ -11,18 +11,22 @@ import java.io.OutputStream;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Random;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
 import org.apache.commons.io.FilenameUtils;
+import org.coode.owlapi.turtle.TurtleOntologyFormat;
 import org.semanticweb.owlapi.apibinding.OWLManager;
-import org.semanticweb.owlapi.io.RDFXMLOntologyFormat;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
-import org.semanticweb.owlapi.model.OWLOntologyStorageException;
 import org.semanticweb.owlapi.vocab.PrefixOWLOntologyFormat;
 
 import uk.ac.ebi.fg.biosd.biosd2rdf.java2rdf.mapping.BioSdRfMapperFactory;
@@ -59,6 +63,10 @@ public class BioSdExportService extends BatchService<BioSdExportTask>
 		}
 	};
 
+	// TODO: comment me!
+	private ExecutorService ontoFlusherExecutor = Executors.newSingleThreadExecutor ();
+	private Future<Throwable> ontoFlusherResult = null;
+	
 	/**
 	 * This sets up proper parameters for {@link #getPoolSizeTuner()} and initialises the {@link #onto triple store} used
 	 * to save the exporters output.
@@ -128,8 +136,13 @@ public class BioSdExportService extends BatchService<BioSdExportTask>
 	public void submit ( BioSdExportTask batchServiceTask )
 	{
 		// This will flush the triples to the disk when the memory is too full and will also invoke the GC
-		MemoryUtils.checkMemory ( this.memFlushAction, 30d / 100d );
-		// DEBUG if ( completedTasks > 0 && completedTasks % 20 == 0 ) flushKnowledgeBase ();
+		// Choose an higher threeshold if the memory isn't already occupied by the background knowledge base that is 
+		// being saved.
+		float memLimit = this.ontoFlusherResult == null || this.ontoFlusherResult.isDone () ? 50 : 15;
+		MemoryUtils.checkMemory ( this.memFlushAction, memLimit / 100d, false );
+
+		// DEBUG 
+		// if ( this.getCompletedTasks () > 0 && this.getCompletedTasks () % 20 == 0 ) flushKnowledgeBase ();
 
 		super.submit ( batchServiceTask );
 	}
@@ -162,7 +175,11 @@ public class BioSdExportService extends BatchService<BioSdExportTask>
 		for ( String msiAcc: msiAccs ) submit ( msiAcc );
 	}
 	
-
+	/** Defaults to false, see below */
+	public void flushKnowledgeBase () {
+		flushKnowledgeBase ( false );
+	}
+	
 	/**
 	 * This saves the triple store that keeps the RDF output of the exporters into the file specified by this class's 
 	 * constructor. This method should be called at the end of a sequence of submissions, after {@link #waitAllFinished()}
@@ -170,28 +187,46 @@ public class BioSdExportService extends BatchService<BioSdExportTask>
 	 * 
 	 * It is also invoked when the RAM available to the JVM executing this service is running out and multiple
 	 * calls of this method will generate numbered file names (see {@link BioSdExportService}). Moreover, each invocation
-	 * empties the triple store at issue and allows the JVM free its memory for new triples. 
+	 * empties the triple store at issue and allows the JVM free its memory for new triples.
+	 * 
+	 * During this type of invocation, a double buffering approach is used to save triples while the exporter is 
+	 * re-started with a new empty knowledge base.
+	 * 
+	 * Before quitting the exporter service completely, you should call this method with isSynchronzed = true, so that
+	 * it can wait for the remaining background buffer.  
 	 * 
 	 */
-	public void flushKnowledgeBase ()
+	public void flushKnowledgeBase ( boolean isSynchronized )
 	{
-		// This is the only way to avoid that multiple threads access a KB that needs to be replaced. I've experienced
-		// that synchronisation over this.onto is not enough.
+		// We need this before we start flushing the current knowledge base
 		//
 		log.info ( "Waiting all tasks to finish, before flusing the RDF triples created so far to stdout/file" );
 		waitAllFinished ();
 
-		OutputStream kbout = null;
+		final OutputStream kbout;
 				
 		try
 		{			
-			if ( this.onto.isEmpty () ) return; 
-		
-			// Don't measure/change the throughput while I'm not actually servicing tasks
-			if ( this.poolSizeTuner != null ) poolSizeTuner.stop ();
-			
+			if ( this.onto.isEmpty () ) 
+			{ 
+				if ( this.ontoFlusherResult != null && !this.ontoFlusherResult.isDone () ) 
+				{
+					log.info ( "Please wait, still saving triples to previous file" );
+
+					if ( this.poolSizeTuner != null ) poolSizeTuner.stop ();
+
+					Throwable result = this.ontoFlusherResult.get ();
+					if ( result != null ) throw new RuntimeException ( 
+						"Error while saving triples to file: " + result.getMessage (), result 
+					);
+				}
+				return; 
+			}
+
+			// Where should we save?
+			//
 			String outp = null;
-			// Do we really have an output path?
+			
 			if ( this.outputPath != null )
 			{
 				if ( outputCounter > 0 ) 
@@ -206,7 +241,7 @@ public class BioSdExportService extends BatchService<BioSdExportTask>
 					outp = this.outputPath;
 				
 				File fout = new File ( outp );
-				log.info ( "Please wait, saving triples to '" + fout.getCanonicalPath () + "'" );
+				log.info ( "Starting to flush triples into '" + fout.getCanonicalPath () + "'" );
 				kbout = new BufferedOutputStream ( new XmlCharFixer ( new FileOutputStream ( outp ) ) );
 			}
 			else 
@@ -220,19 +255,67 @@ public class BioSdExportService extends BatchService<BioSdExportTask>
 				kbout = System.out;
 				
 			} // if outputPath
+
+						
+			// Check if the background buffer is saved, or if the corresponding task has had any problem.
+			//
+			Throwable result = null;
+			
+			if ( this.ontoFlusherResult != null ) 
+			{
+				if ( !this.ontoFlusherResult.isDone () ) 
+				{
+					// If the background buffer isn't saved yet, we've to wait.
+					log.info ( "Please wait, still saving triples to previous file" );
+
+					// Don't measure/change the throughput while I'm not actually servicing tasks
+					if ( this.poolSizeTuner != null ) poolSizeTuner.stop ();
+				}
 				
-			// RDF/XML output. TODO: make this an option?
+				result = this.ontoFlusherResult.get ();
+			}
+			
+			if ( result != null ) throw new RuntimeException ( 
+				"Error while saving triples to file: " + result.getMessage (), result 
+			);
+			
+
+			// Save with the double buffering approach
 			// 
-			PrefixOWLOntologyFormat fmt = new RDFXMLOntologyFormat ();
-			for ( Entry<String, String> nse: getNamespaces ().entrySet () )
-				fmt.setPrefix ( nse.getKey (), nse.getValue () );
-			onto.getOWLOntologyManager ().saveOntology ( this.onto, fmt, kbout );
+			
+			final OWLOntology savingOnto = this.onto;
 			
 			OWLOntologyManager owlMgr = OWLManager.createOWLOntologyManager ();
 			this.onto = owlMgr.createOntology ( IRI.create ( ns ( "biosd-dataset" ) ) );
 			this.rdfMapFactory.setKnowledgeBase ( onto );
-		} 
-		catch ( IOException|OWLOntologyStorageException|OWLOntologyCreationException ex ) {
+			
+			
+			this.ontoFlusherResult = this.ontoFlusherExecutor.submit ( new Callable<Throwable> () 
+			{
+				@Override
+				public Throwable call () throws Exception
+				{
+					try 
+					{
+						// RDF/XML output. TODO: make this an option?
+						// 
+						PrefixOWLOntologyFormat fmt = new TurtleOntologyFormat ();
+						for ( Entry<String, String> nse: getNamespaces ().entrySet () )
+							fmt.setPrefix ( nse.getKey (), nse.getValue () );
+						savingOnto.getOWLOntologyManager ().saveOntology ( savingOnto, fmt, kbout );
+					}
+					catch ( Throwable ex ) {
+						return ex;
+					}
+					return null;
+				}
+			});
+			
+			if ( isSynchronized )
+				// This will cause the empty condition at the top of the method to wait for this last writing.
+				this.flushKnowledgeBase ( false );
+		}
+		catch ( IOException | OWLOntologyCreationException | InterruptedException | ExecutionException ex ) {
 			throw new IllegalArgumentException ( "Error while saving exported triples: " + ex.getMessage (), ex );
 		}
 		finally 
@@ -240,7 +323,7 @@ public class BioSdExportService extends BatchService<BioSdExportTask>
 			this.outputCounter++;
 			
 			// Restart dynamic thread pool size optimisation if it was stopped
-			if ( kbout != null && this.poolSizeTuner != null ) poolSizeTuner.start ();
+			if ( this.poolSizeTuner != null && !this.poolSizeTuner.isActive () ) poolSizeTuner.start ();
 		}
 	} // flushKnowledgeBase
 	

@@ -124,6 +124,6 @@ public class BioSdMappersTest
 		fmt = new RDFXMLOntologyFormat ();
 		for ( Entry<String, String> nse: getNamespaces ().entrySet () )
 			fmt.setPrefix ( nse.getKey (), nse.getValue () );
-		owlMgr.saveOntology ( onto, fmt, new FileOutputStream ( new File ( "target/test_model.owl" ) ));
+		owlMgr.saveOntology ( onto, fmt, new FileOutputStream ( new File ( "target/test_model.ttl" ) ));
 	}
 }

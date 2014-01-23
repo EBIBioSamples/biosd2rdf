@@ -36,7 +36,7 @@ public class ExporterTest
 		}
 		
 		System.setProperty ( "biosd.test_mode", "true" );
-		Biosd2RdfCmd.main ( "-o", "target/biosd_test.owl" );
+		Biosd2RdfCmd.main ( "-o", "target/biosd_test.ttl" );
 	}
 	
 	/**
@@ -45,7 +45,7 @@ public class ExporterTest
 	@Test 
 	public void testNoDbExport ()
 	{
-		BioSdExportService xservice = new BioSdExportService ( "target/biosd_nodb_test.owl" );
+		BioSdExportService xservice = new BioSdExportService ( "target/biosd_nodb_test.ttl" );
 		
 		for ( long id = 1; id <= 50; id++ )
 		{
@@ -55,7 +55,7 @@ public class ExporterTest
 		}
 		
 		xservice.waitAllFinished ();
-		xservice.flushKnowledgeBase ();
+		xservice.flushKnowledgeBase ( true );
 	}
 
 	/**
@@ -65,7 +65,7 @@ public class ExporterTest
 	public void testExporterFromExistingDb ()
 	{
 		System.setProperty ( "biosd.test_mode", "true" );
-		Biosd2RdfCmd.main ( "-o", "target/biosd_test.owl" );
+		Biosd2RdfCmd.main ( "-o", "target/biosd_test.ttl" );
 	}
 
 }
