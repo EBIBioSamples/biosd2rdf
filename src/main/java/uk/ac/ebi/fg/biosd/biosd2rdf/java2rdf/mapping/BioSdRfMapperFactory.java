@@ -7,7 +7,7 @@ import org.semanticweb.owlapi.model.OWLOntology;
 import uk.ac.ebi.fg.biosd.model.expgraph.BioSample;
 import uk.ac.ebi.fg.biosd.model.organizational.BioSampleGroup;
 import uk.ac.ebi.fg.biosd.model.organizational.MSI;
-import uk.ac.ebi.fg.biosd.model.xref.DatabaseRefSource;
+import uk.ac.ebi.fg.biosd.model.xref.DatabaseRecordRef;
 import uk.ac.ebi.fg.core_model.organizational.Contact;
 import uk.ac.ebi.fg.core_model.organizational.Organization;
 import uk.ac.ebi.fg.core_model.organizational.Publication;
@@ -50,7 +50,7 @@ public class BioSdRfMapperFactory extends RdfMapperFactory
 		setMapper ( Publication.class, new PublicationRdfMapper () );
 		setMapper ( Contact.class, new ContactRdfMapper () );
 		setMapper ( Organization.class, new OrganizationRdfMapper () );
-		setMapper ( DatabaseRefSource.class, new DatabaseRefRdfMapper () );
+		setMapper ( DatabaseRecordRef.class, new DbRecRefRdfMapper () );
 	}
 	
 	public BioSdRfMapperFactory () {

@@ -8,7 +8,7 @@ import java.util.Map;
 import org.apache.commons.lang.StringUtils;
 
 import uk.ac.ebi.fg.biosd.model.expgraph.BioSample;
-import uk.ac.ebi.fg.biosd.model.xref.DatabaseRefSource;
+import uk.ac.ebi.fg.biosd.model.xref.DatabaseRecordRef;
 import uk.ac.ebi.fg.core_model.expgraph.properties.BioCharacteristicType;
 import uk.ac.ebi.fg.core_model.expgraph.properties.BioCharacteristicValue;
 import uk.ac.ebi.fg.core_model.expgraph.properties.ExperimentalPropertyType;
@@ -31,16 +31,6 @@ import uk.ac.ebi.fg.java2rdf.mapping.urigen.RdfUriGenerator;
  */
 public class BioSampleRdfMapper extends BeanRdfMapper<BioSample>
 {
-	/** Used both as a regular property mapper and inside the {@link #map(BioSample, Map)} method. */
-	private final CollectionPropRdfMapper<BioSample, DatabaseRefSource> dbRefMapper = 
-		new CollectionPropRdfMapper<> ( new CompositePropRdfMapper<> ( 
-			new OwlObjPropRdfMapper<BioSample, DatabaseRefSource> ( ns ( "pav", "derivedFrom" ) ),
-			// dbrecord denotes submission
-			new InversePropRdfMapper<BioSample, DatabaseRefSource> ( 
-				new OwlObjPropRdfMapper<DatabaseRefSource, BioSample> ( ns ( "obo", "IAO_0000219" ) ) 
-			)
-	));
-			
 	@SuppressWarnings ( "rawtypes" )
 	public BioSampleRdfMapper ()
 	{
@@ -57,7 +47,13 @@ public class BioSampleRdfMapper extends BeanRdfMapper<BioSample>
 		this.addPropertyMapper ( "propertyValues", new CollectionPropRdfMapper<BioSample, ExperimentalPropertyValue> ( 
 			new ExpPropValueRdfMapper<BioSample> ()) 
 		);
-		this.addPropertyMapper ( "databases", dbRefMapper );
+		this.addPropertyMapper ( "databaseRecordRef", new CollectionPropRdfMapper<> ( new CompositePropRdfMapper<> ( 
+			new OwlObjPropRdfMapper<BioSample, DatabaseRecordRef> ( ns ( "pav", "derivedFrom" ) ),
+			// dbrecord denotes submission
+			new InversePropRdfMapper<BioSample, DatabaseRecordRef> ( 
+				new OwlObjPropRdfMapper<DatabaseRecordRef, BioSample> ( ns ( "obo", "IAO_0000219" ) ) 
+			)
+		)));
 		// TODO: more
 	}
 
@@ -69,11 +65,10 @@ public class BioSampleRdfMapper extends BeanRdfMapper<BioSample>
 		// Quite obviously, BioSD has no representation of a web page record, but we'd better add this, just in case
 		// we want to show the external non-RDF records and provide with the corresponding links. 
 		// The quickest way to achieve that is to send this Java object to its RDF mapper.
-		DatabaseRefSource biosdRef = new DatabaseRefSource ( smp.getAcc (), null );
-		biosdRef.setName ( "EBI Biosamples Database" );
+		DatabaseRecordRef biosdRef = new DatabaseRecordRef ( "EBI Biosamples Database", smp.getAcc (), null );
 		biosdRef.setUrl ( "http://www.ebi.ac.uk/biosamples/sample/" + smp.getAcc () );
 		
-		smp.addDatabase ( biosdRef );
+		smp.addDatabaseRecordRef ( biosdRef );
 
 		// Map this manually, we noticed it doesn't work if we just add it to the sample.
 		// TODO: remove dbRefMapper.map ( smp,  biosdRef );

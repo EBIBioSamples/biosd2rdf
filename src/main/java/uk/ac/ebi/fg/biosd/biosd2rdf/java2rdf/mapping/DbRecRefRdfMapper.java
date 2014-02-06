@@ -9,7 +9,7 @@ import java.util.Map;
 import org.apache.commons.lang.StringUtils;
 import org.semanticweb.owlapi.model.OWLOntology;
 
-import uk.ac.ebi.fg.biosd.model.xref.DatabaseRefSource;
+import uk.ac.ebi.fg.biosd.model.xref.DatabaseRecordRef;
 import uk.ac.ebi.fg.java2rdf.mapping.BeanRdfMapper;
 import uk.ac.ebi.fg.java2rdf.mapping.RdfMapperFactory;
 import uk.ac.ebi.fg.java2rdf.mapping.properties.CompositePropRdfMapper;
@@ -25,21 +25,21 @@ import uk.ac.ebi.fg.java2rdf.utils.Java2RdfUtils;
  * @author Marco Brandizi
  *
  */
-public class DatabaseRefRdfMapper extends BeanRdfMapper<DatabaseRefSource>
+public class DbRecRefRdfMapper extends BeanRdfMapper<DatabaseRecordRef>
 {
-	public DatabaseRefRdfMapper ()
+	public DbRecRefRdfMapper ()
 	{
 		super ( 
 			ns ( "biosd-terms", "RepositoryWebRecord" ), 
-	    new RdfUriGenerator<DatabaseRefSource>() {
+	    new RdfUriGenerator<DatabaseRecordRef>() {
 
 				@Override
-				public String getUri ( DatabaseRefSource db, Map<String, Object> params )
+				public String getUri ( DatabaseRecordRef db, Map<String, Object> params )
 				{
 					String acc = StringUtils.trimToNull ( db.getAcc () );
 					if ( acc == null ) return null;
 					
-					String name = StringUtils.trimToNull ( db.getName () );
+					String name = StringUtils.trimToNull ( db.getDbName () );
 					if ( name == null ) return null;
 										
 					return ns ( "biosd", "repository-web-record/" + Java2RdfUtils.urlEncode ( name ) + ":" + acc );
@@ -47,20 +47,20 @@ public class DatabaseRefRdfMapper extends BeanRdfMapper<DatabaseRefSource>
 			}
 		);
 
-		this.addPropertyMapper ( "acc", new OwlDatatypePropRdfMapper<DatabaseRefSource, String> ( ns ( "dc-terms", "identifier" ) ) );
-		this.addPropertyMapper ( "url", new UriStringPropRdfMapper<DatabaseRefSource> ( ns ( "foaf", "page" ), true ) );
+		this.addPropertyMapper ( "acc", new OwlDatatypePropRdfMapper<DatabaseRecordRef, String> ( ns ( "dc-terms", "identifier" ) ) );
+		this.addPropertyMapper ( "url", new UriStringPropRdfMapper<DatabaseRecordRef> ( ns ( "foaf", "page" ), true ) );
 		
 		this.addPropertyMapper ( "description", new CompositePropRdfMapper<> (
-			new OwlDatatypePropRdfMapper<DatabaseRefSource, String> ( ns ( "dc-terms", "description" ) ),
-			new OwlDatatypePropRdfMapper<DatabaseRefSource, String> ( ns ( "rdfs", "comment" ) ) 
+			new OwlDatatypePropRdfMapper<DatabaseRecordRef, String> ( ns ( "dc-terms", "description" ) ),
+			new OwlDatatypePropRdfMapper<DatabaseRecordRef, String> ( ns ( "rdfs", "comment" ) ) 
 		));
 
 		// Contains strings like 'PRIDE' or 'ArrayExpress', so dc:source this should be the best property to represent them
-		this.addPropertyMapper ( "name",  new OwlDatatypePropRdfMapper<DatabaseRefSource, String> ( ns ( "dc-terms", "source" ) ) ); 
+		this.addPropertyMapper ( "name",  new OwlDatatypePropRdfMapper<DatabaseRecordRef, String> ( ns ( "dc-terms", "source" ) ) ); 
 	}
 
 	@Override
-	public boolean map ( DatabaseRefSource db, Map<String, Object> params )
+	public boolean map ( DatabaseRecordRef db, Map<String, Object> params )
 	{
 		if ( !super.map ( db, params ) ) return false;
 		
@@ -68,13 +68,13 @@ public class DatabaseRefRdfMapper extends BeanRdfMapper<DatabaseRefSource>
 		OWLOntology kb = mapf.getKnowledgeBase ();
 
 		// A composed string for the title
-		String title = db.getName () + ":" + db.getAcc ();
-		RdfUriGenerator<DatabaseRefSource> uriGen = this.getRdfUriGenerator ();
+		String title = db.getDbName () + ":" + db.getAcc ();
+		RdfUriGenerator<DatabaseRecordRef> uriGen = this.getRdfUriGenerator ();
 		assertData ( kb, uriGen.getUri ( db, params ), ns ( "dc-terms", "title" ), title );
 		assertData ( kb, uriGen.getUri ( db, params ), ns ( "rdfs", "label" ), title );
 		
 		
-		if ( !"ArrayExpress".equalsIgnoreCase ( db.getName () ) ) return true;
+		if ( !"ArrayExpress".equalsIgnoreCase ( db.getDbName () ) ) return true;
 		
 		// Build a URI that points at the contents of the Gene Expression Atlas data set. 
 		// TODO: The Atlas actually contains a subset of ArrayExpress, we should use the endpoint (or the APIs) to know

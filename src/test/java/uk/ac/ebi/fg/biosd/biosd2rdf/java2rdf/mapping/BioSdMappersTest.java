@@ -20,7 +20,7 @@ import org.semanticweb.owlapi.model.OWLOntologyStorageException;
 import org.semanticweb.owlapi.vocab.PrefixOWLOntologyFormat;
 
 import uk.ac.ebi.fg.biosd.model.utils.test.TestModel;
-import uk.ac.ebi.fg.biosd.model.xref.DatabaseRefSource;
+import uk.ac.ebi.fg.biosd.model.xref.DatabaseRecordRef;
 import uk.ac.ebi.fg.core_model.expgraph.properties.BioCharacteristicType;
 import uk.ac.ebi.fg.core_model.expgraph.properties.BioCharacteristicValue;
 import uk.ac.ebi.fg.core_model.expgraph.properties.ExperimentalPropertyType;
@@ -86,15 +86,13 @@ public class BioSdMappersTest
 		org.setDescription ( "A test Organisation" );
 		biosdModel.msi.addOrganization ( org );		
 		
-		DatabaseRefSource db = new DatabaseRefSource ( "E-GEOD-12040", null );
-		db.setName ( "ArrayExpress" );
+		DatabaseRecordRef db = new DatabaseRecordRef ( "ArrayExpress", "E-GEOD-12040", null );
 		db.setUrl ( "http://www.ebi.ac.uk/arrayexpress/experiments/E-GEOD-12040" );
-		biosdModel.msi.addDatabase ( db );
+		biosdModel.msi.addDatabaseRecordRef ( db );
 
-		DatabaseRefSource db1 = new DatabaseRefSource ( "E-GEOD-12040-smp1", null );
-		db1.setName ( "ArrayExpress" );
+		DatabaseRecordRef db1 = new DatabaseRecordRef ( "ArrayExpress", "E-GEOD-12040-smp1", null );
 		db1.setUrl ( "http://www.ebi.ac.uk/arrayexpress/experiments/E-GEOD-12040/smp1" );
-		biosdModel.smp1.addDatabase ( db1 );
+		biosdModel.smp1.addDatabaseRecordRef ( db1 );
 
 		
 		// This should generate specific statements about the value and the unit.

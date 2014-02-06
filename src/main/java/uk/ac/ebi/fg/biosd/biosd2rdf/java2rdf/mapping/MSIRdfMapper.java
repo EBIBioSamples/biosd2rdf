@@ -11,7 +11,7 @@ import org.apache.commons.lang.StringUtils;
 import uk.ac.ebi.fg.biosd.model.expgraph.BioSample;
 import uk.ac.ebi.fg.biosd.model.organizational.BioSampleGroup;
 import uk.ac.ebi.fg.biosd.model.organizational.MSI;
-import uk.ac.ebi.fg.biosd.model.xref.DatabaseRefSource;
+import uk.ac.ebi.fg.biosd.model.xref.DatabaseRecordRef;
 import uk.ac.ebi.fg.core_model.organizational.Contact;
 import uk.ac.ebi.fg.core_model.organizational.Organization;
 import uk.ac.ebi.fg.core_model.organizational.Publication;
@@ -83,11 +83,11 @@ public class MSIRdfMapper extends BeanRdfMapper<MSI>
 			new OwlObjPropRdfMapper<MSI, Organization> ( ns ( "biosd-terms", "has-knowledgeable-organization" ) ) )
 		);
 
-		this.addPropertyMapper ( "databases", new CollectionPropRdfMapper<> ( new CompositePropRdfMapper<> ( 
-			new OwlObjPropRdfMapper<MSI, DatabaseRefSource> ( ns ( "pav", "derivedFrom" ) ),
+		this.addPropertyMapper ( "databaseRecordRefs", new CollectionPropRdfMapper<> ( new CompositePropRdfMapper<> ( 
+			new OwlObjPropRdfMapper<MSI, DatabaseRecordRef> ( ns ( "pav", "derivedFrom" ) ),
 			// dbrecord denotes submission
-			new InversePropRdfMapper<MSI, DatabaseRefSource> ( 
-				new OwlObjPropRdfMapper<DatabaseRefSource, MSI> ( ns ( "obo", "IAO_0000219" ) ) 
+			new InversePropRdfMapper<MSI, DatabaseRecordRef> ( 
+				new OwlObjPropRdfMapper<DatabaseRecordRef, MSI> ( ns ( "obo", "IAO_0000219" ) ) 
 			)
 		)));
 
