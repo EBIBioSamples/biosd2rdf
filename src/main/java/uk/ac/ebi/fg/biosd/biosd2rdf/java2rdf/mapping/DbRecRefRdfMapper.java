@@ -41,8 +41,9 @@ public class DbRecRefRdfMapper extends BeanRdfMapper<DatabaseRecordRef>
 					
 					String name = StringUtils.trimToNull ( db.getDbName () );
 					if ( name == null ) return null;
-										
-					return ns ( "biosd", "repository-web-record/" + Java2RdfUtils.urlEncode ( name ) + ":" + acc );
+					// TODO: version
+					return ns ( "biosd", 
+						"repository-web-record/" + Java2RdfUtils.urlEncode ( name ) + ":" + Java2RdfUtils.urlEncode ( acc ) );
 				}
 			}
 		);
@@ -50,13 +51,13 @@ public class DbRecRefRdfMapper extends BeanRdfMapper<DatabaseRecordRef>
 		this.addPropertyMapper ( "acc", new OwlDatatypePropRdfMapper<DatabaseRecordRef, String> ( ns ( "dc-terms", "identifier" ) ) );
 		this.addPropertyMapper ( "url", new UriStringPropRdfMapper<DatabaseRecordRef> ( ns ( "foaf", "page" ), true ) );
 		
-		this.addPropertyMapper ( "description", new CompositePropRdfMapper<> (
+		this.addPropertyMapper ( "title", new CompositePropRdfMapper<> (
 			new OwlDatatypePropRdfMapper<DatabaseRecordRef, String> ( ns ( "dc-terms", "description" ) ),
 			new OwlDatatypePropRdfMapper<DatabaseRecordRef, String> ( ns ( "rdfs", "comment" ) ) 
 		));
 
 		// Contains strings like 'PRIDE' or 'ArrayExpress', so dc:source this should be the best property to represent them
-		this.addPropertyMapper ( "name",  new OwlDatatypePropRdfMapper<DatabaseRecordRef, String> ( ns ( "dc-terms", "source" ) ) ); 
+		this.addPropertyMapper ( "dbName",  new OwlDatatypePropRdfMapper<DatabaseRecordRef, String> ( ns ( "dc-terms", "source" ) ) ); 
 	}
 
 	@Override

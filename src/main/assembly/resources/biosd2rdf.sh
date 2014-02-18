@@ -13,6 +13,9 @@ fi
 # OPTS="$OPTS -Xms16G -Xmx32G -XX:PermSize=512m -XX:MaxPermSize=1G"
 OPTS="$OPTS -Xms12G -Xmx24G -XX:PermSize=512m -XX:MaxPermSize=1G"
 
+# Sometimes it hangs on Zooma, this will make it to timeout (they are -1 = oo by default)
+OPTS="$OPTS -Dsun.net.client.defaultConnectTimeout=60000 -Dsun.net.client.defaultReadTimeout=180000"
+
 # We always work with universal text encoding.
 OPTS="$OPTS -Dfile.encoding=UTF-8"
 

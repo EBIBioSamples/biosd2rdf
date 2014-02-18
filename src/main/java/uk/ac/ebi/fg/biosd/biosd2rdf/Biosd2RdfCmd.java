@@ -48,10 +48,20 @@ public class Biosd2RdfCmd
 		{
 			CommandLineParser clparser = new GnuParser ();
 			cli = clparser.parse ( getOptions(), args );
-			
 			if ( cli.hasOption ( 'h' ) ) throw new ParseException ( "--help" );
 
+			double sampleSize = cli.hasOption ( 'z' ) ? Double.parseDouble ( cli.getOptionValue ( 'z' ) ) : 100d;
+
 			exportService = new BioSdExportService ( cli.getOptionValue ( 'o' ) );
+
+			if ( cli.hasOption ( 'l' ) ) 
+			{
+				// In this case, just lists all or a random set of accessions.
+				//
+				for ( String acc: exportService.getSubmissionAccessions ( sampleSize ) )
+					System.out.println ( acc );
+				return;
+			}
 			
 			args = cli.getArgs ();
 			
@@ -61,8 +71,6 @@ public class Biosd2RdfCmd
 			else
 			{
 				// Or, we pick a random subset of them, or all of them. 
-				//
-				double sampleSize = cli.hasOption ( 'z' ) ? Double.parseDouble ( cli.getOptionValue ( 'z' ) ) : 100d;
 
 				// submit export tasks to the thread pool executor. Here we will be put on wait when all the pool threads are
 				// busy, i.e., we'll wait most of time, until the tail of the submission table
@@ -128,7 +136,7 @@ public class Biosd2RdfCmd
 		err.println ( "\nExports from the BioSD relational database to RDF files." );
 		
 		err.println ( "Syntax:" );
-		err.println ( "\n\tbiosd2rdf.sh [options] msi-acc...\n\n" );
+		err.println ( "\n\tbiosd2rdf.sh [options] [msi-acc...]\n\n" );
 
 		err.println ( "\nOptions:" );
 		
@@ -157,6 +165,11 @@ public class Biosd2RdfCmd
 			.withType ( Double.class )
 			.withLongOpt ( "sample-size" )
 			.create ( 'z' )
+		);
+
+		opts.addOption ( OptionBuilder
+			.withDescription ( "Doesn't export anything, gives a list of BioSD submission accessions, used by biosd2rdf_lsf.sh command. Understands -z" )
+			.create ( 'l' )
 		);
 		
 		opts.addOption ( OptionBuilder

@@ -8,6 +8,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Random;
@@ -18,7 +19,6 @@ import javax.persistence.Query;
 import org.apache.commons.io.FilenameUtils;
 import org.coode.owlapi.turtle.TurtleOntologyFormat;
 import org.semanticweb.owlapi.apibinding.OWLManager;
-import org.semanticweb.owlapi.io.RDFXMLOntologyFormat;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
@@ -80,9 +80,12 @@ public class BioSdExportService extends BatchService<BioSdExportTask>
 			if ( this.poolSizeTuner != null ) 
 			{
 				this.poolSizeTuner.setPeriodMSecs ( (int) 5*60*1000 );
-				this.poolSizeTuner.setMaxThreads ( 100 );
+				// TODO: document this
+				this.poolSizeTuner.setMaxThreads ( Integer.parseInt ( System.getProperty ( 
+					"uk.ac.ebi.fg.biosd.biosd2rdf.maxThreads", "100" ) ) 
+				);
 				this.poolSizeTuner.setMinThreads ( 5 );
-				this.poolSizeTuner.setMaxThreadIncr ( 25 );
+				this.poolSizeTuner.setMaxThreadIncr ( this.poolSizeTuner.getMaxThreads () / 4 );
 				this.poolSizeTuner.setMinThreadIncr ( 5 );
 			}
 			
@@ -129,7 +132,7 @@ public class BioSdExportService extends BatchService<BioSdExportTask>
 	public void submit ( BioSdExportTask batchServiceTask )
 	{
 		// This will flush the triples to the disk when the memory is too full and will also invoke the GC
-		MemoryUtils.checkMemory ( this.memFlushAction, 30d / 100d );
+		MemoryUtils.checkMemory ( this.memFlushAction, 25d / 100d );
 		// DEBUG if ( completedTasks > 0 && completedTasks % 20 == 0 ) flushKnowledgeBase ();
 
 		super.submit ( batchServiceTask );
@@ -163,6 +166,32 @@ public class BioSdExportService extends BatchService<BioSdExportTask>
 		for ( String msiAcc: msiAccs ) submit ( msiAcc );
 	}
 	
+	/**
+	 * TODO: comment me!
+	 */
+	public List<String> getSubmissionAccessions ( double sampleSize )
+	{
+		EntityManager em = Resources.getInstance ().getEntityManagerFactory ().createEntityManager ();
+		Random rnd = new Random ( System.currentTimeMillis () );
+		sampleSize /= 100d;
+		
+		Query q = em.createQuery ( "SELECT acc FROM MSI" ).setHint ( "org.hibernate.readOnly", true );
+		List<String> result = new LinkedList<> ();
+		for ( String acc: (List<String>) q.getResultList () )
+		{
+			if ( rnd.nextDouble () >= sampleSize ) continue;
+			result.add ( acc );
+		}
+		
+		return result;
+	}
+
+	/**
+	 * TODO: comment me!
+	 */
+	public List<String> getSubmissionAccessions () {
+		return getSubmissionAccessions ( 1.0d );
+	}
 
 	/**
 	 * This saves the triple store that keeps the RDF output of the exporters into the file specified by this class's 
@@ -218,7 +247,7 @@ public class BioSdExportService extends BatchService<BioSdExportTask>
 				else
 					log.warn ( "Sending more than one OWL document to the standard output" );
 				
-				kbout = System.out;
+				kbout = new XmlCharFixer ( System.out );
 				
 			} // if outputPath
 				

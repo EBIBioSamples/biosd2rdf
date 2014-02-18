@@ -47,7 +47,7 @@ public class BioSampleRdfMapper extends BeanRdfMapper<BioSample>
 		this.addPropertyMapper ( "propertyValues", new CollectionPropRdfMapper<BioSample, ExperimentalPropertyValue> ( 
 			new ExpPropValueRdfMapper<BioSample> ()) 
 		);
-		this.addPropertyMapper ( "databaseRecordRef", new CollectionPropRdfMapper<> ( new CompositePropRdfMapper<> ( 
+		this.addPropertyMapper ( "databaseRecordRefs", new CollectionPropRdfMapper<> ( new CompositePropRdfMapper<> ( 
 			new OwlObjPropRdfMapper<BioSample, DatabaseRecordRef> ( ns ( "pav", "derivedFrom" ) ),
 			// dbrecord denotes submission
 			new InversePropRdfMapper<BioSample, DatabaseRecordRef> ( 
