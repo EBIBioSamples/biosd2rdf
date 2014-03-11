@@ -52,6 +52,8 @@ public class BioSdMappersTest
 
 		TestModel biosdModel = new TestModel ();
 		
+		biosdModel.cv1.setTermText ( "Mus Musculus" ); // ZOOMA likes this more than 'mus-mus'
+		
 		biosdModel.msi.setTitle ( "A test SampleTab Submission" );
 		biosdModel.msi.setDescription ( "Hey! This is just a test!" );
 		
