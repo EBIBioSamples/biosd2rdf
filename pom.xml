@@ -175,8 +175,9 @@
 			
 	</build>
 	
-		
-	
+	<scm>
+		<developerConnection>scm:git:git@github.com:EBIBioSamples/core_model.git</developerConnection>
+	</scm>	
 	
   <repositories>
 
