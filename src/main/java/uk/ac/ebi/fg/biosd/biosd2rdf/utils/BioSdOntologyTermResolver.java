@@ -105,6 +105,9 @@ public class BioSdOntologyTermResolver
 	 */
 	public String getOntologyTermURI ( Collection<OntologyEntry> oes, String oeLabel )
 	{
+		// DEBUG
+		if ( "true".equals ( System.getProperty ( "biosd2rdf.debug.fast_mode" ) ) ) return null;		
+
 		if ( oes == null || oes.size () != 1 ) return null;
 		
 		OntologyEntry oe = oes.iterator ().next ();
@@ -200,6 +203,9 @@ public class BioSdOntologyTermResolver
 	 */
 	public String getUnitUri ( String unitLabel )
 	{
+		// DEBUG
+		if ( "true".equals ( System.getProperty ( "biosd2rdf.debug.fast_mode" ) ) ) return null;		
+		
 		String uri = this.unitCache.get ( unitLabel );
 		if ( uri != null ) 
 		{
