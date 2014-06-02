@@ -222,6 +222,7 @@ public class ExpPropValueRdfMapper<T extends Accessible> extends PropertyRdfMapp
 			// Process the type
 			// 
 			ExperimentalPropertyType ptype = pval.getType ();
+			
 			String typeLabel = BioSdOntologyTermResolver.getExpPropTypeLabel ( ptype );
 			if ( typeLabel == null ) return false;
 			
@@ -237,16 +238,16 @@ public class ExpPropValueRdfMapper<T extends Accessible> extends PropertyRdfMapp
 			// name -> dc:title and similar
 			if ( typeLabel != null && typeLabelLC.matches ( "(sample |group |sample group |)?name" ) )
 			{
-				assertData ( onto, mapFact.getUri ( sample ), ns ( "dc-terms", "title" ), vcomp.valueLabel );
-				assertData ( onto, mapFact.getUri ( sample ), ns ( "rdfs", "label" ), vcomp.valueLabel );
+				assertData ( onto, mapFact.getUri ( sample, params ), ns ( "dc-terms", "title" ), vcomp.valueLabel );
+				assertData ( onto, mapFact.getUri ( sample, params ), ns ( "rdfs", "label" ), vcomp.valueLabel );
 				return true;
 			}
 
 			// 'Sample Description' -> dc-terms:description and similar
 			if ( typeLabel != null && typeLabelLC.matches ( "(sample |group |sample group |)?description" ) )
 			{
-				assertData ( onto, mapFact.getUri ( sample ), ns ( "dc-terms", "description" ), vcomp.valueLabel );
-				assertData ( onto, mapFact.getUri ( sample ), ns ( "rdfs", "comment" ), vcomp.valueLabel );
+				assertData ( onto, mapFact.getUri ( sample, params ), ns ( "dc-terms", "description" ), vcomp.valueLabel );
+				assertData ( onto, mapFact.getUri ( sample, params ), ns ( "rdfs", "comment" ), vcomp.valueLabel );
 				return true;
 			}
 			
@@ -308,7 +309,7 @@ public class ExpPropValueRdfMapper<T extends Accessible> extends PropertyRdfMapp
 				
 			// Now we have either *** sample has-biocharacteristic valUri ***, or *** sample is-about valUri ***, depending on 
 			// the Java type. As said above, biosd:has-biocharacteristic is a subproperty of iao:is-about anyway.
-			assertLink ( onto, mapFact.getUri ( sample ), attributeLinkUri, valUri );
+			assertLink ( onto, mapFact.getUri ( sample, params ), attributeLinkUri, valUri );
 			
 			return true;
 		} 

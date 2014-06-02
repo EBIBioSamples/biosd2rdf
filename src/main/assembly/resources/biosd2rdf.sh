@@ -3,9 +3,11 @@
 # This is the entry point that invokes the BioSD-RDF line command.
 # 
 
-# Do you use a proxy?
+# Do you use a proxy? TODO: this only works at EBI, we need to parse $http_proxy
 if [ "$http_proxy" != '' ]; then
-  OPTS="$OPTS -DproxySet=true -DproxyHost=wwwcache.ebi.ac.uk -DproxyPort=3128 -DnonProxyHosts='*.ebi.ac.uk|localhost'"
+	for proto in http https; do
+	  OPTS="$OPTS -D$proto.proxyHost=wwwcache.ebi.ac.uk -D$proto.proxyPort=3128 -D$proto.nonProxyHosts='*.ebi.ac.uk|localhost'"
+	done	
 fi
 
 # These are passed to the JVM. they're appended, so that you can predefine your stuff via export OPTS=...
@@ -14,7 +16,7 @@ fi
 OPTS="$OPTS -Xms12G -Xmx24G -XX:PermSize=512m -XX:MaxPermSize=1G"
 
 # Sometimes it hangs on Zooma, this will make it to timeout (they are -1 = oo by default)
-OPTS="$OPTS -Dsun.net.client.defaultConnectTimeout=60000 -Dsun.net.client.defaultReadTimeout=180000"
+OPTS="$OPTS -Dsun.net.client.defaultConnectTimeout=30000 -Dsun.net.client.defaultReadTimeout=120000"
 
 # We always work with universal text encoding.
 OPTS="$OPTS -Dfile.encoding=UTF-8"

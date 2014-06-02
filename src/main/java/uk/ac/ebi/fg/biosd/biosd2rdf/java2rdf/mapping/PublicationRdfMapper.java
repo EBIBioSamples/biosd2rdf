@@ -17,6 +17,12 @@ import uk.ac.ebi.fg.java2rdf.utils.Java2RdfUtils;
 
 /**
  * Maps a publication that is associated to a BioSD/SampleTab submission to OWL/RDF.
+ * 
+ * TODO: we create minimal properties for each publication (title, author list and few else), at the moment we don't
+ * produce even these, since all BioSD records only have PUBMED-ID or DOI. For such records, we still generate links
+ * to publication RDF resources and attach the identifiers to them. This way, the resulting RDF can be used to explore
+ * more information about publications, by means of federated queries against resources like 
+ * <a href = 'http://bio2rdf.org/'>Bio2RDF</a> or <a href = 'http://linkedlifedata.com/'>LLD</a>.
  *
  * <dl><dt>date</dt><dd>Jun 18, 2013</dd></dl>
  * @author Marco Brandizi
@@ -32,11 +38,8 @@ public class PublicationRdfMapper extends BeanRdfMapper<Publication>
 			new RdfUriGenerator<Publication>() {
 				@Override public String getUri ( Publication pub, Map<String, Object> params ) 
 				{
-					String title = StringUtils.trimToNull ( pub.getTitle () ); if ( title == null ) return null;
-					String authorList = StringUtils.trimToNull ( pub.getAuthorList () ); if ( authorList == null ) return null;
-					
 					String pmid = urlEncode ( StringUtils.trimToNull ( pub.getPubmedId () ) );
-					
+
 					String id;
 					if ( pmid != null ) 
 						id = pmid;
@@ -47,6 +50,8 @@ public class PublicationRdfMapper extends BeanRdfMapper<Publication>
 							id = Java2RdfUtils.hashUriSignature ( doi );
 						else 
 						{
+							String title = StringUtils.trimToNull ( pub.getTitle () ); if ( title == null ) return null;
+							String authorList = StringUtils.trimToNull ( pub.getAuthorList () ); if ( authorList == null ) return null;
 							int year = NumberUtils.toInt ( pub.getYear (), -1 );
 							id = Java2RdfUtils.hashUriSignature ( title + authorList +  ( year == -1 ? "" : year ) );
 						}

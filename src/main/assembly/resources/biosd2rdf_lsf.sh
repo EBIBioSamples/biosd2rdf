@@ -28,12 +28,12 @@ ct=0; chunk_size=5000; chunkct=0
 (for acc in $(./biosd2rdf.sh -l -z $BIOSD2RDF_SAMPLE_SIZE )
 do
 	if [ $ct == 0 ]; then 
-	echo -J biosd2rdf_$chunkct -g /$BIOSD2RDF_LSF_GROUP -oo "./biosd2rdf_$chunkct".out -M 38000 ./biosd2rdf.sh --output "'"$BIOSD2RDF_OUTFILE"_"$chunkct".ttl'"
-	 chunkct=$[ $chunkct + 1 ]
+		echo -J biosd2rdf_$chunkct -g /$BIOSD2RDF_LSF_GROUP -oo "./biosd2rdf_$chunkct".out -M 38000 ./biosd2rdf.sh --output "'"$BIOSD2RDF_OUTFILE"_"$chunkct".ttl'"
+		chunkct=$[ $chunkct + 1 ]
 	fi
 	echo $acc
 	ct=$[ ( $ct + 1 ) % $chunk_size ]
-done ) | 
+done) | 
 	xargs -d '\n' -n $[ $chunk_size + 1] echo bsub >bsub_$$.sh
 
 # For some damn reason, if we invoke the command above straight, bsub thinks './biosd2rdf.sh --output ...' is still an option and tries to invoke the

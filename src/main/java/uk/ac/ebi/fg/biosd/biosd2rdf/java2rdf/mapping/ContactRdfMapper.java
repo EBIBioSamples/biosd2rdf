@@ -80,7 +80,7 @@ public class ContactRdfMapper extends BeanRdfMapper<Contact>
 	{
 		try
 		{
-			if ( super.map ( cnt, params ) ) return false;
+			if ( !super.map ( cnt, params ) ) return false;
 			
 			String nameLine = trimToEmpty ( cnt.getFirstName () ) 
 				+ trimToEmpty ( cnt.getMidInitials () ) 
@@ -88,10 +88,10 @@ public class ContactRdfMapper extends BeanRdfMapper<Contact>
 			nameLine = trimToNull ( nameLine );
 
 			OwlApiUtils.assertData ( this.getMapperFactory ().getKnowledgeBase (), 
-				this.getRdfUriGenerator ().getUri ( cnt ), ns ( "dc-terms", "title" ), nameLine 
+				this.getRdfUriGenerator ().getUri ( cnt, params ), ns ( "dc-terms", "title" ), nameLine 
 			);
 			OwlApiUtils.assertData ( this.getMapperFactory ().getKnowledgeBase (), 
-				this.getRdfUriGenerator ().getUri ( cnt ), ns ( "rdfs", "label" ), nameLine 
+				this.getRdfUriGenerator ().getUri ( cnt, params ), ns ( "rdfs", "label" ), nameLine 
 			);
 			
 			return true;

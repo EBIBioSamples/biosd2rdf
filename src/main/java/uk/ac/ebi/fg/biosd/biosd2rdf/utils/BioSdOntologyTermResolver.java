@@ -87,7 +87,8 @@ public class BioSdOntologyTermResolver
 		// Try to resolve the type instead of the value
 		if ( isNumberOrDate ) return ontoTermDiscoverer.getOntologyTermUriAsASCII ( pvalTypeLabel, null );
 
-		// OK, we have a value, no ontology term attached, no URI, no number, no date, try to resolve the value string
+		// OK, we have a value, no ontology term attached, no URI, no number, no date, try to resolve the value string (eg, via
+		// ZOOMA)
 
 		// First use both value and type labels
 		uri = ontoTermDiscoverer.getOntologyTermUriAsASCII ( pvalLabel, pvalTypeLabel );

@@ -4,7 +4,8 @@ import static uk.ac.ebi.fg.java2rdf.utils.NamespaceUtils.ns;
 
 import java.util.Map;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Validate;
 import org.semanticweb.owlapi.vocab.XSDVocabulary;
 
 import uk.ac.ebi.fg.core_model.organizational.Publication;
@@ -33,12 +34,20 @@ public class PublicationYearRdfMapper extends OwlDatatypePropRdfMapper<Publicati
 	{
 		try
 		{
-			if ( source == null || year == null ) return false;
+			Validate.notNull ( source, "Internal error: cannot map a null publication to RDF" );
+
 			RdfMapperFactory mapFactory = this.getMapperFactory ();
+			Validate.notNull ( mapFactory, "Internal error: %s must be linked to a mapper factory", this.getClass ().getSimpleName () );
+			
+			String subjUri = mapFactory.getUri ( source, params );
+			if ( subjUri == null ) return false;
+
+			if ( ( year = StringUtils.trimToNull ( year ) ) == null ) return false;
+
 			RdfLiteralGenerator<String> targetValGen = this.getRdfLiteralGenerator ();
 			
 			OwlApiUtils.assertData ( this.getMapperFactory ().getKnowledgeBase (), 
-				mapFactory.getUri ( source ), 
+				mapFactory.getUri ( source, params ), 
 				this.getTargetPropertyUri (), 
 				targetValGen.getValue ( year ), 
 				XSDVocabulary.G_YEAR.toString () );
