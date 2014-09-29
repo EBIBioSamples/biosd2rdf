@@ -28,6 +28,6 @@ public class XmlCharFixer extends FilterOutputStream
          || c >= 0x10000 && c <= 0x10FFFF )
      super.write ( c );
    else
-     this.write ( String.format ( "&#%d;", (int) c  ).getBytes () );
+     this.write ( String.format ( "&#%d;", c & 0xFFFFFFFFL ).getBytes () );
 	}
 }
