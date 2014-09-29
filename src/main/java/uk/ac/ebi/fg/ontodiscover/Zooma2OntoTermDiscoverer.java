@@ -59,7 +59,7 @@ public class Zooma2OntoTermDiscoverer extends OntologyTermDiscoverer
 			
 			if ( zresult == null || zresult.size () == 0 ) return null;
 			AnnotationSummary zsum = zresult.keySet ().iterator ().next ();
-			
+
 			// TODO: the case they're more than one refers to multiple terms used to describe the label, it's rare, but 
 			// might be worth to consider it too somehow
 			Collection<URI> semTags = zsum.getSemanticTags ();

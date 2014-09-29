@@ -7,7 +7,7 @@
   <packaging>jar</packaging>
 
 	<name>SampleTab and BioSD Converter to RDF</name>
-  <url>http://github.com/marco-brandizi/biosd2rdf</url>
+  <url>http://github.com/EBIBioSamples/biosd2rdf</url>
 
   <parent>
 	  <groupId>uk.ac.ebi.fg.biosd</groupId>
