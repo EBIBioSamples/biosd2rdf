@@ -6,7 +6,7 @@ import static uk.ac.ebi.fg.java2rdf.utils.OwlApiUtils.assertLink;
 
 import java.util.Map;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.semanticweb.owlapi.model.OWLOntology;
 
 import uk.ac.ebi.fg.biosd.model.xref.DatabaseRecordRef;

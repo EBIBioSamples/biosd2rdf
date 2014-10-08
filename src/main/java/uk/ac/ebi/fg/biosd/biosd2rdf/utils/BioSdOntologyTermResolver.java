@@ -1,6 +1,5 @@
 package uk.ac.ebi.fg.biosd.biosd2rdf.utils;
 
-import java.net.URI;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -8,22 +7,21 @@ import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import uk.ac.ebi.bioportal.webservice.client.BioportalClient;
+import uk.ac.ebi.bioportal.webservice.exceptions.OntologyServiceException;
+import uk.ac.ebi.bioportal.webservice.model.OntologyClass;
 import uk.ac.ebi.fg.core_model.expgraph.properties.ExperimentalPropertyType;
 import uk.ac.ebi.fg.core_model.expgraph.properties.ExperimentalPropertyValue;
 import uk.ac.ebi.fg.core_model.terms.OntologyEntry;
 import uk.ac.ebi.fg.core_model.xref.ReferenceSource;
-import uk.ac.ebi.fg.ontodiscover.CachedOntoTermDiscoverer;
-import uk.ac.ebi.fg.ontodiscover.OntologyTermDiscoverer;
-import uk.ac.ebi.fg.ontodiscover.Zooma2OntoTermDiscoverer;
-import uk.ac.ebi.ontocat.Ontology;
-import uk.ac.ebi.ontocat.OntologyServiceException;
-import uk.ac.ebi.ontocat.OntologyTerm;
-import uk.ac.ebi.ontocat.bioportal.BioportalOntologyService;
-import uk.ac.ebi.ontocat.bioportal.xmlbeans.ConceptBean;
+import uk.ac.ebi.fgpt.zooma.search.ontodiscover.CachedOntoTermDiscoverer;
+import uk.ac.ebi.fgpt.zooma.search.ontodiscover.OntologyTermDiscoverer;
+import uk.ac.ebi.fgpt.zooma.search.ontodiscover.OntologyTermDiscoverer.DiscoveredTerm;
+import uk.ac.ebi.fgpt.zooma.search.ontodiscover.ZoomaOntoTermDiscoverer;
 import uk.ac.ebi.utils.memory.SimpleCache;
 import uk.ac.ebi.utils.regex.RegEx;
 
@@ -41,13 +39,10 @@ import uk.ac.ebi.utils.regex.RegEx;
  */
 public class BioSdOntologyTermResolver
 {
-	private OntologyTermDiscoverer ontoTermDiscoverer = 
-		new CachedOntoTermDiscoverer ( new Zooma2OntoTermDiscoverer (), (int) 500E3 );
-	private BioportalOntologyService ontologyService;
-	private Map<String, String> bioPortalOntologies;
+	private OntologyTermDiscoverer ontoTermDiscoverer = new CachedOntoTermDiscoverer ( new ZoomaOntoTermDiscoverer () ); 
+	private BioportalClient ontologyService = new BioportalClient ( "07732278-7854-4c4f-8af1-7a80a1ffc1bb" );
 	
 	private final SimpleCache<String, String> ontoCache = new SimpleCache<> ( (int) 500E3 );
-	private final SimpleCache<String, String> unitCache = new SimpleCache<> ( 1000 );
 	private Map<String, String> uoUnits;
 
 	private final static RegEx COMMENT_RE = new RegEx ( "(Comment|Characteristic)\\s*\\[\\s*(.+)\\s*\\]", Pattern.CASE_INSENSITIVE );
@@ -85,17 +80,20 @@ public class BioSdOntologyTermResolver
 		
 		// Next, see if it is a number
 		// Try to resolve the type instead of the value
-		if ( isNumberOrDate ) return ontoTermDiscoverer.getOntologyTermUriAsASCII ( pvalTypeLabel, null );
+		if ( isNumberOrDate ) {
+			// TODO: for the moment we keep the first result, we'd like to add the others too
+			return getFirstUriFromZoomaterms ( ontoTermDiscoverer.getOntologyTermUris ( null, pvalTypeLabel ) );
+		}
 
 		// OK, we have a value, no ontology term attached, no URI, no number, no date, try to resolve the value string (eg, via
 		// ZOOMA)
 
 		// First use both value and type labels
-		uri = ontoTermDiscoverer.getOntologyTermUriAsASCII ( pvalLabel, pvalTypeLabel );
+		uri = getFirstUriFromZoomaterms ( ontoTermDiscoverer.getOntologyTermUris ( pvalLabel, pvalTypeLabel ) );
 		if ( uri != null ) return uri;
 		
 		// If failed, try type-only as well, this should allow to catch stuff like 'del(7herc2-mkrn3)13frdni', 'gene symbol'
-		return ontoTermDiscoverer.getOntologyTermUriAsASCII ( pvalTypeLabel, null );
+		return getFirstUriFromZoomaterms ( ontoTermDiscoverer.getOntologyTermUris ( null, pvalTypeLabel ) );
 	}
 	
 	
@@ -113,13 +111,19 @@ public class BioSdOntologyTermResolver
 		
 		OntologyEntry oe = oes.iterator ().next ();
 		String oeAcc = StringUtils.trimToNull ( oe.getAcc () );
-		if ( oeAcc == null ) return ontoTermDiscoverer.getOntologyTermUriAsASCII ( oeLabel == null ? oeLabel : oe.getLabel (), null );
+		if ( oeAcc == null ) return getFirstUriFromZoomaterms ( 
+			ontoTermDiscoverer.getOntologyTermUris ( null, oeLabel == null ? oeLabel : oe.getLabel () )
+		);
 		
 		ReferenceSource src = oe.getSource ();
-		if ( src == null ) return ontoTermDiscoverer.getOntologyTermUriAsASCII ( oeLabel == null ? oeLabel : oe.getLabel (), null );
+		if ( src == null ) return getFirstUriFromZoomaterms ( 
+			ontoTermDiscoverer.getOntologyTermUris ( null, oeLabel == null ? oeLabel : oe.getLabel () )
+		);
 		
 		String srcAcc = StringUtils.trimToNull ( src.getAcc () );
-		if ( srcAcc == null ) return ontoTermDiscoverer.getOntologyTermUriAsASCII ( oeLabel == null ? oeLabel : oe.getLabel (), null );
+		if ( srcAcc == null ) return getFirstUriFromZoomaterms ( 
+			ontoTermDiscoverer.getOntologyTermUris ( null, oeLabel == null ? oeLabel : oe.getLabel () )
+		);
 		
 		return this.getOntologyTermURI ( oeAcc, srcAcc );
 	}
@@ -144,7 +148,7 @@ public class BioSdOntologyTermResolver
 				
 		// If this key is known to yield a null OT, then fall back to discovering via label
 		if ( uri != null ) {
-			if ( CachedOntoTermDiscoverer.NULL_URI.toASCIIString ().equals ( uri ) ) {
+			if ( "__NULL__".equals ( uri ) ) {
 				log.trace ( "Cached null URI for " + oeCacheKey + ", falling back to label-based discovering" );
 				return null;
 			}
@@ -152,27 +156,23 @@ public class BioSdOntologyTermResolver
 			return uri;
 		}		
 		
-		OntologyTerm oservTerm = null;
+		OntologyClass oservTerm = null;
 		try
 		{
-			if ( getOntologService () != null ) 
-			{
-				//	OLS			oservTerm = this.ontologyService.getTerm ( srcAcc, srcAcc + ":" + oeAcc );
-				String bioPortalOntoAcc = bioPortalOntologies.get ( srcAcc );
-
 				// Try out different combinations for the term accession, this is because the end users suck at using proper
 				// term accessions and these are the variants they most frequently bother us with.
-				if ( bioPortalOntoAcc != null )
-					for ( String bioPortalAcc: new String[] { 
-						srcAcc + "_" + acc, srcAcc + ":" + acc,
+				if ( srcAcc != null )
+					for ( String testAcc: new String[] { 
+						acc, 
+						srcAcc + "_" + acc, 
+						srcAcc + ":" + acc,
 						srcAcc.toLowerCase () + "_" + acc,
-						srcAcc.toLowerCase () + ":" + acc, acc })
+						srcAcc.toLowerCase () + ":" + acc })
 					{
 						synchronized ( this.ontologyService ) {
-							if ( ( oservTerm = this.ontologyService.getTerm ( bioPortalOntoAcc, bioPortalAcc ) ) != null ) break;
+							if ( ( oservTerm = this.ontologyService.getOntologyClass ( srcAcc, testAcc ) ) != null ) break;
 						}
 				}
-			}
 		} 
 		catch ( OntologyServiceException ex ) {
 			log.warn ( "Internal Error about the Ontology Service: " + ex.getMessage () + ", continuing with label-based discovering only", ex );
@@ -180,13 +180,13 @@ public class BioSdOntologyTermResolver
 		}
 		
 		if ( oservTerm != null )
-			uri = oservTerm.getURI ().toASCIIString ();
+			uri = oservTerm.getIri ();
 
 		if ( uri == null ) 
 		{
 			// No luck, record that this OE yields no result and fall back to discovering via label
 			log.trace ( "No good result found for '" + oeCacheKey + "', falling back to label-based discovery and caching a null uri for this key" );
-				ontoCache.put ( oeCacheKey, CachedOntoTermDiscoverer.NULL_URI.toASCIIString () );
+				ontoCache.put ( oeCacheKey, "__NULL__" );
 			return null;
 		}
 
@@ -206,54 +206,13 @@ public class BioSdOntologyTermResolver
 	{
 		// DEBUG
 		if ( "true".equals ( System.getProperty ( "biosd2rdf.debug.fast_mode" ) ) ) return null;		
-		
-		String uri = this.unitCache.get ( unitLabel );
-		if ( uri != null ) 
-		{
-			if ( CachedOntoTermDiscoverer.NULL_URI.toASCIIString ().equals ( uri ) ) {
-				log.trace ( "Returning a cached null URI for the unit '{}'", unitLabel );
-				return null;
-			}
-			log.trace ( "Returning cached URI {} for '{}'", uri, unitLabel );
-			return uri;
-		}		
 			
-		try
-		{
-			if ( getOntologService () == null ) return null;
-
-			// Search under the tree branching from uo:unit			
-			uri = getUnitUris ().get ( unitLabel );
-
-			// The problem with the above is that it doesn't find synonims, so we use this other approach too.
-			// In turn, the problem with searchSubtree() is that it sucks when it has more than one result to yield back 
-			// (a bug occurs inside OC). That's why we're using both
-			//
-			if ( uri == null && getOntologService () != null )
-			{ 
-				String uoBpAcc = this.bioPortalOntologies.get ( "UO" );
-				List<OntologyTerm> terms;
-				
-				synchronized ( this.bioPortalOntologies ) {
-					terms = this.ontologyService.searchSubtree ( uoBpAcc, "UO_0000000", unitLabel );
-				}
-				if ( terms != null && !terms.isEmpty () )
-					uri = terms.iterator ().next ().getURI ().toASCIIString ();
-			}
-		} 
-		catch ( OntologyServiceException ex )
-		{
-			log.warn ( String.format ( 
-				"Internal Error about the Ontology Service: %s, getting nothing for the unit %s", 
-				ex.getMessage (), unitLabel ), ex 
-			);
-		}
-		
-		log.trace ( "Caching and returning the URI {} for the unit '{}'", uri, unitLabel );
-		unitCache.put ( unitLabel, uri == null ? CachedOntoTermDiscoverer.NULL_URI.toASCIIString () : uri );
-		
-		return uri; 
+		// Search under the tree branching from uo:unit			
+		return getUnitUris ().get ( unitLabel );
 	}	
+		
+	
+	
 	
 	private synchronized Map<String, String> getUnitUris () throws OntologyServiceException
 	{
@@ -261,84 +220,61 @@ public class BioSdOntologyTermResolver
 		
 		uoUnits = new HashMap<> ();
 
-		if ( getOntologService () == null ) return uoUnits;
-		String uoBpAcc = this.bioPortalOntologies.get ( "UO" );
-
 		log.info ( "Loading UO units, please wait" );
-		Set<OntologyTerm> terms = ontologyService.getAllChildren ( uoBpAcc, "UO_0000000" );
+		Set<OntologyClass> terms = this.ontologyService.getClassDescendants ( "UO", "UO_0000000" );
 		if ( terms == null || terms.isEmpty () ) throw new OntologyServiceException ( 
 			"No units found in UO via OntoCAT/Bioportal"  
 		);
 		
-		for ( OntologyTerm term: terms ) 
+		for ( OntologyClass term: terms ) 
 		{
 			if ( term == null ) {
 				log.warn ( "Ignoring null term returned by the Ontology Service" );
 				continue;
 			}
 
-			String tlabel = StringUtils.trimToNull ( term.getLabel () );
-			URI uri = term.getURI ();
-			String termAcc = term.getAccession ();
+			String tlabel = StringUtils.trimToNull ( term.getPreferredLabel () );
+			String uri = term.getIri ();
 			
-			this.cacheNewUOUnit ( tlabel, term.getURI (), termAcc);
+			this.cacheNewUOUnit ( tlabel, uri );
 			
-			// Synonyms?!
-			if ( uri == null || !( term instanceof ConceptBean ) ) continue;
+			if ( uri == null ) continue;
 			
-			for ( String slabel: ((ConceptBean) term).getSynonyms () )
-				this.cacheNewUOUnit ( slabel, uri, termAcc );
+			for ( String slabel: term.getSynonyms () )
+				this.cacheNewUOUnit ( slabel, uri );
 		}
 		
 		return this.uoUnits;
 	}
 	
-	private void cacheNewUOUnit ( String unitLabel, URI uri, String termAcc ) throws OntologyServiceException
+	private void cacheNewUOUnit ( String unitLabel, String uri ) throws OntologyServiceException
 	{
 		if ( unitLabel == null ) {
-			log.warn ( "Ignoring term with null label, accession is: {}", termAcc );
+			log.warn ( "Ignoring unit term with null label, URI is: {}", uri );
 			return;
 		}
 		if ( uri == null ) {
-			log.warn ( "Ignoring term '{}' ({}) with no URI", unitLabel, termAcc );
+			log.warn ( "Ignoring unit term '{}' with no URI", unitLabel );
 			return;
 		}
-					
-		unitLabel = unitLabel.trim ();			
-		if ( this.uoUnits.containsKey ( unitLabel ) ) throw new OntologyServiceException ( 
-		  "For some reason UO contains two unit terms with the same label '" + unitLabel + "'"
-		);
+
+		if ( "A".equals ( unitLabel ) && uri.endsWith ( "UO_0000019" ) )
+			// This is angstrom and it's represented as an 'A', but the wrong synonim is returned
+			unitLabel = "Å";
+		else if ( "micrometre".equals ( unitLabel ) && uri.endsWith ( "UO_0000016" ) )
+			// The URI is actually about millimeter, which is already mapped
+			return;
+		
+		unitLabel = unitLabel.trim ();
+		String storedUri = this.uoUnits.get ( unitLabel );
+		
+		if ( storedUri != null && !uri.equals ( storedUri ) ) throw new OntologyServiceException ( String.format ( 
+		  "For some reason UO contains two URIs for the label '%s': ('%s', '%s')", unitLabel, uri, storedUri
+		));
 		log.trace ( "Saving '{}', {}", unitLabel, uri );
-		this.uoUnits.put ( unitLabel, uri.toASCIIString () );
+		this.uoUnits.put ( unitLabel, uri );
 	}
 	
-	/**
-	 * OntoCat interface, used in this class for ontology term searches.
-	 */
-	private synchronized BioportalOntologyService getOntologService ()
-	{		
-		if ( ontologyService != null ) return ontologyService;
-	
-		try 
-		{
-			// return ontologyService = new OlsOntologyService ();
-			ontologyService = new BioportalOntologyService ();
-			bioPortalOntologies = new HashMap<> ();
-			// Bioportal wants the ontology identified by their damn internal ID and it has no mean to achieve that from
-			// the symbolic short name, so we need to cache this rubbish
-			log.info ( "Loading Bioportal Ontologies, please wait" );
-			for ( Ontology onto: ontologyService.getOntologies () )
-				bioPortalOntologies.put ( onto.getAbbreviation (), onto.getOntologyAccession () );
-			return ontologyService;
-		} 
-		catch ( OntologyServiceException ex )
-		{
-			log.warn ( 
-				"Internal Error about the Ontology Service: " + ex.getMessage () + ", continuing with label-based discovering only", ex );
-			bioPortalOntologies = null;
-			return ontologyService = null;
-		}
-	}
 
 	/**
 	 * Extract the type label, considering things like Comment [ X ] (return 'X' in such cases).
@@ -352,5 +288,10 @@ public class BioSdOntologyTermResolver
 		String[] chunks = COMMENT_RE.groups ( typeLabel );
 		if ( chunks == null || chunks.length < 3 ) return typeLabel;
 		return chunks [ 2 ];
+	}
+	
+	private static String getFirstUriFromZoomaterms ( List<DiscoveredTerm> zterms )
+	{
+		return zterms == null || zterms.isEmpty () ? null : zterms.get ( 0 ).getUri ().toASCIIString ();
 	}
 }

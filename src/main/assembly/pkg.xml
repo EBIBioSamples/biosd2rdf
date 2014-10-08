@@ -1,6 +1,5 @@
 <!-- 
   File for the Maven Assembly plug-in.
- 	Takes the dependency file (prepared by deps.xml) and adds a few other files to the final distribution package. 
  -->
 <assembly>
   <id>pkg</id>
@@ -8,6 +7,19 @@
   <formats>
     <format>zip</format>
   </formats>
+
+	<dependencySets>
+		<dependencySet>
+		  <!-- Enable only if non-empty <outputFileNameMapping></outputFileNameMapping> -->
+		  <outputDirectory>/lib</outputDirectory>
+		  <unpack>false</unpack>
+		  <scope>runtime</scope>
+		  <excludes>
+		    <!--  This comes in due some indirect dependency. We want to use logback and hence the exclusion  -->
+				<exclude>commons-logging:commons-logging</exclude> 
+		  </excludes>
+		</dependencySet>
+	</dependencySets> 
 
   <fileSets>
 
@@ -22,17 +34,6 @@
 			<outputDirectory></outputDirectory>
 			<filtered>true</filtered>
 		</fileSet>
-
-<!--		<fileSet>-->
-<!--			<directory>src/main/resources</directory>-->
-<!--      <includes>-->
-<!--        <include>log4j.properties</include>-->
-<!--      </includes>-->
-<!--      <fileMode>0644</fileMode>-->
-<!--			<directoryMode>0755</directoryMode>-->
-<!--			<outputDirectory></outputDirectory>-->
-<!--			<filtered>true</filtered>-->
-<!--		</fileSet>-->
 
 		<fileSet>
 			<directory>src/main/assembly/resources</directory>
@@ -56,26 +57,6 @@
 			<outputDirectory></outputDirectory>
 			<filtered>true</filtered>
 		</fileSet>
-
-
-
-		<!-- fileSet>
-			<directory>src/main/doc</directory>
-			<outputDirectory>doc</outputDirectory>
-      <fileMode>0644</fileMode>
-			<directoryMode>0755</directoryMode>      
-			<filtered>true</filtered>
-		</fileSet -->
-
-    <fileSet>
-     	<directory>target</directory>
-      <includes>
-        <include>${project.artifactId}_deps.jar</include>
-      </includes>
-			<outputDirectory></outputDirectory>
-      <fileMode>0644</fileMode>
-    </fileSet>
-
 
   </fileSets>
 

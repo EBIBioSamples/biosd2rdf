@@ -5,8 +5,8 @@ import static uk.ac.ebi.fg.java2rdf.utils.NamespaceUtils.ns;
 
 import java.util.Map;
 
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.math.NumberUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 
 import uk.ac.ebi.fg.core_model.organizational.Publication;
 import uk.ac.ebi.fg.java2rdf.mapping.BeanRdfMapper;

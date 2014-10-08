@@ -8,6 +8,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map.Entry;
@@ -17,6 +18,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.io.output.WriterOutputStream;
 import org.coode.owlapi.turtle.TurtleOntologyFormat;
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.IRI;
@@ -237,7 +239,7 @@ public class BioSdExportService extends BatchService<BioSdExportTask>
 				
 				File fout = new File ( outp );
 				log.info ( "Please wait, saving triples to '" + fout.getCanonicalPath () + "'" );
-				kbout = new BufferedOutputStream ( new XmlCharFixer ( new FileOutputStream ( outp ) ) );
+				kbout = new BufferedOutputStream ( new FileOutputStream ( outp ) );
 			}
 			else 
 			{
@@ -247,10 +249,13 @@ public class BioSdExportService extends BatchService<BioSdExportTask>
 				else
 					log.warn ( "Sending more than one OWL document to the standard output" );
 				
-				kbout = new XmlCharFixer ( System.out );
+				kbout = System.out;
 				
 			} // if outputPath
 				
+			// This should be necessary only in case of XML output, not Turtle.  
+			// kbout = new WriterOutputStream ( new XmlCharFixer ( new OutputStreamWriter ( kbout, "UTF-8" ) ), "UTF-8" ); 
+			
 			// TODO: make this an option?
 			// 
 			PrefixOWLOntologyFormat fmt = new TurtleOntologyFormat ();

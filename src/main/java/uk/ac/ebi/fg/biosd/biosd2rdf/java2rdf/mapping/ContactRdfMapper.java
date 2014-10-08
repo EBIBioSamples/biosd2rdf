@@ -1,7 +1,7 @@
 package uk.ac.ebi.fg.biosd.biosd2rdf.java2rdf.mapping;
 
-import static org.apache.commons.lang.StringUtils.trimToEmpty;
-import static org.apache.commons.lang.StringUtils.trimToNull;
+import static org.apache.commons.lang3.StringUtils.trimToEmpty;
+import static org.apache.commons.lang3.StringUtils.trimToNull;
 import static uk.ac.ebi.fg.java2rdf.utils.Java2RdfUtils.hashUriSignature;
 import static uk.ac.ebi.fg.java2rdf.utils.Java2RdfUtils.urlEncode;
 import static uk.ac.ebi.fg.java2rdf.utils.NamespaceUtils.ns;

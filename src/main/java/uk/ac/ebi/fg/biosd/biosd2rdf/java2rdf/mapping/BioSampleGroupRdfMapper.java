@@ -5,7 +5,7 @@ import static uk.ac.ebi.fg.java2rdf.utils.NamespaceUtils.ns;
 
 import java.util.Map;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import uk.ac.ebi.fg.biosd.model.expgraph.BioSample;
 import uk.ac.ebi.fg.biosd.model.organizational.BioSampleGroup;

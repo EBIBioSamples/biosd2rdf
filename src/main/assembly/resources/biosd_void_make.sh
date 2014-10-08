@@ -33,16 +33,16 @@ OPTS="$OPTS -Dfile.encoding=UTF-8"
 cd "$(dirname $0)"
 MYDIR="$(pwd)"
 
-CP="$MYDIR:$MYDIR/${project.artifactId}_deps.jar"
-if [ "$JDBCPATH" != "" ]; then
-  CP="$CP:$JDBCPATH"
-fi
+
+# Define your classpath, eg. with the JDBC driver, if you need to include stuff 
+export CLASSPATH="$CLASSPATH:$MYDIR:$MYDIR/lib/*"
+
+
 
 # See here for an explanation about ${1+"$@"} :
 # http://stackoverflow.com/questions/743454/space-in-java-command-line-arguments 
 
-java \
-  $OPTS -cp $CP uk.ac.ebi.fg.biosd.biosd2rdf.BiosdVoidCmd ${1+"$@"}
+java $OPTS uk.ac.ebi.fg.biosd.biosd2rdf.BiosdVoidCmd ${1+"$@"}
 
 EXCODE=$?
 

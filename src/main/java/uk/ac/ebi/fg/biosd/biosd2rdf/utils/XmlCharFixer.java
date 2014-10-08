@@ -1,8 +1,10 @@
 package uk.ac.ebi.fg.biosd.biosd2rdf.utils;
 
-import java.io.FilterOutputStream;
+import java.io.FilterWriter;
 import java.io.IOException;
-import java.io.OutputStream;
+import java.io.Writer;
+
+import org.apache.commons.lang3.StringEscapeUtils;
 
 /**
  * Fixes certain characters that are not liked by XML parsers and turns them into a more acceptable representation
@@ -14,20 +16,39 @@ import java.io.OutputStream;
  * @author Marco Brandizi
  *
  */
-public class XmlCharFixer extends FilterOutputStream
+public class XmlCharFixer extends FilterWriter
 {
-	public XmlCharFixer ( OutputStream out ) {
-		super ( out );
+	public XmlCharFixer ( Writer base ) {
+		super ( base );
 	}
 
-	/** Uses the approach described at http://tinyurl.com/oruw4ye */
+	
 	@Override
 	public void write ( int c ) throws IOException
 	{
-    if ( c == 0x9 || c == 0xA || c == 0xD || c >= 0x20 && c <= 0xD7FF || c >= 0xE000 && c <= 0xFFFD
-         || c >= 0x10000 && c <= 0x10FFFF )
-     super.write ( c );
-   else
-     this.write ( String.format ( "&#%d;", c & 0xFFFFFFFFL ).getBytes () );
+		this.write ( Character.toString ( (char) c ) );
 	}
+
+	@Override
+	public void write ( char[] cbuf, int off, int len ) throws IOException
+	{
+		int end = off + len;
+		for ( int i = off; i < end; i++ )
+		{
+			char c = cbuf [ i ];
+			
+	    if ( c >= '\u0000' && c <= '\u0008' || c == '\u000b' || c == '\u000c' || c >= '\u000e' && c <= '\u0019' 
+	    		 || c >= '\u001a' && c <= '\u001f' || c == '\ufffe' || c == '\uffff' )
+	    	cbuf [ i ] = '?';
+		}
+		super.write ( cbuf, off, len );
+	}
+
+	@Override
+	public void write ( String str, int off, int len ) throws IOException
+	{
+		char buf[] = new char [ len ];
+		str.getChars ( off, off + len, buf, 0 );
+		this.write ( buf, 0, len );
+	}	
 }
