@@ -31,10 +31,6 @@ OPTS="$OPTS -Dfile.encoding=UTF-8"
 #OPTS="$OPTS -Xdebug -Xnoagent"
 #OPTS="$OPTS -Djava.compiler=NONE -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=5005"
 
-# The Database driver. You need to set this to your driver, in case you don't use one of the provided ones
-# 
-#JDBCPATH=/path/to/jdbc_driver.jar
-
 # You shouldn't need to change the rest
 #
 ###

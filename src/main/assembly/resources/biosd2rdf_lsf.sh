@@ -3,8 +3,11 @@
 cd "$(dirname $0)"
 MYDIR="$(pwd)"
 
-# The output file
+# The output file (base name, suffixes+extension will be added when multiple files are generated, i.e., always)
 if [ "$BIOSD2RDF_OUTFILE" == '' ]; then BIOSD2RDF_OUTFILE='biosd'; fi
+
+# How many parallel LSF nodes?
+if [ "$BIOSD2RDF_LSF_NODES" == '' ]; then BIOSD2RDF_LSF_NODES=5; fi
 
 # Random sample?
 if [ "$BIOSD2RDF_SAMPLE_SIZE" == '' ]; then BIOSD2RDF_SAMPLE_SIZE=100; fi
@@ -14,21 +17,22 @@ if [ "$BIOSD2RDF_LSF_GROUP" == '' ]; then BIOSD2RDF_LSF_GROUP='biosd2rdf'; fi
 
 # If it doesn't already exist, create an LSF group to manage a limited running pool
 if [ "$(bjgroup -s /$BIOSD2RDF_LSF_GROUP 2>&1)" == 'No job group found' ]; then
-  bgadd -L 5 /$BIOSD2RDF_LSF_GROUP
+  bgadd -L $BIOSD2RDF_LSF_NODES /$BIOSD2RDF_LSF_GROUP
 else
-  bgmod -L 5 /$BIOSD2RDF_LSF_GROUP # Just to be sure
+  bgmod -L $BIOSD2RDF_LSF_NODES /$BIOSD2RDF_LSF_GROUP # Just to be sure
 fi
 
 # This is absolutely necessary when you run the exporter through the cluster, since every instance of it sucks up to 
 # 100 DB connections and parallel instances will soon overcome the server limit.
 #
-export OPTS="$OPTS -Duk.ac.ebi.fg.biosd.biosd2rdf.maxThreads=60" 
+nthreads=$(( 300 / $BIOSD2RDF_LSF_NODES ))
+export OPTS="$OPTS -Duk.ac.ebi.fg.biosd.biosd2rdf.maxThreads=$nthreads" 
 
 ct=0; chunk_size=5000; chunkct=0
 (for acc in $(./biosd2rdf.sh -l -z $BIOSD2RDF_SAMPLE_SIZE )
 do
 	if [ $ct == 0 ]; then 
-		echo -J biosd2rdf_$chunkct -g /$BIOSD2RDF_LSF_GROUP -oo "./biosd2rdf_$chunkct".out -M 38000 ./biosd2rdf.sh --output "'"$BIOSD2RDF_OUTFILE"_"$chunkct".ttl'"
+		echo -J biosd2rdf_$chunkct -g /$BIOSD2RDF_LSF_GROUP -oo "./logs/biosd2rdf_$chunkct".out -M 38000 ./biosd2rdf.sh --output "'"$BIOSD2RDF_OUTFILE"_"$chunkct".ttl'"
 		chunkct=$[ $chunkct + 1 ]
 	fi
 	echo $acc
