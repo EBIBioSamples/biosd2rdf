@@ -59,7 +59,15 @@ public class BioSdMappersTest
 		// Mus mus subspecies
 		mycv.addOntologyTerm ( new OntologyEntry ( "EFO_0003013", new ReferenceSource ( "EFO", null ) ) );
 		biosdModel.smp1.addPropertyValue ( mycv );
+
+		BioCharacteristicValue mycv1 = new BioCharacteristicValue ( "Liver", new BioCharacteristicType ( "Organ" ) );
+		// This should be taken as-is, cause it's a URI without source
+		mycv1.addOntologyTerm ( new OntologyEntry ( "http://sig.uw.edu/fma#Liver", null ) );
+		biosdModel.smp1.addPropertyValue ( mycv1 );
+
 		biosdModel.smp1.addPropertyValue ( new BioCharacteristicValue ( "Sample 1", new BioCharacteristicType ("name") ) );
+
+		
 		
 		Publication pub1 = new Publication ( "doi://123", "123" );
 		pub1.setTitle ( "A test publication 1" );
@@ -118,6 +126,10 @@ public class BioSdMappersTest
 		
 		// Zooma should solve this into EFO_0004950 and the value should be an xsd:dateTime
 		biosdModel.smp1.addPropertyValue ( new BioCharacteristicValue ( "31/12/2012", new BioCharacteristicType ( "Date of Birth" ) ) );
+		
+		
+		// We currently set this at submission level only
+		biosdModel.msi.setPublicFlag ( true );
 		
 		new BioSdRfMapperFactory ( onto ).map ( biosdModel.msi );
 		
@@ -194,6 +206,23 @@ public class BioSdMappersTest
 			+ "}\n"		
 		);
 
+		tester.testRDFOutput ( "Direct-URI ontology annotation not found!", 
+				"ASK {\n"
+				+ "  ?smp a biosd-terms:Sample;\n"
+				+ "  biosd-terms:has-bio-characteristic [ "
+				+ "    biosd-terms:has-bio-characteristic-type ?ptype, ?ptype1;\n"
+				+ "    rdfs:label 'Liver';\n"
+				+ "  ].\n"
+				+ "\n"
+				+ "  ?ptype a efo:EFO_0000001;\n"
+				+ "    dc-terms:title 'Organ'.\n"
+				+ "\n"
+				+ "  ?ptype1 a <http://sig.uw.edu/fma#Liver>"
+				+ "}\n"		
+			);
+
+		
+		
 		tester.testRDFOutput ( "ZOOMA-based annotation not found!", 
 				"ASK {\n"
 				+ "  ?smp a biosd-terms:Sample;\n"
@@ -209,7 +238,7 @@ public class BioSdMappersTest
 				+ "}\n"		
 			);
 		
-		tester.testRDFOutput ( "ZOOMA-based annotation not found!", 
+		tester.testRDFOutput ( "Publication statements not found!", 
 			"ASK { <http://rdf.ebi.ac.uk/resource/biosamples/publication/123> rdf:type obo:IAO_0000311;\n"+
 			" rdfs:label 'A test publication 1';\n"+
 			" fabio:hasPubMedId '123';\n"+
