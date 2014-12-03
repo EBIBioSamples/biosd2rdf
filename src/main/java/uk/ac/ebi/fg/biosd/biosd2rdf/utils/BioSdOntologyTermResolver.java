@@ -116,9 +116,18 @@ public class BioSdOntologyTermResolver
 		);
 		
 		ReferenceSource src = oe.getSource ();
-		if ( src == null ) return getFirstUriFromZoomaterms ( 
-			ontoTermDiscoverer.getOntologyTermUris ( null, oeLabel == null ? oeLabel : oe.getLabel () )
-		);
+		if ( src == null ) 
+		{ 
+			if ( oeAcc.startsWith ( "http://" ) )
+				// We trust that this is a term specified by giving the URI straight. 
+				// TODO: needs review, like the BioSD model to be changed to explicitly represent this case.
+				return oeAcc;
+			else
+				// Let's do a final attempt using the term label
+				return getFirstUriFromZoomaterms ( 
+					ontoTermDiscoverer.getOntologyTermUris ( null, oeLabel == null ? oeLabel : oe.getLabel () )
+				);
+		}
 		
 		String srcAcc = StringUtils.trimToNull ( src.getAcc () );
 		if ( srcAcc == null ) return getFirstUriFromZoomaterms ( 
