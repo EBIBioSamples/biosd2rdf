@@ -92,7 +92,10 @@ public class BioSdExportTask extends BatchServiceTask
 	{
 		try
 		{
-			rdfMapFactory.map ( msi );
+			if ( !this.msi.isPublic () )
+				log.trace ( "Skipping non-public submission '{}'", this.msi.getAcc () );
+			else
+				rdfMapFactory.map ( msi );
 			/* DEBUG log.info ( "Here I should export {}, having a nap instead", msi.getAcc () );
 			Thread.sleep ( RandomUtils.nextLong () % 10000 ); */
 		} 
