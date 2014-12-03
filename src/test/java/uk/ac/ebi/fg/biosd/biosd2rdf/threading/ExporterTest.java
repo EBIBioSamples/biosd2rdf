@@ -8,6 +8,8 @@ import org.slf4j.LoggerFactory;
 import uk.ac.ebi.fg.biosd.biosd2rdf.Biosd2RdfCmd;
 import uk.ac.ebi.fg.biosd.model.utils.test.TestModel;
 import uk.ac.ebi.fg.biosd.sampletab.persistence.Persister;
+import uk.ac.ebi.fg.core_model.terms.OntologyEntry;
+import uk.ac.ebi.fg.core_model.xref.ReferenceSource;
 
 /**
  * Basic tests of the BioSD exporter.
@@ -31,6 +33,10 @@ public class ExporterTest
 		for ( long id = 1; id <= 50; id++ )
 		{
 			TestModel tm = new TestModel ( "test." + id + "." );
+
+			// We currently set this at submission level only
+			tm.msi.setPublicFlag ( true );
+			
 			persister.persist ( tm.msi );
 			log.info ( "{} persisted", tm.msi.getAcc () );
 		}
@@ -50,6 +56,12 @@ public class ExporterTest
 		for ( long id = 1; id <= 50; id++ )
 		{
 			TestModel tm = new TestModel ( "test." + id + "." );
+
+			// We currently set this at submission level only
+			tm.msi.setPublicFlag ( true );
+
+			
+			tm.cv3.addOntologyTerm ( new OntologyEntry ( "FOO ACC", new ReferenceSource ( "FOO ONTO", null ) ) );
 			log.debug ( "Exporting {}", tm.msi.getAcc () );
 			xservice.submit ( tm.msi );
 		}
@@ -65,7 +77,7 @@ public class ExporterTest
 	public void testExporterFromExistingDb ()
 	{
 		System.setProperty ( "biosd.test_mode", "true" );
-		Biosd2RdfCmd.main ( "-o", "target/biosd_test.ttl" );
+		Biosd2RdfCmd.main ( "-o", "target/biosd_realdb_test.ttl" );
 	}
 
 }
