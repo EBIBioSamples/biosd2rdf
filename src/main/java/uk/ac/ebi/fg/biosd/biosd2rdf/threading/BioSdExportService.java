@@ -8,7 +8,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.io.OutputStreamWriter;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map.Entry;
@@ -18,7 +17,6 @@ import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
 import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.io.output.WriterOutputStream;
 import org.coode.owlapi.turtle.TurtleOntologyFormat;
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.IRI;
@@ -29,7 +27,6 @@ import org.semanticweb.owlapi.model.OWLOntologyStorageException;
 import org.semanticweb.owlapi.vocab.PrefixOWLOntologyFormat;
 
 import uk.ac.ebi.fg.biosd.biosd2rdf.java2rdf.mapping.BioSdRfMapperFactory;
-import uk.ac.ebi.fg.biosd.biosd2rdf.utils.XmlCharFixer;
 import uk.ac.ebi.fg.biosd.model.organizational.MSI;
 import uk.ac.ebi.fg.core_model.resources.Resources;
 import uk.ac.ebi.utils.memory.MemoryUtils;
@@ -134,7 +131,7 @@ public class BioSdExportService extends BatchService<BioSdExportTask>
 	public void submit ( BioSdExportTask batchServiceTask )
 	{
 		// This will flush the triples to the disk when the memory is too full and will also invoke the GC
-		MemoryUtils.checkMemory ( this.memFlushAction, 25d / 100d );
+		MemoryUtils.checkMemory ( this.memFlushAction, 0.25 );
 		// DEBUG if ( completedTasks > 0 && completedTasks % 20 == 0 ) flushKnowledgeBase ();
 
 		super.submit ( batchServiceTask );
