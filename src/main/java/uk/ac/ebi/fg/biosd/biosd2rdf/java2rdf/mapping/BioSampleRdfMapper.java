@@ -3,11 +3,14 @@ package uk.ac.ebi.fg.biosd.biosd2rdf.java2rdf.mapping;
 import static uk.ac.ebi.fg.java2rdf.utils.Java2RdfUtils.urlEncode;
 import static uk.ac.ebi.fg.java2rdf.utils.NamespaceUtils.ns;
 
+import java.util.Date;
 import java.util.Map;
+import java.util.Objects;
 
 import org.apache.commons.lang3.StringUtils;
 
 import uk.ac.ebi.fg.biosd.model.expgraph.BioSample;
+import uk.ac.ebi.fg.biosd.model.organizational.MSI;
 import uk.ac.ebi.fg.biosd.model.xref.DatabaseRecordRef;
 import uk.ac.ebi.fg.core_model.expgraph.properties.BioCharacteristicType;
 import uk.ac.ebi.fg.core_model.expgraph.properties.BioCharacteristicValue;
@@ -61,6 +64,23 @@ public class BioSampleRdfMapper extends BeanRdfMapper<BioSample>
 	public boolean map ( BioSample smp, Map<String, Object> params )
 	{
 		if ( smp == null ) return false;
+		
+		// public/privacy status is only set for submissions, so, in order to be extra-sure it can be published, we
+		// check all attached submissions. We also check at the sample level, just in case
+		//
+		Date releaseDate = smp.getReleaseDate ();
+		if ( !Objects.equals ( false, smp.isPublic () ) || releaseDate != null && releaseDate.after ( new Date () ) )
+		{
+			log.trace ( "Skipping non-public sample '{}'", smp.getAcc () );
+			return false;
+		}
+		for ( MSI msi: smp.getMSIs () )
+			if ( !msi.isPublic () )
+			{
+				log.trace ( "Skipping non-public sample '{}'", smp.getAcc () );
+				return false;
+		}
+
 		
 		// Quite obviously, BioSD has no representation of a web page record, but we'd better add this, just in case
 		// we want to show the external non-RDF records and provide with the corresponding links. 
