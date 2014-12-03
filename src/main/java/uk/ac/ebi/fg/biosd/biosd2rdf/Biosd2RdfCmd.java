@@ -168,6 +168,7 @@ public class Biosd2RdfCmd
 		);
 
 		opts.addOption ( OptionBuilder
+			.withLongOpt ( "list-submission" )
 			.withDescription ( "Doesn't export anything, gives a list of BioSD submission accessions, used by biosd2rdf_lsf.sh command. Understands -z" )
 			.create ( 'l' )
 		);
