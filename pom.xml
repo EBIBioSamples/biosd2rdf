@@ -12,7 +12,7 @@
   <parent>
 	  <groupId>uk.ac.ebi.fg.biosd</groupId>
 	  <artifactId>biosd_common</artifactId>
-	  <version>1.2</version>
+	  <version>1.2.1-SNAPSHOT</version>
 	</parent> 
 
 
@@ -55,6 +55,19 @@
 			<groupId>uk.ac.ebi.fg</groupId>
 			<artifactId>biosd_model</artifactId>
 			<version>2.2</version>
+			<exclusions>
+					<exclusion>
+							<!-- Conflicts with different versions, imports a more recent version below -->
+							<artifactId>xml-apis</artifactId>
+							<groupId>xml-apis</groupId>
+					</exclusion>
+			</exclusions>
+		</dependency>
+		
+		<dependency>
+			<artifactId>xml-apis</artifactId>
+			<groupId>xml-apis</groupId>
+			<version>1.4.01</version>
 		</dependency>
 		
 		<dependency>
@@ -90,20 +103,34 @@
 			<artifactId>commons-io</artifactId>
 		</dependency>
 
+		<!-- Currently used to convert some primitive data types into XML/XSD representations (eg, dates) -->
 		<dependency>
 			<groupId>org.apache.cxf.xjc-utils</groupId>
 			<artifactId>cxf-xjc-runtime</artifactId>
 			<version>2.6.2</version>
 		</dependency>
 
+		<!-- To fetch BioSD crossrefs -->
+		<dependency>
+			<groupId>uk.ac.ebi.fg</groupId>
+			<artifactId>myequivalents-db</artifactId>
+			<version>0.3.2</version>		
+		</dependency>  
+
+		<dependency>
+			<groupId>net.sf.opencsv</groupId>
+			<artifactId>opencsv</artifactId>
+			<version>2.3</version>
+		</dependency>
 		  
+
+		<!-- TEST -->
+
 	  <dependency>
 	    <groupId>junit</groupId>
 	    <artifactId>junit</artifactId>
 	  </dependency>
 
-
-		<!-- TEST -->
 
 		<dependency>
 			<groupId>uk.ac.ebi.fg</groupId>
@@ -124,9 +151,18 @@
 					<groupId>org.slf4j</groupId>
 					<artifactId>slf4j-log4j12</artifactId>
 	    	</exclusion>
+	    	<exclusion>
+	    			<artifactId>xml-apis</artifactId>
+	    			<groupId>xml-apis</groupId>
+	    	</exclusion>
 	    </exclusions>
 		</dependency>
 		
+		<dependency>
+			<groupId>org.apache.lucene</groupId>
+			<artifactId>lucene-queryparser</artifactId>
+			<version>4.10.2</version>
+		</dependency>		
 
   </dependencies>
 
@@ -211,5 +247,55 @@
 
 				  	
   </repositories>
+
+
+	<profiles>
+	
+		<!-- 
+			The test instance of myEquivalents X-references for BioSD. 
+			This usually points at an empty database, so actually disable myEq 
+		-->
+  	<profile>
+  		<id>myeq.test.h2</id>
+  		<activation><activeByDefault>true</activeByDefault></activation>
+  		<properties>
+				<myeq.test.jdbc.username>sa</myeq.test.jdbc.username>
+				<myeq.test.jdbc.password />
+				<myeq.test.jdbc.url>jdbc:h2:mem:testdb;DB_CLOSE_ON_EXIT=FALSE</myeq.test.jdbc.url>
+				<myeq.test.jdbc.driverClassName>org.h2.Driver</myeq.test.jdbc.driverClassName>
+				<myeq.test.hibernate.dialect>org.hibernate.dialect.H2Dialect</myeq.test.hibernate.dialect>
+				<myeq.test.hibernate.hbm2ddl.auto>update</myeq.test.hibernate.hbm2ddl.auto> 
+  		</properties>
+  		<dependencies>
+				<dependency>
+					<groupId>com.h2database</groupId>
+					<artifactId>h2</artifactId>
+					<version>${h2.version}</version>
+				</dependency>
+  		</dependencies>
+  	</profile>
+  	
+		<!-- The Production instance of myEquivalents X-references for BioSD -->
+  	<profile>
+  		<id>myeq.prod</id>
+  		<activation><activeByDefault>false</activeByDefault></activation>
+  		<properties>
+				<myeq.jdbc.username>myeq</myeq.jdbc.username>
+				<myeq.jdbc.password>my3qp4o</myeq.jdbc.password>
+				<myeq.jdbc.url>jdbc:oracle:thin:@ora-vm-023.ebi.ac.uk:1531:biosdpro</myeq.jdbc.url>
+				<myeq.jdbc.driverClassName>${oracle.jdbc.driverClassName}</myeq.jdbc.driverClassName>
+				<myeq.hibernate.dialect>${oracle.hibernate.dialect}</myeq.hibernate.dialect>
+				<myeq.hibernate.hbm2ddl.auto /> 
+  		</properties>
+  		<dependencies>
+				<dependency>
+					<groupId>${oracle.groupId}</groupId>
+					<artifactId>${oracle.artifactId}</artifactId>
+					<version>${oracle.version}</version>
+				</dependency>
+  		</dependencies>
+  	</profile>   	
+  		
+	</profiles>
 
 </project>

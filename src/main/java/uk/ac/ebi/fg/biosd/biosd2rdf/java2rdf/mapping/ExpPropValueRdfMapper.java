@@ -10,6 +10,7 @@ import static uk.ac.ebi.fg.java2rdf.utils.OwlApiUtils.assertLink;
 
 import java.text.ParseException;
 import java.util.Date;
+import java.util.Locale;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
@@ -50,7 +51,7 @@ public class ExpPropValueRdfMapper<T extends Accessible> extends PropertyRdfMapp
 	private class PropValueComponents
 	{
 		public Double value = null, lo = null, hi = null;
-		public Date date = null;
+		public Date date = null, dateTime = null;
 		public String valueLabel = null;
 		public String unitLabel = null;
 		public String unitClassUri = null;
@@ -117,15 +118,23 @@ public class ExpPropValueRdfMapper<T extends Accessible> extends PropertyRdfMapp
 			// Or maybe a single date?
 			// TODO: factorise these constants
 			try {
-				this.date = DateUtils.parseDate ( pvalStr, 
-					"dd'/'MM'/'yyyy", "dd'/'MM'/'yyyy HH:mm:ss", "dd'/'MM'/'yyyy HH:mm", 
-					"dd'-'MM'-'yyyy", "dd'-'MM'-'yyyy HH:mm:ss", "dd'-'MM'-'yyyy HH:mm",
-					"yyyyMMdd", "yyyyMMdd'-'HHmmss", "yyyyMMdd'-'HHmm"  
-				);
+				this.date = DateUtils.parseDate ( pvalStr, "dd'/'MM'/'yyyy", "dd'-'MM'-'yyyy", "yyyyMMdd" );
 			}
 			catch ( ParseException dex ) {
 				// Just ignore all in case of problems
 				this.date = null;
+			}
+			// Or even date+time?
+			try {
+				this.dateTime = DateUtils.parseDate ( pvalStr, 
+					"dd'/'MM'/'yyyy HH:mm:ss", "dd'/'MM'/'yyyy HH:mm", 
+					"dd'-'MM'-'yyyy HH:mm:ss", "dd'-'MM'-'yyyy HH:mm",
+					"yyyyMMdd'-'HHmmss", "yyyyMMdd'-'HHmm"  
+				);
+			}
+			catch ( ParseException dex ) {
+				// Just ignore all in case of problems
+				this.dateTime = null;
 			}
 		}
 		
@@ -172,6 +181,13 @@ public class ExpPropValueRdfMapper<T extends Accessible> extends PropertyRdfMapp
 			// 
 			if ( this.date != null ) {
 				// has value
+				assertData ( onto, pvalUri, ns ( "sio", "SIO_000300") , DataTypeAdapter.printDate ( this.date ), XSDVocabulary.DATE.toString () );
+				return;
+			}
+			
+			// Or date+time?
+			if ( this.dateTime != null ) {
+				// has value
 				assertData ( onto, pvalUri, ns ( "sio", "SIO_000300") , DataTypeAdapter.printDateTime ( this.date ), XSDVocabulary.DATE_TIME.toString () );
 				return;
 			}
@@ -194,7 +210,8 @@ public class ExpPropValueRdfMapper<T extends Accessible> extends PropertyRdfMapp
 		public boolean isNumberOrDate ()
 		{
 			return 
-				this.unitLabel != null || this.value != null || ( this.lo != null && this.hi != null ) || this.date != null; 
+				this.unitLabel != null || this.value != null || ( this.lo != null && this.hi != null ) 
+				|| this.date != null || this.dateTime != null; 
 		}
 	}
 	
@@ -297,7 +314,7 @@ public class ExpPropValueRdfMapper<T extends Accessible> extends PropertyRdfMapp
 			// it makes sense to take the first ones top-ranked by Zooma. 
 			if( discoveredTypeUri != null )
 			{
-				String typeUri1 = typeUri + ":1";
+				String typeUri1 = ns ( "biosd", "exp-prop-type/ONTO_CONCEPT#" + hashUriSignature ( discoveredTypeUri ) );
 				assertLink ( onto, valUri, ns ( "biosd-terms", "has-bio-characteristic-type" ), typeUri1 );
 				assertIndividual ( onto, typeUri1, discoveredTypeUri );
 			}

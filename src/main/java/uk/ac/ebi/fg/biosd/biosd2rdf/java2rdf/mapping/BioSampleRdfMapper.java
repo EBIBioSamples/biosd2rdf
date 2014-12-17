@@ -90,8 +90,10 @@ public class BioSampleRdfMapper extends BeanRdfMapper<BioSample>
 		
 		smp.addDatabaseRecordRef ( biosdRef );
 
-		// Map this manually, we noticed it doesn't work if we just add it to the sample.
-		// TODO: remove dbRefMapper.map ( smp,  biosdRef );
+		// Add links coming from myEquivalents
+		for ( DatabaseRecordRef dbxref: DbRecRefRdfMapper.getMyEquivalentsLinks ( "ebi.biosamples.samples", smp.getAcc () ) )
+			smp.addDatabaseRecordRef ( dbxref );
+		
 		
 		// Do you have a name? (names will be used for dcterms:title and rdfs:label
 		// 

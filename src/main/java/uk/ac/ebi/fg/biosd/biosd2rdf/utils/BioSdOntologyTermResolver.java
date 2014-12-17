@@ -18,7 +18,7 @@ import uk.ac.ebi.fg.core_model.expgraph.properties.ExperimentalPropertyType;
 import uk.ac.ebi.fg.core_model.expgraph.properties.ExperimentalPropertyValue;
 import uk.ac.ebi.fg.core_model.terms.OntologyEntry;
 import uk.ac.ebi.fg.core_model.xref.ReferenceSource;
-import uk.ac.ebi.fgpt.zooma.search.ontodiscover.CachedOntoTermDiscoverer;
+import uk.ac.ebi.fgpt.zooma.search.StatsZOOMASearchClient;
 import uk.ac.ebi.fgpt.zooma.search.ontodiscover.OntologyTermDiscoverer;
 import uk.ac.ebi.fgpt.zooma.search.ontodiscover.OntologyTermDiscoverer.DiscoveredTerm;
 import uk.ac.ebi.fgpt.zooma.search.ontodiscover.ZoomaOntoTermDiscoverer;
@@ -39,7 +39,8 @@ import uk.ac.ebi.utils.regex.RegEx;
  */
 public class BioSdOntologyTermResolver
 {
-	private OntologyTermDiscoverer ontoTermDiscoverer = new CachedOntoTermDiscoverer ( new ZoomaOntoTermDiscoverer () ); 
+	private OntologyTermDiscoverer ontoTermDiscoverer; 
+	
 	private BioportalClient ontologyService = new BioportalClient ( "07732278-7854-4c4f-8af1-7a80a1ffc1bb" );
 	
 	private final SimpleCache<String, String> ontoCache = new SimpleCache<> ( (int) 500E3 );
@@ -47,6 +48,13 @@ public class BioSdOntologyTermResolver
 
 	private final static RegEx COMMENT_RE = new RegEx ( "(Comment|Characteristic)\\s*\\[\\s*(.+)\\s*\\]", Pattern.CASE_INSENSITIVE );
 	private final Logger log = LoggerFactory.getLogger ( this.getClass () );
+	
+	{
+		StatsZOOMASearchClient zoomaClient = new StatsZOOMASearchClient ();
+		((StatsZOOMASearchClient) zoomaClient).setSamplingTimeMs ( 1000 * 60 * 10 );
+		this.ontoTermDiscoverer = new BioSDCachedDiscoverer (	new ZoomaOntoTermDiscoverer ( zoomaClient ) );
+	}
+	
 	
 	/**
 	 * Tries to get the URI of an OWL class that the {@link ExperimentalPropertyValue} appears to be instance of. 
@@ -89,11 +97,12 @@ public class BioSdOntologyTermResolver
 		// ZOOMA)
 
 		// First use both value and type labels
-		uri = getFirstUriFromZoomaterms ( ontoTermDiscoverer.getOntologyTermUris ( pvalLabel, pvalTypeLabel ) );
+		uri = getFirstUriFromZoomaterms ( ontoTermDiscoverer.getOntologyTermUris ( pvalLabel, pvalTypeLabel )	);
 		if ( uri != null ) return uri;
 		
 		// If failed, try type-only as well, this should allow to catch stuff like 'del(7herc2-mkrn3)13frdni', 'gene symbol'
-		return getFirstUriFromZoomaterms ( ontoTermDiscoverer.getOntologyTermUris ( null, pvalTypeLabel ) );
+		// Note that the ZOOMA client don't understand val = null, type = x, but it gets the reverse
+		return getFirstUriFromZoomaterms ( ontoTermDiscoverer.getOntologyTermUris ( pvalTypeLabel, null ) );
 	}
 	
 	

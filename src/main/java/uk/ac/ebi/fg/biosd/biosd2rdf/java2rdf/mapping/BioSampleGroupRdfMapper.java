@@ -89,11 +89,11 @@ public class BioSampleGroupRdfMapper extends BeanRdfMapper<BioSampleGroup>
 		// The quickest way to achieve that is to send this Java object to its RDF mapper.
 		DatabaseRecordRef biosdRef = new DatabaseRecordRef ( "EBI Biosamples Database", sg.getAcc (), null );
 		biosdRef.setUrl ( "http://www.ebi.ac.uk/biosamples/group/" + sg.getAcc () );
-
 		sg.addDatabaseRecordRef ( biosdRef );
 		
-		// Map this manually, we noticed it doesn't work if we just add it to the sample.
-		// TODO REMOVE dbRefMapper.map ( sg, Collections.singleton ( biosdRef ) );
+		// Add links coming from myEquivalents
+		for ( DatabaseRecordRef dbxref: DbRecRefRdfMapper.getMyEquivalentsLinks ( "ebi.biosamples.groups", sg.getAcc () ) )
+			sg.addDatabaseRecordRef ( dbxref );
 		
 		// Do you have a name? (names will be used for dcterms:title and rdfs:label
 		// 
@@ -115,6 +115,6 @@ public class BioSampleGroupRdfMapper extends BeanRdfMapper<BioSampleGroup>
 		
 		return super.map ( sg, params ) | true;
 	}
-	
+
 }
 

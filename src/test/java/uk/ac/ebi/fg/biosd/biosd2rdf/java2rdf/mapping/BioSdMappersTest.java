@@ -297,8 +297,10 @@ public class BioSdMappersTest
 			+ "  ?smp a biosd-terms:Sample;\n"
 			+ "  biosd-terms:has-bio-characteristic [ "
 			+ "    dc-terms:title '31/12/2012';\n"
-			+ "    sio:SIO_000300 '2012-12-31T00:00:00Z'^^xsd:dateTime\n"
+			+ "    sio:SIO_000300 ?date\n"
 			+ "  ].\n"
+			+ "  FILTER ( datatype( ?date ) = xsd:date )."
+			+ "  FILTER ( REGEX ( STR ( ?date ), '2012-12-31' ) )." // Cannot test this directly, cause it's time zone-dependent
 			+ "}\n"		
 		);		
 		

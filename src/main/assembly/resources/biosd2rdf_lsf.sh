@@ -7,7 +7,7 @@ MYDIR="$(pwd)"
 if [ "$BIOSD2RDF_OUTFILE" == '' ]; then BIOSD2RDF_OUTFILE='biosd'; fi
 
 # How many parallel LSF nodes?
-if [ "$BIOSD2RDF_LSF_NODES" == '' ]; then BIOSD2RDF_LSF_NODES=5; fi
+if [ "$BIOSD2RDF_LSF_NODES" == '' ]; then BIOSD2RDF_LSF_NODES=3; fi
 
 # Random sample?
 if [ "$BIOSD2RDF_SAMPLE_SIZE" == '' ]; then BIOSD2RDF_SAMPLE_SIZE=100; fi
@@ -24,8 +24,9 @@ fi
 
 # This is absolutely necessary when you run the exporter through the cluster, since every instance of it sucks up to 
 # 100 DB connections and parallel instances will soon overcome the server limit.
+# ZOOMA doesn't seem to cope with more than 100 parallel requests, which have to be spread over the jobs.
 #
-nthreads=$(( 300 / $BIOSD2RDF_LSF_NODES ))
+nthreads=$(( 105 / $BIOSD2RDF_LSF_NODES ))
 export OPTS="$OPTS -Duk.ac.ebi.fg.biosd.biosd2rdf.maxThreads=$nthreads" 
 
 ct=0; chunk_size=5000; chunkct=0

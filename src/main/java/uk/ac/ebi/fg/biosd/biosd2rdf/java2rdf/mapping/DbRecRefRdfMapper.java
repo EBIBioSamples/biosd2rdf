@@ -4,10 +4,14 @@ import static uk.ac.ebi.fg.java2rdf.utils.NamespaceUtils.ns;
 import static uk.ac.ebi.fg.java2rdf.utils.OwlApiUtils.assertData;
 import static uk.ac.ebi.fg.java2rdf.utils.OwlApiUtils.assertLink;
 
+import java.util.Collection;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 import org.semanticweb.owlapi.model.OWLOntology;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import uk.ac.ebi.fg.biosd.model.xref.DatabaseRecordRef;
 import uk.ac.ebi.fg.java2rdf.mapping.BeanRdfMapper;
@@ -17,6 +21,11 @@ import uk.ac.ebi.fg.java2rdf.mapping.properties.OwlDatatypePropRdfMapper;
 import uk.ac.ebi.fg.java2rdf.mapping.properties.UriStringPropRdfMapper;
 import uk.ac.ebi.fg.java2rdf.mapping.urigen.RdfUriGenerator;
 import uk.ac.ebi.fg.java2rdf.utils.Java2RdfUtils;
+import uk.ac.ebi.fg.myequivalents.managers.interfaces.EntityMappingManager;
+import uk.ac.ebi.fg.myequivalents.managers.interfaces.EntityMappingSearchResult;
+import uk.ac.ebi.fg.myequivalents.managers.interfaces.ManagerFactory;
+import uk.ac.ebi.fg.myequivalents.model.Entity;
+import uk.ac.ebi.fg.myequivalents.resources.Resources;
 
 /**
  * TODO: Comment me!
@@ -27,6 +36,8 @@ import uk.ac.ebi.fg.java2rdf.utils.Java2RdfUtils;
  */
 public class DbRecRefRdfMapper extends BeanRdfMapper<DatabaseRecordRef>
 {
+	private static Logger log = LoggerFactory.getLogger ( DbRecRefRdfMapper.class );
+	
 	public DbRecRefRdfMapper ()
 	{
 		super ( 
@@ -88,5 +99,60 @@ public class DbRecRefRdfMapper extends BeanRdfMapper<DatabaseRecordRef>
 
 		return true;
 	}
+	
+	/**
+	 * TODO: comment me!
+	 */
+	public static DatabaseRecordRef[] getMyEquivalentsLinks ( String serviceName, String acc )
+	{
+		EntityMappingManager myeqMapMgr = null;
+		
+		try
+		{
+			ManagerFactory myeqMgrFact = Resources.getInstance ().getMyEqManagerFactory ();
+			myeqMapMgr = myeqMgrFact.newEntityMappingManager ();
+			
+			Collection<EntityMappingSearchResult.Bundle> bundles = myeqMapMgr.getMappings ( false, serviceName + ":" + acc ).getBundles ();
+			if ( bundles.isEmpty () ) return new DatabaseRecordRef [ 0 ];
+
+			EntityMappingSearchResult.Bundle bundle = bundles.iterator ().next ();
+			Set<Entity> entities = bundle.getEntities ();
+			DatabaseRecordRef result[] = new DatabaseRecordRef [ bundle.getEntities ().size () - 1 ];
+			int iresult = 0;
+			
+			for ( Entity entity: entities )
+			{
+				String eServiceName = entity.getServiceName (), eAcc = entity.getAccession ();
+				if ( serviceName.equals ( eServiceName ) && acc.equals ( eAcc ) ) continue;
+				
+				String eServiceNameCleaned = eServiceName;
+				if ( eServiceName.endsWith ( ".samples" ) )
+					eServiceNameCleaned = StringUtils.substring ( eServiceName, 0, - ".samples".length () );
+				else if ( eServiceName.endsWith ( ".groups" ) )
+					eServiceNameCleaned = StringUtils.substring ( eServiceName, 0, - ".groups".length () );
+				
+				DatabaseRecordRef dbxref = new DatabaseRecordRef ( 
+					eServiceNameCleaned, eAcc, null, entity.getURI (), entity.getService ().getTitle () 
+				);
+				
+				result [ iresult++ ] = dbxref;
+				
+			}
+			
+			return result;
+		}
+		catch ( RuntimeException ex )
+		{
+			log.error ( String.format ( 
+				"Error while contacting myEquivalents for '%s:%s': %s, returning null", serviceName, acc, ex.getMessage () ), 
+				ex	
+			);
+			return new DatabaseRecordRef [ 0 ];
+		}
+		finally {
+			if ( myeqMapMgr != null ) myeqMapMgr.close ();
+		}
+	}
+
 	
 }
