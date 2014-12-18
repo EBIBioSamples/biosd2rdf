@@ -253,7 +253,7 @@ public class ExpPropValueRdfMapper<T extends Accessible> extends PropertyRdfMapp
 			String typeLabelLC = typeLabel.toLowerCase ();
 			
 			// name -> dc:title and similar
-			if ( typeLabel != null && typeLabelLC.matches ( "(sample |group |sample group |)?name" ) )
+			if ( typeLabelLC.matches ( "(sample |group |sample group |)?name" ) )
 			{
 				assertData ( onto, mapFact.getUri ( sample, params ), ns ( "dc-terms", "title" ), vcomp.valueLabel );
 				assertData ( onto, mapFact.getUri ( sample, params ), ns ( "rdfs", "label" ), vcomp.valueLabel );

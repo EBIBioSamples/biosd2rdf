@@ -109,7 +109,7 @@ public class BioSdOntologyTermResolver
 	
 	/**
 	 * If oes has only one element and this contains a proper source identifier and accession, fetches the term URI via
-	 * {@link #getOntologService() OntoCAT}. The result is cached.
+	 * Bioportal. The result is cached.
 	 *  
 	 */
 	public String getOntologyTermURI ( Collection<OntologyEntry> oes, String oeLabel )
@@ -122,7 +122,7 @@ public class BioSdOntologyTermResolver
 		OntologyEntry oe = oes.iterator ().next ();
 		String oeAcc = StringUtils.trimToNull ( oe.getAcc () );
 		if ( oeAcc == null ) return getFirstUriFromZoomaterms ( 
-			ontoTermDiscoverer.getOntologyTermUris ( null, oeLabel == null ? oeLabel : oe.getLabel () )
+			ontoTermDiscoverer.getOntologyTermUris ( null, oeLabel != null ? oeLabel : oe.getLabel () )
 		);
 		
 		ReferenceSource src = oe.getSource ();

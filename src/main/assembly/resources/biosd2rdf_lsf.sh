@@ -29,21 +29,23 @@ fi
 nthreads=$(( 105 / $BIOSD2RDF_LSF_NODES ))
 export OPTS="$OPTS -Duk.ac.ebi.fg.biosd.biosd2rdf.maxThreads=$nthreads" 
 
-ct=0; chunk_size=5000; chunkct=0
+# Create bsub invocations for every data chunk
+# I know, there is xargs for this, but it turns out that it sucks and I cannot find a way to tell it to split arguments when I want.
+# 
+ct=0; chunk_size=10000; chunkct=0
 (for acc in $(./biosd2rdf.sh -l -z $BIOSD2RDF_SAMPLE_SIZE )
 do
 	if [ $ct == 0 ]; then 
-		echo -J biosd2rdf_$chunkct -g /$BIOSD2RDF_LSF_GROUP -oo "./logs/biosd2rdf_$chunkct".out -M 38000 ./biosd2rdf.sh --output "'"$BIOSD2RDF_OUTFILE"_"$chunkct".ttl'"
-		chunkct=$[ $chunkct + 1 ]
+	  printf "\n"
+		printf "bsub -J biosd2rdf_$chunkct -g /$BIOSD2RDF_LSF_GROUP -oo ./logs/biosd2rdf_$chunkct.out -M 38000 ./biosd2rdf.sh --output \'${BIOSD2RDF_OUTFILE}_$chunkct.ttl\' "
+		((chunkct++))
 	fi
-	echo $acc
+	printf "$acc "
 	ct=$[ ( $ct + 1 ) % $chunk_size ]
-done) | 
-	xargs -d '\n' -n $[ $chunk_size + 1] echo bsub >bsub_$$.sh
+done) >bsub_$$.sh
 
-# For some damn reason, if we invoke the command above straight, bsub thinks './biosd2rdf.sh --output ...' is still an option and tries to invoke the
-# first accession. I hate this job when it gets like this sh**t...
-#
+# And then invoke
+# 
 sh ./bsub_$$.sh
 rm ./bsub_$$.sh
 
