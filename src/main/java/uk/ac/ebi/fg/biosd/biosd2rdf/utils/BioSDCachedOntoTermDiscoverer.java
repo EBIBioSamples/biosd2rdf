@@ -19,7 +19,7 @@ import au.com.bytecode.opencsv.CSVReader;
  * @author brandizi
  *
  */
-public class BioSDCachedDiscoverer extends CachedOntoTermDiscoverer
+public class BioSDCachedOntoTermDiscoverer extends CachedOntoTermDiscoverer
 {
 	/**
 	 * This is loaded from a file, containing a list of property type labels, which of values are known to not being associated to ontology
@@ -30,7 +30,7 @@ public class BioSDCachedDiscoverer extends CachedOntoTermDiscoverer
 	
 	// Initialise nonOntologyTypes from non_ontology_property_types.csv
 	{
-		synchronized ( BioSDCachedDiscoverer.class )
+		synchronized ( BioSDCachedOntoTermDiscoverer.class )
 		{
 			try
 			{
@@ -58,14 +58,14 @@ public class BioSDCachedDiscoverer extends CachedOntoTermDiscoverer
 		}
 	}
 
-	public BioSDCachedDiscoverer ( OntologyTermDiscoverer base, OntoTermDiscoveryCache cache )
+	public BioSDCachedOntoTermDiscoverer ( OntologyTermDiscoverer base, OntoTermDiscoveryCache cache )
 		throws IllegalArgumentException
 	{
 		super ( base, cache );
 	}
 
 
-	public BioSDCachedDiscoverer ( OntologyTermDiscoverer base )
+	public BioSDCachedOntoTermDiscoverer ( OntologyTermDiscoverer base )
 	{
 		super ( base );
 	}

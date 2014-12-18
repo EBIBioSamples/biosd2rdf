@@ -13,7 +13,7 @@ import uk.ac.ebi.fgpt.zooma.search.ontodiscover.ZoomaOntoTermDiscoverer;
 
 /**
  * 
- * Tests for {@link BioSDCachedDiscoverer}, our special cache handler for ontology term discovery.
+ * Tests for {@link BioSDCachedOntoTermDiscoverer}, our special cache handler for ontology term discovery.
  *
  * @author brandizi
  * <dl><dt>Date:</dt><dd>15 Dec 2014</dd>
@@ -45,7 +45,7 @@ public class BioSDCachedDiscovererTest
 	public void testNonOntologyTypes ()
 	{
 		// Assertion inside MyZOOMASearchClient
-		BioSDCachedDiscoverer discoverer = new BioSDCachedDiscoverer (	new ZoomaOntoTermDiscoverer ( new MyZOOMASearchClient () ) );
+		BioSDCachedOntoTermDiscoverer discoverer = new BioSDCachedOntoTermDiscoverer (	new ZoomaOntoTermDiscoverer ( new MyZOOMASearchClient () ) );
 		discoverer.getOntologyTermUris ( "123", "sample_title" );
 	}
 }

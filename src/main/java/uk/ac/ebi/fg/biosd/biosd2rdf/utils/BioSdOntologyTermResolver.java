@@ -18,7 +18,8 @@ import uk.ac.ebi.fg.core_model.expgraph.properties.ExperimentalPropertyType;
 import uk.ac.ebi.fg.core_model.expgraph.properties.ExperimentalPropertyValue;
 import uk.ac.ebi.fg.core_model.terms.OntologyEntry;
 import uk.ac.ebi.fg.core_model.xref.ReferenceSource;
-import uk.ac.ebi.fgpt.zooma.search.StatsZOOMASearchClient;
+import uk.ac.ebi.fgpt.zooma.search.StatsZOOMASearchFilter;
+import uk.ac.ebi.fgpt.zooma.search.ZOOMASearchClient;
 import uk.ac.ebi.fgpt.zooma.search.ontodiscover.OntologyTermDiscoverer;
 import uk.ac.ebi.fgpt.zooma.search.ontodiscover.OntologyTermDiscoverer.DiscoveredTerm;
 import uk.ac.ebi.fgpt.zooma.search.ontodiscover.ZoomaOntoTermDiscoverer;
@@ -50,9 +51,9 @@ public class BioSdOntologyTermResolver
 	private final Logger log = LoggerFactory.getLogger ( this.getClass () );
 	
 	{
-		StatsZOOMASearchClient zoomaClient = new StatsZOOMASearchClient ();
-		((StatsZOOMASearchClient) zoomaClient).setSamplingTimeMs ( 1000 * 60 * 10 );
-		this.ontoTermDiscoverer = new BioSDCachedDiscoverer (	new ZoomaOntoTermDiscoverer ( zoomaClient ) );
+		StatsZOOMASearchFilter zoomaSearcher = new StatsZOOMASearchFilter ( new ZOOMASearchClient () );
+		zoomaSearcher.setSamplingTimeMs ( 1000 * 60 * 10 );
+		this.ontoTermDiscoverer = new BioSDCachedOntoTermDiscoverer (	new ZoomaOntoTermDiscoverer ( zoomaSearcher ) );
 	}
 	
 	
