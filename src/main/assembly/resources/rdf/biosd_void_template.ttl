@@ -58,7 +58,7 @@
      ;                         
      pav:version "${biosd.version}";
      pav:previousVersion <http://rdf.ebi.ac.uk/dataset/biosamples/${biosd.previous-version}>;
-     void:dataDump <ftp://ftp.ebi.ac.uk/pub/databases/RDF/biosd/biosamples-rdf-${biosd.version}.tar.gz>;
+     void:dataDump <ftp://ftp.ebi.ac.uk/pub/databases/biosamples/biosd2rdf/biosd_rdf_${biosd.version}.tar.bz2>;
      pav:importedOn "${biosd.creation-date}"^^xsd:date
 .
 

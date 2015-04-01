@@ -40,6 +40,7 @@ public class BioSdRfMapperFactory extends RdfMapperFactory
 		registerNs ( "sch",							"http://schema.org/" );
 		registerNs ( "foaf",						"http://xmlns.com/foaf/0.1/" );
 		registerNs ( "pav", 						"http://purl.org/pav/2.0/" );
+		registerNs ( "prov", 						"http://www.w3.org/ns/prov#" );	
 		registerNs ( "sio",							"http://semanticscience.org/resource/" );
 	}
 	

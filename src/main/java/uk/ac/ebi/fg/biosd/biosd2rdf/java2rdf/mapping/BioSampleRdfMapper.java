@@ -4,14 +4,18 @@ import static uk.ac.ebi.fg.java2rdf.utils.Java2RdfUtils.urlEncode;
 import static uk.ac.ebi.fg.java2rdf.utils.NamespaceUtils.ns;
 
 import java.util.Date;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
 import org.apache.commons.lang3.StringUtils;
+import org.semanticweb.owlapi.model.OWLOntology;
 
 import uk.ac.ebi.fg.biosd.model.expgraph.BioSample;
 import uk.ac.ebi.fg.biosd.model.organizational.MSI;
 import uk.ac.ebi.fg.biosd.model.xref.DatabaseRecordRef;
+import uk.ac.ebi.fg.core_model.expgraph.Product;
 import uk.ac.ebi.fg.core_model.expgraph.properties.BioCharacteristicType;
 import uk.ac.ebi.fg.core_model.expgraph.properties.BioCharacteristicValue;
 import uk.ac.ebi.fg.core_model.expgraph.properties.ExperimentalPropertyType;
@@ -23,6 +27,7 @@ import uk.ac.ebi.fg.java2rdf.mapping.properties.InversePropRdfMapper;
 import uk.ac.ebi.fg.java2rdf.mapping.properties.OwlDatatypePropRdfMapper;
 import uk.ac.ebi.fg.java2rdf.mapping.properties.OwlObjPropRdfMapper;
 import uk.ac.ebi.fg.java2rdf.mapping.urigen.RdfUriGenerator;
+import uk.ac.ebi.fg.java2rdf.utils.OwlApiUtils;
 
 /**
  * Maps a BioSD sample to RDF. <a href = 'http://www.ebi.ac.uk/rdf/documentation/biosamples'>Here</a> you can find 
@@ -94,6 +99,25 @@ public class BioSampleRdfMapper extends BeanRdfMapper<BioSample>
 		for ( DatabaseRecordRef dbxref: DbRecRefRdfMapper.getMyEquivalentsLinks ( "ebi.biosamples.samples", smp.getAcc () ) )
 			smp.addDatabaseRecordRef ( dbxref );
 		
+		// Do you have a derivation property? These have to be treated specially
+		//
+		for ( Product<?> derivedFrom: smp.getDerivedFrom () )
+			mapDerived ( smp, derivedFrom.getAcc (), true, params );			
+		for ( Product<?> derivedTo: smp.getDerivedInto () )
+			mapDerived ( smp, derivedTo.getAcc (), false, params );			
+		
+		for ( ExperimentalPropertyValue<?> pval: smp.getPropertyValues () )
+		{
+			String pvalLabel = StringUtils.trimToNull ( pval.getTermText () );
+			ExperimentalPropertyType ptype = pval.getType ();
+			if ( pvalLabel == null ) continue;
+			if ( ptype == null ) continue;
+			String typeLabel = StringUtils.trimToNull ( ptype.getTermText () );
+			if ( "Derived From".equalsIgnoreCase ( typeLabel ) )
+				mapDerived ( smp, pvalLabel, true, params );			
+			else if ( "Derived To".equalsIgnoreCase ( typeLabel ) ) 
+				mapDerived ( smp, pvalLabel, false, params );			
+		}
 		
 		// Do you have a name? (names will be used for dcterms:title and rdfs:label
 		// 
@@ -114,6 +138,39 @@ public class BioSampleRdfMapper extends BeanRdfMapper<BioSample>
 		smp.addPropertyValue ( nval );
 		
 		return super.map ( smp, params ) | true;
+	}
+	
+	
+	/**
+	 * Add an assertion about the fact that the sample smp is derived from (or into ) the sample identified by otherAcc, 
+	 * the direction from/into is established by isFrom.
+	 * 
+	 * This is used inside {@link #map(BioSample, Map)}.
+	 * 
+	 */
+	private void mapDerived ( BioSample smp, String otherAcc, boolean isFrom, Map<String, Object> params )
+	{
+		RdfUriGenerator<BioSample> uriGen = this.getRdfUriGenerator ();
+		OWLOntology kb = this.getMapperFactory ().getKnowledgeBase ();
+		String luri = uriGen.getUri ( smp, params );
+		// We prefer to reuse the URI generator, and this requires a sample
+		String ruri = uriGen.getUri ( new BioSample ( otherAcc ), params );
+		
+		String sioDerivedFrom = ns ( "sio", "SIO_000244" ), sioDerivedInto = ns ( "sio", "SIO_000245" );
+		String provDerivedFrom = ns ( "prov", "wasDerivedFrom" );
+		
+		if ( isFrom ) 
+		{
+			OwlApiUtils.assertLink ( kb, luri, sioDerivedFrom, ruri );
+			OwlApiUtils.assertLink ( kb, luri, provDerivedFrom, ruri );
+			OwlApiUtils.assertLink ( kb, ruri, sioDerivedInto, luri );
+		}
+		else
+		{
+			OwlApiUtils.assertLink ( kb, luri, sioDerivedInto, ruri );
+			OwlApiUtils.assertLink ( kb, ruri, sioDerivedFrom, luri );
+			OwlApiUtils.assertLink ( kb, ruri, provDerivedFrom, luri );
+		}
 	}
 }
 

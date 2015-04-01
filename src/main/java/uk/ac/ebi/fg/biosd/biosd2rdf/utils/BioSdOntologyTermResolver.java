@@ -52,7 +52,8 @@ public class BioSdOntologyTermResolver
 	
 	{
 		StatsZOOMASearchFilter zoomaSearcher = new StatsZOOMASearchFilter ( new ZOOMASearchClient () );
-		zoomaSearcher.setSamplingTimeMs ( 1000 * 60 * 10 );
+		zoomaSearcher.setSamplingTimeMs ( 1000 * 60 * 5 );
+		zoomaSearcher.setThrottleMode ( true );
 		this.ontoTermDiscoverer = new BioSDCachedOntoTermDiscoverer (	new ZoomaOntoTermDiscoverer ( zoomaSearcher ) );
 	}
 	
@@ -60,7 +61,8 @@ public class BioSdOntologyTermResolver
 	/**
 	 * Tries to get the URI of an OWL class that the {@link ExperimentalPropertyValue} appears to be instance of. 
 	 * 
-	 * Several things are checked to do that:<ul> 
+	 * Several things are checked to do that:
+	 * <ul> 
 	 * <li>if proper {@link OntologyEntry ontology entries} are attached to either the value or its 
 	 * {@link ExperimentalPropertyType type}, it uses {@link #getOntologyTermURI(Collection, String)} to fetch their
 	 * URI and returns that</li> 

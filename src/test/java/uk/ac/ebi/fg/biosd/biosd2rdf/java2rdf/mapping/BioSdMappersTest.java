@@ -67,7 +67,10 @@ public class BioSdMappersTest
 
 		biosdModel.smp1.addPropertyValue ( new BioCharacteristicValue ( "Sample 1", new BioCharacteristicType ("name") ) );
 
-		
+		// Special relations translated as provenance
+		biosdModel.smp1.addPropertyValue ( new BioCharacteristicValue ( "smp0", new BioCharacteristicType ( "Derived From" ) ) );
+		biosdModel.smp1.addPropertyValue ( new BioCharacteristicValue ( "smp999", new BioCharacteristicType ( "Derived To" ) ) );
+
 		
 		Publication pub1 = new Publication ( "doi://123", "123" );
 		pub1.setTitle ( "A test publication 1" );
@@ -154,6 +157,8 @@ public class BioSdMappersTest
 			"PREFIX fabio: <http://purl.org/spar/fabio/>\n" +
 			"PREFIX foaf: <http://xmlns.com/foaf/0.1/>\n" +
 			"PREFIX pav: <http://purl.org/pav/2.0/>\n" +
+			"PREFIX biosd: <http://rdf.ebi.ac.uk/resource/biosamples/sample/>" +
+			"PREFIX prov: <http://www.w3.org/ns/prov#>" +
 		  "\n"
 		);
 		
@@ -188,6 +193,30 @@ public class BioSdMappersTest
 			"ASK {\n"
 			+ "  <http://rdf.ebi.ac.uk/resource/biosamples/sample/smp1> a biosd-terms:Sample;\n"
 			+ "    dc-terms:title 'Sample 1'\n"
+			+ "}\n"		
+		);
+
+		tester.testRDFOutput ( "smp1 derivedFrom smp0 not found! (via special property)", 
+			"ASK {\n"
+			+ "  biosd:smp1 prov:wasDerivedFrom biosd:smp0.\n"
+			+ "  biosd:smp1 sio:SIO_000244 biosd:smp0.\n"
+			+ "  biosd:smp0 sio:SIO_000245 biosd:smp1.\n"
+			+ "}\n"		
+		);
+
+		tester.testRDFOutput ( "smp1 derivedInto smp999 not found! (via special property)", 
+			"ASK {\n"
+			+ "  biosd:smp999 prov:wasDerivedFrom biosd:smp1.\n"
+			+ "  biosd:smp999 sio:SIO_000244 biosd:smp1.\n"
+			+ "  biosd:smp1 sio:SIO_000245 biosd:smp999.\n"
+			+ "}\n"		
+		);
+		
+		tester.testRDFOutput ( "smp3 derivedFrom smp1 not found!", 
+			"ASK {\n"
+			+ "  biosd:smp3 prov:wasDerivedFrom biosd:smp1.\n"
+			+ "  biosd:smp3 sio:SIO_000244 biosd:smp1.\n"
+			+ "  biosd:smp1 sio:SIO_000245 biosd:smp3.\n"
 			+ "}\n"		
 		);
 		

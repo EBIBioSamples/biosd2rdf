@@ -168,6 +168,7 @@ public class BioSdExportService extends BatchService<BioSdExportTask>
 	/**
 	 * TODO: comment me!
 	 */
+	@SuppressWarnings ( "unchecked" )
 	public List<String> getSubmissionAccessions ( double sampleSize )
 	{
 		EntityManager em = Resources.getInstance ().getEntityManagerFactory ().createEntityManager ();
