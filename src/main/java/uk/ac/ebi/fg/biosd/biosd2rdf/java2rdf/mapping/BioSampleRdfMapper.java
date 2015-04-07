@@ -106,6 +106,7 @@ public class BioSampleRdfMapper extends BeanRdfMapper<BioSample>
 		for ( Product<?> derivedTo: smp.getDerivedInto () )
 			mapDerived ( smp, derivedTo.getAcc (), false, params );			
 		
+		boolean hasName = false;
 		for ( ExperimentalPropertyValue<?> pval: smp.getPropertyValues () )
 		{
 			String pvalLabel = StringUtils.trimToNull ( pval.getTermText () );
@@ -116,22 +117,15 @@ public class BioSampleRdfMapper extends BeanRdfMapper<BioSample>
 			if ( "Derived From".equalsIgnoreCase ( typeLabel ) )
 				mapDerived ( smp, pvalLabel, true, params );			
 			else if ( "Derived To".equalsIgnoreCase ( typeLabel ) ) 
-				mapDerived ( smp, pvalLabel, false, params );			
+				mapDerived ( smp, pvalLabel, false, params );
+			else if ( "name".equalsIgnoreCase ( typeLabel ) || "sample name".equalsIgnoreCase ( typeLabel ) ) 
+				hasName = true;
 		}
 		
 		// Do you have a name? (names will be used for dcterms:title and rdfs:label
 		// 
-		for ( ExperimentalPropertyValue<?> pval: smp.getPropertyValues () ) 
-		{
-			String pvalLabel = StringUtils.trimToNull ( pval.getTermText () );
-			ExperimentalPropertyType ptype = pval.getType ();
-			if ( pvalLabel == null ) continue;
-			if ( ptype == null ) continue;
-			String typeLabel = StringUtils.trimToNull ( ptype.getTermText () );
-			if ( "name".equalsIgnoreCase ( typeLabel ) || "sample name".equalsIgnoreCase ( typeLabel ) ) 
-				return super.map ( smp, params ) | true;
-		}
-
+		if ( hasName ) return super.map ( smp, params ) | true;
+		
 		// You don't! Take the accession!
 		BioCharacteristicType ntype = new BioCharacteristicType ( "name" );
 		BioCharacteristicValue nval = new BioCharacteristicValue ( "Sample " + smp.getAcc (), ntype );

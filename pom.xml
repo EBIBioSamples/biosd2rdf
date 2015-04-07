@@ -16,10 +16,6 @@
 	</parent> 
 
 
-  <properties>
-    <owlapi.version>3.4.3</owlapi.version>
-  </properties>
-
   <dependencies>
   
 		<!-- Common facade for logging -->
