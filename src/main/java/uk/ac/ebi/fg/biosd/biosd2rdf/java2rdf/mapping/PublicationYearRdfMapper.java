@@ -1,6 +1,6 @@
 package uk.ac.ebi.fg.biosd.biosd2rdf.java2rdf.mapping;
 
-import static uk.ac.ebi.fg.java2rdf.utils.NamespaceUtils.ns;
+import static uk.ac.ebi.fg.java2rdf.utils.NamespaceUtils.uri;
 
 import java.util.Map;
 
@@ -26,7 +26,7 @@ import uk.ac.ebi.fg.java2rdf.utils.OwlApiUtils;
 public class PublicationYearRdfMapper extends OwlDatatypePropRdfMapper<Publication, String>
 {
 	public PublicationYearRdfMapper () {
-		super ( ns ( "fabio", "hasPublicationYear" ) );
+		super ( uri ( "fabio", "hasPublicationYear" ) );
 	}
 	
 	@Override

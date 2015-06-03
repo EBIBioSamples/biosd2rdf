@@ -4,7 +4,7 @@ import static org.apache.commons.lang3.StringUtils.trimToEmpty;
 import static org.apache.commons.lang3.StringUtils.trimToNull;
 import static uk.ac.ebi.fg.java2rdf.utils.Java2RdfUtils.hashUriSignature;
 import static uk.ac.ebi.fg.java2rdf.utils.Java2RdfUtils.urlEncode;
-import static uk.ac.ebi.fg.java2rdf.utils.NamespaceUtils.ns;
+import static uk.ac.ebi.fg.java2rdf.utils.NamespaceUtils.uri;
 
 import java.util.Map;
 
@@ -30,7 +30,7 @@ public class ContactRdfMapper extends BeanRdfMapper<Contact>
 	public ContactRdfMapper ()
 	{
 		super (
-			ns ( "biosd-terms", "ContactPerson" ),
+			uri ( "biosd-terms", "ContactPerson" ),
 			new RdfUriGenerator<Contact> () 
 			{
 				@Override public String getUri ( Contact cnt, Map<String, Object> params ) 
@@ -46,7 +46,7 @@ public class ContactRdfMapper extends BeanRdfMapper<Contact>
 						: nameLine == null 
 						  ? null : urlEncode ( (String) params.get ( "msiAccession" ) ) + "/" + hashUriSignature ( nameLine );    
 					
-					return id == null ? null : ns ( "biosd", "ref-contact/" + id );
+					return id == null ? null : uri ( "biosd", "ref-contact/" + id );
 			}}
 		);
 		
@@ -55,21 +55,21 @@ public class ContactRdfMapper extends BeanRdfMapper<Contact>
 		// also foaf properties
 		// name + mid + surname will be dc:title/rdfs:comment
 		
-		this.addPropertyMapper ( "email", new OwlDatatypePropRdfMapper<Contact, String> ( ns ( "sch", "email" ) ) );
-		this.addPropertyMapper ( "firstName", new OwlDatatypePropRdfMapper<Contact, String> ( ns ( "sch", "givenName" ) ) );
-		this.addPropertyMapper ( "midInitials", new OwlDatatypePropRdfMapper<Contact, String> ( ns ( "sch", "additionalName" ) ) );
-		this.addPropertyMapper ( "lastName", new OwlDatatypePropRdfMapper<Contact, String> ( ns ( "sch", "familyName" ) ) );
-		this.addPropertyMapper ( "phone", new OwlDatatypePropRdfMapper<Contact, String> ( ns ( "sch", "telephone" ) ) );
-		this.addPropertyMapper ( "phone", new OwlDatatypePropRdfMapper<Contact, String> ( ns ( "sch", "faxNumber" ) ) );
+		this.addPropertyMapper ( "email", new OwlDatatypePropRdfMapper<Contact, String> ( uri ( "sch", "email" ) ) );
+		this.addPropertyMapper ( "firstName", new OwlDatatypePropRdfMapper<Contact, String> ( uri ( "sch", "givenName" ) ) );
+		this.addPropertyMapper ( "midInitials", new OwlDatatypePropRdfMapper<Contact, String> ( uri ( "sch", "additionalName" ) ) );
+		this.addPropertyMapper ( "lastName", new OwlDatatypePropRdfMapper<Contact, String> ( uri ( "sch", "familyName" ) ) );
+		this.addPropertyMapper ( "phone", new OwlDatatypePropRdfMapper<Contact, String> ( uri ( "sch", "telephone" ) ) );
+		this.addPropertyMapper ( "phone", new OwlDatatypePropRdfMapper<Contact, String> ( uri ( "sch", "faxNumber" ) ) );
 		
 		// biosd-terms:has-address-line (subprop of dc:description/rdfs:comment)
 		// TODO: possibly more annotations to be considered: 
 		//   http://answers.semanticweb.com/questions/298/how-can-you-represent-physical-addresses-in-foaf
-		this.addPropertyMapper ( "address", new OwlDatatypePropRdfMapper<Contact, String> ( ns ( "biosd-terms", "has-address-line" ) ) );
+		this.addPropertyMapper ( "address", new OwlDatatypePropRdfMapper<Contact, String> ( uri ( "biosd-terms", "has-address-line" ) ) );
 		
 		// biosd-terms:has-affiliation-line (subprop of dc:description/rdfs:comment)
-		this.addPropertyMapper ( "affiliation", new OwlDatatypePropRdfMapper<Contact, String> ( ns ( "biosd-terms", "has-affiliation-line" ) ) );
-		this.addPropertyMapper ( "url", new UriStringPropRdfMapper<Contact> ( ns ( "foaf", "page" ), true ) );
+		this.addPropertyMapper ( "affiliation", new OwlDatatypePropRdfMapper<Contact, String> ( uri ( "biosd-terms", "has-affiliation-line" ) ) );
+		this.addPropertyMapper ( "url", new UriStringPropRdfMapper<Contact> ( uri ( "foaf", "page" ), true ) );
 		
 		// TODO: These need to be checked against Zooma
 		// c.getContactRoles ();
@@ -88,10 +88,10 @@ public class ContactRdfMapper extends BeanRdfMapper<Contact>
 			nameLine = trimToNull ( nameLine );
 
 			OwlApiUtils.assertData ( this.getMapperFactory ().getKnowledgeBase (), 
-				this.getRdfUriGenerator ().getUri ( cnt, params ), ns ( "dc-terms", "title" ), nameLine 
+				this.getRdfUriGenerator ().getUri ( cnt, params ), uri ( "dc-terms", "title" ), nameLine 
 			);
 			OwlApiUtils.assertData ( this.getMapperFactory ().getKnowledgeBase (), 
-				this.getRdfUriGenerator ().getUri ( cnt, params ), ns ( "rdfs", "label" ), nameLine 
+				this.getRdfUriGenerator ().getUri ( cnt, params ), uri ( "rdfs", "label" ), nameLine 
 			);
 			
 			return true;

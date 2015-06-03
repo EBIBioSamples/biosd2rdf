@@ -1,6 +1,6 @@
 package uk.ac.ebi.fg.biosd.biosd2rdf.java2rdf.mapping;
 
-import static uk.ac.ebi.fg.java2rdf.utils.NamespaceUtils.ns;
+import static uk.ac.ebi.fg.java2rdf.utils.NamespaceUtils.uri;
 import static uk.ac.ebi.fg.java2rdf.utils.OwlApiUtils.assertData;
 import static uk.ac.ebi.fg.java2rdf.utils.OwlApiUtils.assertLink;
 
@@ -41,7 +41,7 @@ public class DbRecRefRdfMapper extends BeanRdfMapper<DatabaseRecordRef>
 	public DbRecRefRdfMapper ()
 	{
 		super ( 
-			ns ( "biosd-terms", "RepositoryWebRecord" ), 
+			uri ( "biosd-terms", "RepositoryWebRecord" ), 
 	    new RdfUriGenerator<DatabaseRecordRef>() {
 
 				@Override
@@ -53,22 +53,22 @@ public class DbRecRefRdfMapper extends BeanRdfMapper<DatabaseRecordRef>
 					String name = StringUtils.trimToNull ( db.getDbName () );
 					if ( name == null ) return null;
 					// TODO: version
-					return ns ( "biosd", 
+					return uri ( "biosd", 
 						"repository-web-record/" + Java2RdfUtils.urlEncode ( name ) + ":" + Java2RdfUtils.urlEncode ( acc ) );
 				}
 			}
 		);
 
-		this.addPropertyMapper ( "acc", new OwlDatatypePropRdfMapper<DatabaseRecordRef, String> ( ns ( "dc-terms", "identifier" ) ) );
-		this.addPropertyMapper ( "url", new UriStringPropRdfMapper<DatabaseRecordRef> ( ns ( "foaf", "page" ), true ) );
+		this.addPropertyMapper ( "acc", new OwlDatatypePropRdfMapper<DatabaseRecordRef, String> ( uri ( "dc-terms", "identifier" ) ) );
+		this.addPropertyMapper ( "url", new UriStringPropRdfMapper<DatabaseRecordRef> ( uri ( "foaf", "page" ), true ) );
 		
 		this.addPropertyMapper ( "title", new CompositePropRdfMapper<> (
-			new OwlDatatypePropRdfMapper<DatabaseRecordRef, String> ( ns ( "dc-terms", "description" ) ),
-			new OwlDatatypePropRdfMapper<DatabaseRecordRef, String> ( ns ( "rdfs", "comment" ) ) 
+			new OwlDatatypePropRdfMapper<DatabaseRecordRef, String> ( uri ( "dc-terms", "description" ) ),
+			new OwlDatatypePropRdfMapper<DatabaseRecordRef, String> ( uri ( "rdfs", "comment" ) ) 
 		));
 
 		// Contains strings like 'PRIDE' or 'ArrayExpress', so dc:source this should be the best property to represent them
-		this.addPropertyMapper ( "dbName",  new OwlDatatypePropRdfMapper<DatabaseRecordRef, String> ( ns ( "dc-terms", "source" ) ) ); 
+		this.addPropertyMapper ( "dbName",  new OwlDatatypePropRdfMapper<DatabaseRecordRef, String> ( uri ( "dc-terms", "source" ) ) ); 
 	}
 
 	@Override
@@ -82,8 +82,8 @@ public class DbRecRefRdfMapper extends BeanRdfMapper<DatabaseRecordRef>
 		// A composed string for the title
 		String title = db.getDbName () + ":" + db.getAcc ();
 		RdfUriGenerator<DatabaseRecordRef> uriGen = this.getRdfUriGenerator ();
-		assertData ( kb, uriGen.getUri ( db, params ), ns ( "dc-terms", "title" ), title );
-		assertData ( kb, uriGen.getUri ( db, params ), ns ( "rdfs", "label" ), title );
+		assertData ( kb, uriGen.getUri ( db, params ), uri ( "dc-terms", "title" ), title );
+		assertData ( kb, uriGen.getUri ( db, params ), uri ( "rdfs", "label" ), title );
 		
 		
 		if ( !"ArrayExpress".equalsIgnoreCase ( db.getDbName () ) ) return true;
@@ -95,7 +95,7 @@ public class DbRecRefRdfMapper extends BeanRdfMapper<DatabaseRecordRef>
 		//
 				
 		String atlasUri = "http://rdf.ebi.ac.uk/resource/atlas/" + db.getAcc ();
-		assertLink ( kb, atlasUri, ns ( "pav", "derivedFrom" ), mapf.getUri ( db, params ) );
+		assertLink ( kb, atlasUri, uri ( "pav", "derivedFrom" ), mapf.getUri ( db, params ) );
 
 		return true;
 	}

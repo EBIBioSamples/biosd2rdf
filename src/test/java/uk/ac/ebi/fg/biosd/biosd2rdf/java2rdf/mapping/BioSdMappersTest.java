@@ -30,6 +30,7 @@ import uk.ac.ebi.fg.core_model.organizational.Organization;
 import uk.ac.ebi.fg.core_model.organizational.Publication;
 import uk.ac.ebi.fg.core_model.terms.OntologyEntry;
 import uk.ac.ebi.fg.core_model.xref.ReferenceSource;
+import uk.ac.ebi.fg.java2rdf.utils.NamespaceUtils;
 
 /**
  * Basic test of the BioSD-to-RDF mapping machinery.
@@ -71,6 +72,10 @@ public class BioSdMappersTest
 		biosdModel.smp1.addPropertyValue ( new BioCharacteristicValue ( "smp0", new BioCharacteristicType ( "Derived From" ) ) );
 		biosdModel.smp1.addPropertyValue ( new BioCharacteristicValue ( "smp999", new BioCharacteristicType ( "Derived To" ) ) );
 
+		// Testing "Same As"
+		BioCharacteristicValue sameAsRel = new BioCharacteristicValue ( "smp1bis", new BioCharacteristicType ( "Same As" ) );
+		biosdModel.smp1.addPropertyValue ( sameAsRel );
+		
 		
 		Publication pub1 = new Publication ( "doi://123", "123" );
 		pub1.setTitle ( "A test publication 1" );
@@ -143,28 +148,19 @@ public class BioSdMappersTest
 
 	
 	  // Now tests stuff
-		SparqlBasedTester tester = new SparqlBasedTester ( "target/test_model.ttl", 
-			"PREFIX biosd-terms: <http://rdf.ebi.ac.uk/terms/biosd/>\n" +
-			"PREFIX dc-terms: <http://purl.org/dc/terms/>\n" +
-			"PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\n" +
-			"PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n" +
-			"PREFIX efo: <http://www.ebi.ac.uk/efo/>\n" +
-			"PREFIX obo: <http://purl.obolibrary.org/obo/>\n" +
-			"PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>\n" + 
-			"PREFIX bibo: <http://purl.org/ontology/bibo/>\n" +
-			"PREFIX sio: <http://semanticscience.org/resource/>\n" +
-			"PREFIX prism: <http://prismstandard.org/namespaces/basic/2.0/>\n" +
-			"PREFIX fabio: <http://purl.org/spar/fabio/>\n" +
-			"PREFIX foaf: <http://xmlns.com/foaf/0.1/>\n" +
-			"PREFIX pav: <http://purl.org/pav/2.0/>\n" +
-			"PREFIX biosd: <http://rdf.ebi.ac.uk/resource/biosamples/sample/>" +
-			"PREFIX prov: <http://www.w3.org/ns/prov#>" +
-		  "\n"
+		SparqlBasedTester tester = new SparqlBasedTester ( 
+			"target/test_model.ttl", 
+			NamespaceUtils.asSPARQLProlog () 
+			+ "PREFIX smp: <http://rdf.ebi.ac.uk/resource/biosamples/sample/>\n"
+			+ "PREFIX sg: <http://rdf.ebi.ac.uk/resource/biosamples/sample-group/>\n"
+			+ "PREFIX msi: <http://rdf.ebi.ac.uk/resource/biosamples/msi/>\n"
+			+ "PREFIX msipub: <http://rdf.ebi.ac.uk/resource/biosamples/publication/>\n"
+			+ "\n\n"
 		);
 		
 		tester.testRDFOutput ( "Test submission not found!", 
 			"ASK {\n"
-			+ "  <http://rdf.ebi.ac.uk/resource/biosamples/msi/" + biosdModel.msi.getAcc () + "> a biosd-terms:BiosamplesSubmission;\n"
+			+ "  msi:" + biosdModel.msi.getAcc () + " a biosd-terms:BiosamplesSubmission;\n"
 			+ "    dc-terms:title '" + biosdModel.msi.getTitle () + "';\n"
 			+ "    rdfs:label '" + biosdModel.msi.getTitle () + "';\n"
 			+ "    rdfs:comment '" + biosdModel.msi.getDescription () + "';\n"
@@ -176,49 +172,54 @@ public class BioSdMappersTest
 		
 		tester.testRDFOutput ( "Submission contents not found!", 
 			"ASK {\n"
-			+ "  <http://rdf.ebi.ac.uk/resource/biosamples/msi/" + biosdModel.msi.getAcc () + "> a biosd-terms:BiosamplesSubmission;\n"
+			+ "  msi:" + biosdModel.msi.getAcc () + " a biosd-terms:BiosamplesSubmission;\n"
 			+ "    obo:IAO_0000219"
-			+ "        <http://rdf.ebi.ac.uk/resource/biosamples/sample-group/sg1>,\n"
-      + "        <http://rdf.ebi.ac.uk/resource/biosamples/sample-group/sg2>, \n"
-      + "        <http://rdf.ebi.ac.uk/resource/biosamples/sample/smp1>,\n"
-      + "        <http://rdf.ebi.ac.uk/resource/biosamples/sample/smp2>,\n"
-      + "        <http://rdf.ebi.ac.uk/resource/biosamples/sample/smp3>,\n"
-      + "        <http://rdf.ebi.ac.uk/resource/biosamples/sample/smp4>,\n"
-      + "        <http://rdf.ebi.ac.uk/resource/biosamples/sample/smp5>,\n"
-      + "        <http://rdf.ebi.ac.uk/resource/biosamples/sample/smp6>.\n"
+			+ "        sg:sg1, sg:sg1,\n"
+      + "        smp:smp1, smp:smp1, smp:smp3, smp:smp4, smp:smp5, smp:smp6.\n"
 			+ "}\n"		
 		);
 		
 		tester.testRDFOutput ( "smp1 details not found!", 
 			"ASK {\n"
-			+ "  <http://rdf.ebi.ac.uk/resource/biosamples/sample/smp1> a biosd-terms:Sample;\n"
+			+ "  smp:smp1 a biosd-terms:Sample;\n"
 			+ "    dc-terms:title 'Sample 1'\n"
 			+ "}\n"		
 		);
 
 		tester.testRDFOutput ( "smp1 derivedFrom smp0 not found! (via special property)", 
 			"ASK {\n"
-			+ "  biosd:smp1 prov:wasDerivedFrom biosd:smp0.\n"
-			+ "  biosd:smp1 sio:SIO_000244 biosd:smp0.\n"
-			+ "  biosd:smp0 sio:SIO_000245 biosd:smp1.\n"
+			+ "  smp:smp1 prov:wasDerivedFrom smp:smp0.\n"
+			+ "  smp:smp0 prov:hadDerivation smp:smp1.\n"
+			+ "  smp:smp1 sio:SIO_000244 smp:smp0.\n"
+			+ "  smp:smp0 sio:SIO_000245 smp:smp1.\n"
 			+ "}\n"		
 		);
 
 		tester.testRDFOutput ( "smp1 derivedInto smp999 not found! (via special property)", 
 			"ASK {\n"
-			+ "  biosd:smp999 prov:wasDerivedFrom biosd:smp1.\n"
-			+ "  biosd:smp999 sio:SIO_000244 biosd:smp1.\n"
-			+ "  biosd:smp1 sio:SIO_000245 biosd:smp999.\n"
+			+ "  smp:smp999 prov:wasDerivedFrom smp:smp1.\n"
+			+ "  smp:smp1 prov:hadDerivation smp:smp999.\n"
+			+ "  smp:smp999 sio:SIO_000244 smp:smp1.\n"
+			+ "  smp:smp1 sio:SIO_000245 smp:smp999.\n"
 			+ "}\n"		
 		);
 		
 		tester.testRDFOutput ( "smp3 derivedFrom smp1 not found!", 
 			"ASK {\n"
-			+ "  biosd:smp3 prov:wasDerivedFrom biosd:smp1.\n"
-			+ "  biosd:smp3 sio:SIO_000244 biosd:smp1.\n"
-			+ "  biosd:smp1 sio:SIO_000245 biosd:smp3.\n"
+			+ "  smp:smp3 prov:wasDerivedFrom smp:smp1.\n"
+			+ "  smp:smp1 prov:hadDerivation smp:smp3.\n"
+			+ "  smp:smp3 sio:SIO_000244 smp:smp1.\n"
+			+ "  smp:smp1 sio:SIO_000245 smp:smp3.\n"
 			+ "}\n"		
 		);
+		
+		tester.testRDFOutput ( "smp1 sameAs smp1bis not found! ", 
+			"ASK {\n"
+			+ "  smp:smp1 owl:sameAs smp:smp1bis.\n"
+			+ "  smp:smp1bis owl:sameAs smp:smp1.\n"
+			+ "}\n"		
+		);
+		
 		
 		tester.testRDFOutput ( "explicit ontology annotation not found!", 
 			"ASK {\n"
@@ -268,7 +269,7 @@ public class BioSdMappersTest
 			);
 		
 		tester.testRDFOutput ( "Publication statements not found!", 
-			"ASK { <http://rdf.ebi.ac.uk/resource/biosamples/publication/123> rdf:type obo:IAO_0000311;\n"+
+			"ASK { msipub:123 rdf:type obo:IAO_0000311;\n"+
 			" rdfs:label 'A test publication 1';\n"+
 			" fabio:hasPubMedId '123';\n"+
 			" bibo:pmid '123';\n"+
@@ -277,13 +278,13 @@ public class BioSdMappersTest
 			" biosd-terms:has-authors-list 'Test 1, A, Test 2, B, Test 3, C';\n"+
 			" prism:doi 'doi://123';\n"+
 			" bibo:doi 'doi://123';\n"+
-			" obo:IAO_0000136 <http://rdf.ebi.ac.uk/resource/biosamples/msi/msi1>;\n"+
-			" sio:SIO_000332 <http://rdf.ebi.ac.uk/resource/biosamples/msi/msi1> }" 
+			" obo:IAO_0000136 msi:msi1;\n"+
+			" sio:SIO_000332 msi:msi1 }" 
 		);
 		
 		tester.testRDFOutput ( "Web Record for SG1 not found!",
 		  "ASK {\n"
-		  + "  <http://rdf.ebi.ac.uk/resource/biosamples/sample-group/sg1> a biosd-terms:SampleGroup;\n"
+		  + "  sg:sg1 a biosd-terms:SampleGroup;\n"
 		  + "    rdfs:label 'Sample Group sg1';\n"
 		  + "    pav:derivedFrom [\n"
 		  + "      a biosd-terms:RepositoryWebRecord;\n"

@@ -2,7 +2,7 @@ package uk.ac.ebi.fg.biosd.biosd2rdf.java2rdf.mapping;
 
 import static uk.ac.ebi.fg.java2rdf.utils.Java2RdfUtils.hashUriSignature;
 import static uk.ac.ebi.fg.java2rdf.utils.Java2RdfUtils.urlEncode;
-import static uk.ac.ebi.fg.java2rdf.utils.NamespaceUtils.ns;
+import static uk.ac.ebi.fg.java2rdf.utils.NamespaceUtils.uri;
 import static uk.ac.ebi.fg.java2rdf.utils.OwlApiUtils.assertAnnotationData;
 import static uk.ac.ebi.fg.java2rdf.utils.OwlApiUtils.assertData;
 import static uk.ac.ebi.fg.java2rdf.utils.OwlApiUtils.assertIndividual;
@@ -10,7 +10,6 @@ import static uk.ac.ebi.fg.java2rdf.utils.OwlApiUtils.assertLink;
 
 import java.text.ParseException;
 import java.util.Date;
-import java.util.Locale;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
@@ -146,8 +145,8 @@ public class ExpPropValueRdfMapper<T extends Accessible> extends PropertyRdfMapp
 		{
 			OWLOntology onto = ExpPropValueRdfMapper.this.getMapperFactory ().getKnowledgeBase ();
 			
-			assertData ( onto, pvalUri, ns ( "dc-terms", "title" ), this.valueLabel );
-			assertData ( onto, pvalUri, ns ( "rdfs", "label" ), this.valueLabel );
+			assertData ( onto, pvalUri, uri ( "dc-terms", "title" ), this.valueLabel );
+			assertData ( onto, pvalUri, uri ( "rdfs", "label" ), this.valueLabel );
 			
 			// Say something about the unit, if you've one
 			//
@@ -157,15 +156,15 @@ public class ExpPropValueRdfMapper<T extends Accessible> extends PropertyRdfMapp
 				// I'd like to use unitClassUri + prefix for this, but it's recommended not to use other's namespaces
 				// TODO: experiment OWL2 punning?
 				//
-				String unitInstUri = ns ( "biosd", "unit#" + Java2RdfUtils.hashUriSignature ( this.unitClassUri ) );
-				assertLink ( onto, pvalUri, ns ( "sio", "SIO_000221" ), unitInstUri ); // 'has unit'
+				String unitInstUri = uri ( "biosd", "unit#" + Java2RdfUtils.hashUriSignature ( this.unitClassUri ) );
+				assertLink ( onto, pvalUri, uri ( "sio", "SIO_000221" ), unitInstUri ); // 'has unit'
 				assertIndividual ( onto, unitInstUri, this.unitClassUri );
-				assertAnnotationData ( onto, unitInstUri, ns ( "rdfs", "label" ), this.unitLabel ); // let's report user details somewhere
-				assertAnnotationData ( onto, unitInstUri, ns ( "dc-terms", "title" ), this.unitLabel ); 
+				assertAnnotationData ( onto, unitInstUri, uri ( "rdfs", "label" ), this.unitLabel ); // let's report user details somewhere
+				assertAnnotationData ( onto, unitInstUri, uri ( "dc-terms", "title" ), this.unitLabel ); 
 				
 				// This is 'unit of measurement'. this is implied by the range of 'has unit', but let's report it, for sake of 
 				// completeness and to ease things when no inference is computed
-				assertIndividual ( onto, unitInstUri, ns ( "sio", "SIO_000074" ) );
+				assertIndividual ( onto, unitInstUri, uri ( "sio", "SIO_000074" ) );
 			}
 			
 			
@@ -173,7 +172,7 @@ public class ExpPropValueRdfMapper<T extends Accessible> extends PropertyRdfMapp
 			//
 			if ( this.value != null ) {
 				// has value
-				assertData ( onto, pvalUri, ns ( "sio", "SIO_000300") , String.valueOf ( this.value ), XSDVocabulary.DOUBLE.toString () );
+				assertData ( onto, pvalUri, uri ( "sio", "SIO_000300") , String.valueOf ( this.value ), XSDVocabulary.DOUBLE.toString () );
 				return;
 			}
 				
@@ -181,14 +180,14 @@ public class ExpPropValueRdfMapper<T extends Accessible> extends PropertyRdfMapp
 			// 
 			if ( this.date != null ) {
 				// has value
-				assertData ( onto, pvalUri, ns ( "sio", "SIO_000300") , DataTypeAdapter.printDate ( this.date ), XSDVocabulary.DATE.toString () );
+				assertData ( onto, pvalUri, uri ( "sio", "SIO_000300") , DataTypeAdapter.printDate ( this.date ), XSDVocabulary.DATE.toString () );
 				return;
 			}
 			
 			// Or date+time?
 			if ( this.dateTime != null ) {
 				// has value
-				assertData ( onto, pvalUri, ns ( "sio", "SIO_000300") , DataTypeAdapter.printDateTime ( this.date ), XSDVocabulary.DATE_TIME.toString () );
+				assertData ( onto, pvalUri, uri ( "sio", "SIO_000300") , DataTypeAdapter.printDateTime ( this.date ), XSDVocabulary.DATE_TIME.toString () );
 				return;
 			}
 			
@@ -196,9 +195,9 @@ public class ExpPropValueRdfMapper<T extends Accessible> extends PropertyRdfMapp
 			// 
 			if ( this.lo != null && this.hi != null )
 			{
-				assertIndividual ( onto, pvalUri, ns ( "sio", "SIO_000944" ) ); // interval
-				assertData ( onto, pvalUri, ns ( "biosd-terms", "has-low-value" ), String.valueOf ( this.lo ), XSDVocabulary.DOUBLE.toString () );
-				assertData ( onto, pvalUri, ns ( "biosd-terms", "has-high-value" ), String.valueOf ( this.hi ), XSDVocabulary.DOUBLE.toString () );
+				assertIndividual ( onto, pvalUri, uri ( "sio", "SIO_000944" ) ); // interval
+				assertData ( onto, pvalUri, uri ( "biosd-terms", "has-low-value" ), String.valueOf ( this.lo ), XSDVocabulary.DOUBLE.toString () );
+				assertData ( onto, pvalUri, uri ( "biosd-terms", "has-high-value" ), String.valueOf ( this.hi ), XSDVocabulary.DOUBLE.toString () );
 								
 				return;
 			}
@@ -247,24 +246,33 @@ public class ExpPropValueRdfMapper<T extends Accessible> extends PropertyRdfMapp
 			// We're ignoring it here, cause the accession is already assigned by the sample mapper.
 			if ( "sample accession".equalsIgnoreCase ( typeLabel ) ) return false;
 
-			RdfMapperFactory mapFact = this.getMapperFactory ();
-			OWLOntology onto = mapFact.getKnowledgeBase ();
+			// The Sample mapper already deals with this
+			if ( "same as".equals ( typeLabel ) ) return false;
+			
 			
 			String typeLabelLC = typeLabel.toLowerCase ();
+
+			// The Sample mapper already deals with this
+			if ( typeLabelLC.matches ( "derived (from|to)" ) )
+				return false;
+			
+			RdfMapperFactory mapFact = this.getMapperFactory ();
+			OWLOntology onto = mapFact.getKnowledgeBase ();
+
 			
 			// name -> dc:title and similar
 			if ( typeLabelLC.matches ( "(sample |group |sample group |)?name" ) )
 			{
-				assertData ( onto, mapFact.getUri ( sample, params ), ns ( "dc-terms", "title" ), vcomp.valueLabel );
-				assertData ( onto, mapFact.getUri ( sample, params ), ns ( "rdfs", "label" ), vcomp.valueLabel );
+				assertData ( onto, mapFact.getUri ( sample, params ), uri ( "dc-terms", "title" ), vcomp.valueLabel );
+				assertData ( onto, mapFact.getUri ( sample, params ), uri ( "rdfs", "label" ), vcomp.valueLabel );
 				return true;
 			}
 
 			// 'Sample Description' -> dc-terms:description and similar
-			if ( typeLabel != null && typeLabelLC.matches ( "(sample |group |sample group |)?description" ) )
+			if ( typeLabelLC.matches ( "(sample |group |sample group |)?description" ) )
 			{
-				assertData ( onto, mapFact.getUri ( sample, params ), ns ( "dc-terms", "description" ), vcomp.valueLabel );
-				assertData ( onto, mapFact.getUri ( sample, params ), ns ( "rdfs", "comment" ), vcomp.valueLabel );
+				assertData ( onto, mapFact.getUri ( sample, params ), uri ( "dc-terms", "description" ), vcomp.valueLabel );
+				assertData ( onto, mapFact.getUri ( sample, params ), uri ( "rdfs", "comment" ), vcomp.valueLabel );
 				return true;
 			}
 			
@@ -287,7 +295,7 @@ public class ExpPropValueRdfMapper<T extends Accessible> extends PropertyRdfMapp
 			
 			// Define the property value
 			String pvalHash = hashUriSignature ( typeLabel + vcomp.valueLabel );
-			valUri = ns ( "biosd", "exp-prop-val/" + parentAcc + "#" + pvalHash ); 
+			valUri = uri ( "biosd", "exp-prop-val/" + parentAcc + "#" + pvalHash ); 
 			
 			// Define its label and possible additional stuff, such as the numerical value, unit, range (see above)
 			vcomp.map ( valUri );
@@ -295,17 +303,17 @@ public class ExpPropValueRdfMapper<T extends Accessible> extends PropertyRdfMapp
 			// Define a type URI that is specific to this type and a generic subclass of efo:experimental factor
 			// TODO: this would be more correct, if it didn't cause Zooma to discover that 1964 is an NCBI term and
 			// the same property type is both an organism and a year
-			//typeUri = ns ( "biosd", "exp-prop-type/" + parentAcc + "#" + hashUriSignature (  typeLabel ) );
-			typeUri = ns ( "biosd", "exp-prop-type/" + parentAcc + "#" + pvalHash );
+			//typeUri = uri ( "biosd", "exp-prop-type/" + parentAcc + "#" + hashUriSignature (  typeLabel ) );
+			typeUri = uri ( "biosd", "exp-prop-type/" + parentAcc + "#" + pvalHash );
 			
 			// Bottom line: it's an experimental factor
-			assertIndividual ( onto, valUri, ns ( "efo", "EFO_0000001" ) );
+			assertIndividual ( onto, valUri, uri ( "efo", "EFO_0000001" ) );
 			
 			// Another basic fact: it has a type defined as per the original data
-			assertLink ( onto, valUri, ns ( "biosd-terms", "has-bio-characteristic-type" ), typeUri );
-			assertIndividual ( onto, typeUri, ns ( "efo", "EFO_0000001" ) ); // Experimental factor
-			assertAnnotationData ( onto, typeUri, ns ( "rdfs", "label" ), typeLabel );
-			assertAnnotationData ( onto, typeUri, ns ( "dc-terms", "title" ), typeLabel );
+			assertLink ( onto, valUri, uri ( "biosd-terms", "has-bio-characteristic-type" ), typeUri );
+			assertIndividual ( onto, typeUri, uri ( "efo", "EFO_0000001" ) ); // Experimental factor
+			assertAnnotationData ( onto, typeUri, uri ( "rdfs", "label" ), typeLabel );
+			assertAnnotationData ( onto, typeUri, uri ( "dc-terms", "title" ), typeLabel );
 
 			// Now, see if Zooma has something more to say
 			String discoveredTypeUri = otermResolver.getOntoClassUri ( pval, vcomp.isNumberOrDate () );
@@ -314,15 +322,15 @@ public class ExpPropValueRdfMapper<T extends Accessible> extends PropertyRdfMapp
 			// it makes sense to take the first ones top-ranked by Zooma. 
 			if( discoveredTypeUri != null )
 			{
-				String typeUri1 = ns ( "biosd", "exp-prop-type/ONTO_CONCEPT#" + hashUriSignature ( discoveredTypeUri ) );
-				assertLink ( onto, valUri, ns ( "biosd-terms", "has-bio-characteristic-type" ), typeUri1 );
+				String typeUri1 = uri ( "biosd", "exp-prop-type/ONTO_CONCEPT#" + hashUriSignature ( discoveredTypeUri ) );
+				assertLink ( onto, valUri, uri ( "biosd-terms", "has-bio-characteristic-type" ), typeUri1 );
 				assertIndividual ( onto, typeUri1, discoveredTypeUri );
 			}
 			
 			// Establish how to link the prop value to the sample
 			String attributeLinkUri = pval instanceof BioCharacteristicValue  
-				? ns ( "biosd-terms", "has-bio-characteristic" ) // sub-property of sio:SIO_000008 ('has attribute') 
-				: ns ( "sio", "SIO_000332" );	// is about
+				? uri ( "biosd-terms", "has-bio-characteristic" ) // sub-property of sio:SIO_000008 ('has attribute') 
+				: uri ( "sio", "SIO_000332" );	// is about
 				
 			// Now we have either *** sample has-biocharacteristic valUri ***, or *** sample is-about valUri ***, depending on 
 			// the Java type. As said above, biosd:has-biocharacteristic is a subproperty of iao:is-about anyway.

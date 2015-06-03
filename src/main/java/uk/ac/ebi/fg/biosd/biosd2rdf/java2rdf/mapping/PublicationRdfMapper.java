@@ -1,7 +1,7 @@
 package uk.ac.ebi.fg.biosd.biosd2rdf.java2rdf.mapping;
 
 import static uk.ac.ebi.fg.java2rdf.utils.Java2RdfUtils.urlEncode;
-import static uk.ac.ebi.fg.java2rdf.utils.NamespaceUtils.ns;
+import static uk.ac.ebi.fg.java2rdf.utils.NamespaceUtils.uri;
 
 import java.util.Map;
 
@@ -34,7 +34,7 @@ public class PublicationRdfMapper extends BeanRdfMapper<Publication>
 	{
 		super (
 			// publication, ebi_terms.owl additionally defines this as subclass of: foaf:document, fabio:work, bibo:Document
-			ns ( "obo", "IAO_0000311" ), 
+			uri ( "obo", "IAO_0000311" ), 
 			new RdfUriGenerator<Publication>() {
 				@Override public String getUri ( Publication pub, Map<String, Object> params ) 
 				{
@@ -56,27 +56,27 @@ public class PublicationRdfMapper extends BeanRdfMapper<Publication>
 							id = Java2RdfUtils.hashUriSignature ( title + authorList +  ( year == -1 ? "" : year ) );
 						}
 					}
-					return ns ( "biosd", "publication/" + id );
+					return uri ( "biosd", "publication/" + id );
 			}}
 		);
 		
 		this.addPropertyMapper ( "title", new CompositePropRdfMapper<> (  
-			new OwlDatatypePropRdfMapper<Publication, String> ( ns ( "dc-terms", "title" ) ), 
-			new OwlDatatypePropRdfMapper<Publication, String> ( ns ( "rdfs", "label" ) ) 
+			new OwlDatatypePropRdfMapper<Publication, String> ( uri ( "dc-terms", "title" ) ), 
+			new OwlDatatypePropRdfMapper<Publication, String> ( uri ( "rdfs", "label" ) ) 
 		));
 
 		
 		// TODO: add EDAM identifiers, which are individuals and not a data values.
 		this.addPropertyMapper ( "pubmedId", new CompositePropRdfMapper<> ( 
-			new OwlDatatypePropRdfMapper<Publication, String> ( ns ( "fabio", "hasPubMedId" ) ), 
-			new OwlDatatypePropRdfMapper<Publication, String> ( ns ( "bibo", "pmid" ) ) 
+			new OwlDatatypePropRdfMapper<Publication, String> ( uri ( "fabio", "hasPubMedId" ) ), 
+			new OwlDatatypePropRdfMapper<Publication, String> ( uri ( "bibo", "pmid" ) ) 
 		));
 		this.addPropertyMapper ( "DOI", new CompositePropRdfMapper<> ( 
-			new OwlDatatypePropRdfMapper<Publication, String> ( ns ( "bibo", "doi" ) ), 
-			new OwlDatatypePropRdfMapper<Publication, String> ( ns ( "prism", "doi" ) ) 
+			new OwlDatatypePropRdfMapper<Publication, String> ( uri ( "bibo", "doi" ) ), 
+			new OwlDatatypePropRdfMapper<Publication, String> ( uri ( "prism", "doi" ) ) 
 		));
 		// TODO: a sub-property of dc-elems:creator and of owl:dataProperty
-		this.addPropertyMapper ( "authorList", new OwlDatatypePropRdfMapper<Publication, String> ( ns ( "biosd-terms", "has-authors-list" ) ) );
+		this.addPropertyMapper ( "authorList", new OwlDatatypePropRdfMapper<Publication, String> ( uri ( "biosd-terms", "has-authors-list" ) ) );
 		this.addPropertyMapper ( "year", new PublicationYearRdfMapper () );
 	}
 }

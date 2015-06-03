@@ -3,7 +3,7 @@ package uk.ac.ebi.fg.biosd.biosd2rdf.java2rdf.mapping;
 import static org.apache.commons.lang3.StringUtils.trimToNull;
 import static uk.ac.ebi.fg.java2rdf.utils.Java2RdfUtils.hashUriSignature;
 import static uk.ac.ebi.fg.java2rdf.utils.Java2RdfUtils.urlEncode;
-import static uk.ac.ebi.fg.java2rdf.utils.NamespaceUtils.ns;
+import static uk.ac.ebi.fg.java2rdf.utils.NamespaceUtils.uri;
 
 import java.util.Map;
 
@@ -28,7 +28,7 @@ public class OrganizationRdfMapper extends BeanRdfMapper<Organization>
 	public OrganizationRdfMapper ()
 	{
 		super (
-			ns ( "biosd-terms", "ContactOrganization" ), 
+			uri ( "biosd-terms", "ContactOrganization" ), 
 			new RdfUriGenerator<Organization>()
 			{
 				@Override public String getUri ( Organization org, Map<String, Object> params ) 
@@ -40,23 +40,23 @@ public class OrganizationRdfMapper extends BeanRdfMapper<Organization>
 						? hashUriSignature ( id ) 
 						: urlEncode ( (String) params.get ( "msiAccession" ) ) + "/" + hashUriSignature ( name );    
 					
-					return ns ( "biosd", "organization/" + id );
+					return uri ( "biosd", "organization/" + id );
 			}}
 		);
 		
-		this.addPropertyMapper ( "email", new OwlDatatypePropRdfMapper<Organization, String> ( ns ( "sch", "email" ) ) );
+		this.addPropertyMapper ( "email", new OwlDatatypePropRdfMapper<Organization, String> ( uri ( "sch", "email" ) ) );
 		this.addPropertyMapper ( "name", new CompositePropRdfMapper<> ( 
-			new OwlDatatypePropRdfMapper<Organization, String> ( ns ( "sch", "name" ) ),
-			new OwlDatatypePropRdfMapper<Organization, String> ( ns ( "dc-terms", "title" ) ),
-			new OwlDatatypePropRdfMapper<Organization, String> ( ns ( "rdfs", "label" ) )
+			new OwlDatatypePropRdfMapper<Organization, String> ( uri ( "sch", "name" ) ),
+			new OwlDatatypePropRdfMapper<Organization, String> ( uri ( "dc-terms", "title" ) ),
+			new OwlDatatypePropRdfMapper<Organization, String> ( uri ( "rdfs", "label" ) )
 		));
 		this.addPropertyMapper ( "description", new CompositePropRdfMapper<> (
-			new OwlDatatypePropRdfMapper<Organization, String> ( ns ( "sch", "description" ) ),
-			new OwlDatatypePropRdfMapper<Organization, String> ( ns ( "dc-terms", "description" ) ),
-			new OwlDatatypePropRdfMapper<Organization, String> ( ns ( "rdfs", "comment" ) ) 
+			new OwlDatatypePropRdfMapper<Organization, String> ( uri ( "sch", "description" ) ),
+			new OwlDatatypePropRdfMapper<Organization, String> ( uri ( "dc-terms", "description" ) ),
+			new OwlDatatypePropRdfMapper<Organization, String> ( uri ( "rdfs", "comment" ) ) 
 		));
-		this.addPropertyMapper ( "address", new OwlDatatypePropRdfMapper<Organization, String> ( ns ( "biosd-terms", "has-address-line" ) ) );
-		this.addPropertyMapper ( "url", new UriStringPropRdfMapper<Organization> ( ns ( "foaf", "page" ), true ) );
+		this.addPropertyMapper ( "address", new OwlDatatypePropRdfMapper<Organization, String> ( uri ( "biosd-terms", "has-address-line" ) ) );
+		this.addPropertyMapper ( "url", new UriStringPropRdfMapper<Organization> ( uri ( "foaf", "page" ), true ) );
 		
 		// TODO: These need to be checked against Zooma
 		// o.getRole ();

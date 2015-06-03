@@ -1,6 +1,8 @@
 package uk.ac.ebi.fg.biosd.biosd2rdf.utils;
 
 import org.junit.Assert;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.hp.hpl.jena.query.Query;
 import com.hp.hpl.jena.query.QueryExecution;
@@ -8,6 +10,7 @@ import com.hp.hpl.jena.query.QueryExecutionFactory;
 import com.hp.hpl.jena.query.QueryFactory;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
+import com.hp.hpl.jena.shared.JenaException;
 
 /**
  * A simple helper to verify what a triple store contains.
@@ -20,6 +23,8 @@ public class SparqlBasedTester
 {
 	private Model model;
 	private String sparqlPrefixes = "";
+	
+	private Logger log = LoggerFactory.getLogger ( this.getClass () );
 	
 	/**
 	 * @param url the path to the RDF source to be tested.
@@ -50,8 +55,17 @@ public class SparqlBasedTester
 	 */
 	public void testRDFOutput ( String errorMessage, String sparql )
 	{
-		Query q = QueryFactory.create ( sparqlPrefixes + sparql );
-		QueryExecution qe = QueryExecutionFactory.create ( q, model );
-		Assert.assertTrue ( errorMessage, qe.execAsk () );
+		sparql = sparqlPrefixes + sparql;
+		try
+		{
+			Query q = QueryFactory.create ( sparql );
+			QueryExecution qe = QueryExecutionFactory.create ( q, model );
+			Assert.assertTrue ( errorMessage, qe.execAsk () );
+		}
+		catch ( JenaException ex ) 
+		{
+			log.error ( "Error while doing SPARQL, query is: {}, error is: {}", sparql, ex.getMessage () );
+			throw ex;
+		}
 	}
 }

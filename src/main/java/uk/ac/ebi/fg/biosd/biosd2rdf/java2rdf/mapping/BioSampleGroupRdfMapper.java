@@ -1,7 +1,7 @@
 package uk.ac.ebi.fg.biosd.biosd2rdf.java2rdf.mapping;
 
 import static uk.ac.ebi.fg.java2rdf.utils.Java2RdfUtils.urlEncode;
-import static uk.ac.ebi.fg.java2rdf.utils.NamespaceUtils.ns;
+import static uk.ac.ebi.fg.java2rdf.utils.NamespaceUtils.uri;
 
 import java.util.Date;
 import java.util.Map;
@@ -39,24 +39,24 @@ public class BioSampleGroupRdfMapper extends BeanRdfMapper<BioSampleGroup>
 	{
 		super ( 
 			// it's a subclass of iao:document_part and sio:collection too.
-			ns ( "biosd-terms", "SampleGroup" ),
+			uri ( "biosd-terms", "SampleGroup" ),
 			// The MSI's accession is passed to the property value mapper
 			new RdfUriGenerator<BioSampleGroup> () {
 				@Override public String getUri ( BioSampleGroup sg, Map<String, Object> params ) {
-					return ns ( "biosd", "sample-group/" + urlEncode ( sg.getAcc () ) );
+					return uri ( "biosd", "sample-group/" + urlEncode ( sg.getAcc () ) );
 			}});
-		this.addPropertyMapper ( "acc", new OwlDatatypePropRdfMapper<BioSampleGroup, String> ( ns ( "dc-terms", "identifier" ) ) );
+		this.addPropertyMapper ( "acc", new OwlDatatypePropRdfMapper<BioSampleGroup, String> ( uri ( "dc-terms", "identifier" ) ) );
 		this.addPropertyMapper ( "propertyValues", new CollectionPropRdfMapper<BioSampleGroup, ExperimentalPropertyValue> ( 
 			new ExpPropValueRdfMapper<BioSampleGroup> ()) 
 		);
 		this.addPropertyMapper ( "samples", new CollectionPropRdfMapper<BioSampleGroup, BioSample> (
-			new OwlObjPropRdfMapper<BioSampleGroup, BioSample> ( ns ( "sio", "SIO_000059" ) ) // has member
+			new OwlObjPropRdfMapper<BioSampleGroup, BioSample> ( uri ( "sio", "SIO_000059" ) ) // has member
 		));
 		this.addPropertyMapper ( "databaseRecordRefs", new CollectionPropRdfMapper<> ( new CompositePropRdfMapper<> ( 
-			new OwlObjPropRdfMapper<BioSampleGroup, DatabaseRecordRef> ( ns ( "pav", "derivedFrom" ) ),
+			new OwlObjPropRdfMapper<BioSampleGroup, DatabaseRecordRef> ( uri ( "pav", "derivedFrom" ) ),
 			// dbrecord denotes submission
 			new InversePropRdfMapper<BioSampleGroup, DatabaseRecordRef> ( 
-				new OwlObjPropRdfMapper<DatabaseRecordRef, BioSampleGroup> ( ns ( "obo", "IAO_0000219" ) ) 
+				new OwlObjPropRdfMapper<DatabaseRecordRef, BioSampleGroup> ( uri ( "obo", "IAO_0000219" ) ) 
 			)
 		)));
 		

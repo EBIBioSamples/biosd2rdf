@@ -1,7 +1,7 @@
 package uk.ac.ebi.fg.biosd.biosd2rdf.java2rdf.mapping;
 
 import static uk.ac.ebi.fg.java2rdf.utils.Java2RdfUtils.urlEncode;
-import static uk.ac.ebi.fg.java2rdf.utils.NamespaceUtils.ns;
+import static uk.ac.ebi.fg.java2rdf.utils.NamespaceUtils.uri;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -37,57 +37,57 @@ public class MSIRdfMapper extends BeanRdfMapper<MSI>
 	public MSIRdfMapper ()
 	{
 		super ( 
-			ns ( "biosd-terms", "BiosamplesSubmission" ), // is-a iao:document 
+			uri ( "biosd-terms", "BiosamplesSubmission" ), // is-a iao:document 
 			new RdfUriGenerator<MSI>() 
 			{
 				@Override
 				public String getUri ( MSI msi, Map<String, Object> params ) { msi.getPublications ();
-					return ns ( "biosd", "msi/" + urlEncode ( msi.getAcc () ) );
+					return uri ( "biosd", "msi/" + urlEncode ( msi.getAcc () ) );
 				}
 		});
 
-		this.addPropertyMapper ( "acc", new OwlDatatypePropRdfMapper<MSI, String> ( ns ( "dc-terms", "identifier" ) ) );
+		this.addPropertyMapper ( "acc", new OwlDatatypePropRdfMapper<MSI, String> ( uri ( "dc-terms", "identifier" ) ) );
 		
 		this.addPropertyMapper ( "title", new CompositePropRdfMapper<> (  
-			new OwlDatatypePropRdfMapper<MSI, String> ( ns ( "dc-terms", "title" ) ), 
-			new OwlDatatypePropRdfMapper<MSI, String> ( ns ( "rdfs", "label" ) ) 
+			new OwlDatatypePropRdfMapper<MSI, String> ( uri ( "dc-terms", "title" ) ), 
+			new OwlDatatypePropRdfMapper<MSI, String> ( uri ( "rdfs", "label" ) ) 
 		));
 		this.addPropertyMapper ( "description", new CompositePropRdfMapper<> (
-			new OwlDatatypePropRdfMapper<MSI, String> ( ns ( "dc-terms", "description" ) ),
-			new OwlDatatypePropRdfMapper<MSI, String> ( ns ( "rdfs", "comment" ) ) 
+			new OwlDatatypePropRdfMapper<MSI, String> ( uri ( "dc-terms", "description" ) ),
+			new OwlDatatypePropRdfMapper<MSI, String> ( uri ( "rdfs", "comment" ) ) 
 		));
 		
 		
 		this.addPropertyMapper ( "samples", new CollectionPropRdfMapper<MSI, BioSample> ( 
-			new OwlObjPropRdfMapper<MSI, BioSample> ( ns ( "obo", "IAO_0000219" ) ) ) // denotes
+			new OwlObjPropRdfMapper<MSI, BioSample> ( uri ( "obo", "IAO_0000219" ) ) ) // denotes
 		);
 		
 		this.addPropertyMapper ( "sampleGroups", new CollectionPropRdfMapper<MSI, BioSampleGroup> ( 
-			new OwlObjPropRdfMapper<MSI, BioSampleGroup> ( ns ( "obo", "IAO_0000219" ) ) ) // denotes
+			new OwlObjPropRdfMapper<MSI, BioSampleGroup> ( uri ( "obo", "IAO_0000219" ) ) ) // denotes
 		);
 		
 		// 'is about', because we use an InversePropRdfMapper, this will generate (pub, is-about, msi) for every pub in 
 		// msi.getPublications()
 		this.addPropertyMapper ( "publications", new CollectionPropRdfMapper<MSI, Publication> ( 
 			new InversePropRdfMapper<MSI, Publication> ( new CompositePropRdfMapper<Publication, MSI> ( 
-				new OwlObjPropRdfMapper<Publication, MSI> ( ns ( "obo", "IAO_0000136" ) ), // is about
-				new OwlObjPropRdfMapper<Publication, MSI> ( ns ( "sio", "SIO_000332" ) ) // is about 
+				new OwlObjPropRdfMapper<Publication, MSI> ( uri ( "obo", "IAO_0000136" ) ), // is about
+				new OwlObjPropRdfMapper<Publication, MSI> ( uri ( "sio", "SIO_000332" ) ) // is about 
 		))));
 		
 		// a sub-property of ( (dc-terms:creator union dc-terms:contributor ) and ( schema.org:author union schema.org:contributor ) ) 
 		this.addPropertyMapper ( "contacts", new CollectionPropRdfMapper<MSI, Contact> ( 
-			new OwlObjPropRdfMapper<MSI, Contact> ( ns ( "biosd-terms", "has-knowledgeable-person" ) ) )
+			new OwlObjPropRdfMapper<MSI, Contact> ( uri ( "biosd-terms", "has-knowledgeable-person" ) ) )
 		);
 
 		this.addPropertyMapper ( "organizations", new CollectionPropRdfMapper<MSI, Organization> ( 
-			new OwlObjPropRdfMapper<MSI, Organization> ( ns ( "biosd-terms", "has-knowledgeable-organization" ) ) )
+			new OwlObjPropRdfMapper<MSI, Organization> ( uri ( "biosd-terms", "has-knowledgeable-organization" ) ) )
 		);
 
 		this.addPropertyMapper ( "databaseRecordRefs", new CollectionPropRdfMapper<> ( new CompositePropRdfMapper<> ( 
-			new OwlObjPropRdfMapper<MSI, DatabaseRecordRef> ( ns ( "pav", "derivedFrom" ) ),
+			new OwlObjPropRdfMapper<MSI, DatabaseRecordRef> ( uri ( "pav", "derivedFrom" ) ),
 			// dbrecord denotes submission
 			new InversePropRdfMapper<MSI, DatabaseRecordRef> ( 
-				new OwlObjPropRdfMapper<DatabaseRecordRef, MSI> ( ns ( "obo", "IAO_0000219" ) ) 
+				new OwlObjPropRdfMapper<DatabaseRecordRef, MSI> ( uri ( "obo", "IAO_0000219" ) ) 
 			)
 		)));
 

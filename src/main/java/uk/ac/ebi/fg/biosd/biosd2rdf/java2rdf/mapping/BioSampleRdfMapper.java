@@ -1,11 +1,10 @@
 package uk.ac.ebi.fg.biosd.biosd2rdf.java2rdf.mapping;
 
 import static uk.ac.ebi.fg.java2rdf.utils.Java2RdfUtils.urlEncode;
-import static uk.ac.ebi.fg.java2rdf.utils.NamespaceUtils.ns;
+import static uk.ac.ebi.fg.java2rdf.utils.NamespaceUtils.uri;
+import static uk.ac.ebi.fg.java2rdf.utils.OwlApiUtils.assertLink;
 
 import java.util.Date;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -27,7 +26,7 @@ import uk.ac.ebi.fg.java2rdf.mapping.properties.InversePropRdfMapper;
 import uk.ac.ebi.fg.java2rdf.mapping.properties.OwlDatatypePropRdfMapper;
 import uk.ac.ebi.fg.java2rdf.mapping.properties.OwlObjPropRdfMapper;
 import uk.ac.ebi.fg.java2rdf.mapping.urigen.RdfUriGenerator;
-import uk.ac.ebi.fg.java2rdf.utils.OwlApiUtils;
+import uk.ac.ebi.fg.java2rdf.utils.NamespaceUtils;
 
 /**
  * Maps a BioSD sample to RDF. <a href = 'http://www.ebi.ac.uk/rdf/documentation/biosamples'>Here</a> you can find 
@@ -44,22 +43,22 @@ public class BioSampleRdfMapper extends BeanRdfMapper<BioSample>
 	{
 		super ( 
 			// subclass of material sample (TODO: obi:material entity? Samples are supposed to be collected and stored)
-			ns ( "biosd-terms", "Sample" ), 
+			uri ( "biosd-terms", "Sample" ), 
 			// The MSI's accession is passed to the property value mapper
 			new RdfUriGenerator<BioSample> () {
 				@Override public String getUri ( BioSample smp, Map<String, Object> params ) {
-					return ns ( "biosd", "sample/" + urlEncode ( smp.getAcc () ) );
+					return uri ( "biosd", "sample/" + urlEncode ( smp.getAcc () ) );
 			}}
 		);
-		this.addPropertyMapper ( "acc", new OwlDatatypePropRdfMapper<BioSample, String> ( ns ( "dc-terms", "identifier" ) ) );
+		this.addPropertyMapper ( "acc", new OwlDatatypePropRdfMapper<BioSample, String> ( uri ( "dc-terms", "identifier" ) ) );
 		this.addPropertyMapper ( "propertyValues", new CollectionPropRdfMapper<BioSample, ExperimentalPropertyValue> ( 
 			new ExpPropValueRdfMapper<BioSample> ()) 
 		);
 		this.addPropertyMapper ( "databaseRecordRefs", new CollectionPropRdfMapper<> ( new CompositePropRdfMapper<> ( 
-			new OwlObjPropRdfMapper<BioSample, DatabaseRecordRef> ( ns ( "pav", "derivedFrom" ) ),
+			new OwlObjPropRdfMapper<BioSample, DatabaseRecordRef> ( uri ( "pav", "derivedFrom" ) ),
 			// dbrecord denotes submission
 			new InversePropRdfMapper<BioSample, DatabaseRecordRef> ( 
-				new OwlObjPropRdfMapper<DatabaseRecordRef, BioSample> ( ns ( "obo", "IAO_0000219" ) ) 
+				new OwlObjPropRdfMapper<DatabaseRecordRef, BioSample> ( uri ( "obo", "IAO_0000219" ) ) 
 			)
 		)));
 		// TODO: more
@@ -99,7 +98,7 @@ public class BioSampleRdfMapper extends BeanRdfMapper<BioSample>
 		for ( DatabaseRecordRef dbxref: DbRecRefRdfMapper.getMyEquivalentsLinks ( "ebi.biosamples.samples", smp.getAcc () ) )
 			smp.addDatabaseRecordRef ( dbxref );
 		
-		// Do you have a derivation property? These have to be treated specially
+		// Do you have derivations? These have to be treated specially
 		//
 		for ( Product<?> derivedFrom: smp.getDerivedFrom () )
 			mapDerived ( smp, derivedFrom.getAcc (), true, params );			
@@ -114,10 +113,26 @@ public class BioSampleRdfMapper extends BeanRdfMapper<BioSample>
 			if ( pvalLabel == null ) continue;
 			if ( ptype == null ) continue;
 			String typeLabel = StringUtils.trimToNull ( ptype.getTermText () );
+			
 			if ( "Derived From".equalsIgnoreCase ( typeLabel ) )
 				mapDerived ( smp, pvalLabel, true, params );			
+			
 			else if ( "Derived To".equalsIgnoreCase ( typeLabel ) ) 
 				mapDerived ( smp, pvalLabel, false, params );
+			
+			else if ( "Same As".equalsIgnoreCase ( typeLabel ) )
+			{
+				RdfUriGenerator<BioSample> uriGen = this.getRdfUriGenerator ();
+				OWLOntology kb = this.getMapperFactory ().getKnowledgeBase ();
+				String thisUri = uriGen.getUri ( smp, params );
+				String thatUri = uriGen.getUri ( new BioSample ( pvalLabel ), params );
+				String sameAsUri = NamespaceUtils.uri ( "owl", "sameAs" );
+
+				// TODO: should we use schema:sameAs instead?
+				assertLink ( kb, thisUri, sameAsUri, thatUri );
+				assertLink ( kb, thatUri, sameAsUri, thisUri );
+			}
+			
 			else if ( "name".equalsIgnoreCase ( typeLabel ) || "sample name".equalsIgnoreCase ( typeLabel ) ) 
 				hasName = true;
 		}
@@ -150,21 +165,25 @@ public class BioSampleRdfMapper extends BeanRdfMapper<BioSample>
 		// We prefer to reuse the URI generator, and this requires a sample
 		String ruri = uriGen.getUri ( new BioSample ( otherAcc ), params );
 		
-		String sioDerivedFrom = ns ( "sio", "SIO_000244" ), sioDerivedInto = ns ( "sio", "SIO_000245" );
-		String provDerivedFrom = ns ( "prov", "wasDerivedFrom" );
+		String sioDerivedFrom = uri ( "sio", "SIO_000244" ), sioDerivedInto = uri ( "sio", "SIO_000245" );
+		String provDerivedFrom = uri ( "prov", "wasDerivedFrom" ), provDerivedInto = uri ( "prov", "hadDerivation" );
 		
 		if ( isFrom ) 
 		{
-			OwlApiUtils.assertLink ( kb, luri, sioDerivedFrom, ruri );
-			OwlApiUtils.assertLink ( kb, luri, provDerivedFrom, ruri );
-			OwlApiUtils.assertLink ( kb, ruri, sioDerivedInto, luri );
+			assertLink ( kb, luri, sioDerivedFrom, ruri );
+			assertLink ( kb, luri, provDerivedFrom, ruri );
+			assertLink ( kb, ruri, sioDerivedInto, luri );
+			assertLink ( kb, ruri, provDerivedInto, luri );
 		}
 		else
 		{
-			OwlApiUtils.assertLink ( kb, luri, sioDerivedInto, ruri );
-			OwlApiUtils.assertLink ( kb, ruri, sioDerivedFrom, luri );
-			OwlApiUtils.assertLink ( kb, ruri, provDerivedFrom, luri );
+			assertLink ( kb, luri, sioDerivedInto, ruri );
+			assertLink ( kb, luri, provDerivedInto, ruri );
+			assertLink ( kb, ruri, sioDerivedFrom, luri );
+			assertLink ( kb, ruri, provDerivedFrom, luri );
 		}
 	}
+
 }
+
 
