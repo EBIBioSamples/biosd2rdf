@@ -322,7 +322,7 @@ public class ExpPropValueRdfMapper<T extends Accessible> extends PropertyRdfMapp
 			// it makes sense to take the first ones top-ranked by Zooma. 
 			if( discoveredTypeUri != null )
 			{
-				String typeUri1 = uri ( "biosd", "exp-prop-type/ONTO_CONCEPT#" + hashUriSignature ( discoveredTypeUri ) );
+				String typeUri1 = uri ( "biosd", "exp-prop-type/zooma-concept#" + hashUriSignature ( discoveredTypeUri ) );
 				assertLink ( onto, valUri, uri ( "biosd-terms", "has-bio-characteristic-type" ), typeUri1 );
 				assertIndividual ( onto, typeUri1, discoveredTypeUri );
 			}
