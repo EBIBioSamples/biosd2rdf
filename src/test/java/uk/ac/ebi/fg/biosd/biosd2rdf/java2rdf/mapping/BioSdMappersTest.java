@@ -220,7 +220,7 @@ public class BioSdMappersTest
 			+ "}\n"		
 		);
 		
-		
+		// TODO:oldmodel
 		tester.testRDFOutput ( "explicit ontology annotation not found!", 
 			"ASK {\n"
 			+ "  ?smp a biosd-terms:Sample;\n"
@@ -236,6 +236,20 @@ public class BioSdMappersTest
 			+ "}\n"		
 		);
 
+		tester.testRDFOutput ( "explicit ontology annotation not found!", 
+			"ASK {\n"
+			+ "  ?smp a biosd-terms:Sample;\n"
+			+ "  biosd-terms:has-bio-characteristic [ "
+			+ "    a efo:EFO_0000001, efo:EFO_0003013;\n"
+			+ "    dc-terms:type 'My specie';\n"
+			+ "    atlas:propertyType 'My specie';\n"
+			+ "    rdfs:label 'My mouse';\n"
+			+ "    atlas:propertyValue 'My mouse'\n"
+			+ "  ]\n"
+			+ "}\n"		
+		);
+		
+		// TODO:oldmodel
 		tester.testRDFOutput ( "Direct-URI ontology annotation not found!", 
 				"ASK {\n"
 				+ "  ?smp a biosd-terms:Sample;\n"
@@ -251,8 +265,20 @@ public class BioSdMappersTest
 				+ "}\n"		
 			);
 
+		tester.testRDFOutput ( "Direct-URI ontology annotation not found!", 
+			"ASK {\n"
+			+ "  ?smp a biosd-terms:Sample;\n"
+			+ "  biosd-terms:has-bio-characteristic [ "
+			+ "    a efo:EFO_0000001, <http://sig.uw.edu/fma#Liver>;\n"
+			+ "    dc-terms:type 'Organ';\n"
+			+ "    atlas:propertyType 'Organ';\n"
+			+ "    rdfs:label 'Liver';\n"
+			+ "    atlas:propertyValue 'Liver'\n"
+			+ "  ]\n"
+			+ "}\n"		
+		);
 		
-		
+		// TODO:oldmodel
 		tester.testRDFOutput ( "ZOOMA-based annotation not found!", 
 				"ASK {\n"
 				+ "  ?smp a biosd-terms:Sample;\n"
@@ -267,6 +293,21 @@ public class BioSdMappersTest
 				+ "  ?ptype1 a obo:NCBITaxon_10090"
 				+ "}\n"		
 			);
+		
+		tester.testRDFOutput ( "ZOOMA-based annotation not found!", 
+			"ASK {\n"
+			+ "  ?smp a biosd-terms:Sample;\n"
+			+ "  biosd-terms:has-bio-characteristic [ "
+			+ "    a efo:EFO_0000001, obo:NCBITaxon_10090;\n"
+			+ "    dc-terms:type 'Organism';\n"
+			+ "    atlas:propertyType 'Organism';\n"
+			+ "    rdfs:label 'Mus Musculus';\n"
+			+ "    atlas:propertyValue 'Mus Musculus'\n"
+			+ "  ]\n"
+			+ "}\n"		
+		);
+		
+		
 		
 		tester.testRDFOutput ( "Publication statements not found!", 
 			"ASK { msipub:123 rdf:type obo:IAO_0000311;\n"+

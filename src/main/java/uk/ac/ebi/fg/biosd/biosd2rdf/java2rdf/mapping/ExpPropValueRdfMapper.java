@@ -147,6 +147,7 @@ public class ExpPropValueRdfMapper<T extends Accessible> extends PropertyRdfMapp
 			
 			assertData ( onto, pvalUri, uri ( "dc-terms", "title" ), this.valueLabel );
 			assertData ( onto, pvalUri, uri ( "rdfs", "label" ), this.valueLabel );
+			assertAnnotationData ( onto, pvalUri, uri ( "atlas", "propertyValue" ), this.valueLabel );
 			
 			// Say something about the unit, if you've one
 			//
@@ -303,12 +304,19 @@ public class ExpPropValueRdfMapper<T extends Accessible> extends PropertyRdfMapp
 			// Define a type URI that is specific to this type and a generic subclass of efo:experimental factor
 			// TODO: this would be more correct, if it didn't cause Zooma to discover that 1964 is an NCBI term and
 			// the same property type is both an organism and a year
-			//typeUri = uri ( "biosd", "exp-prop-type/" + parentAcc + "#" + hashUriSignature (  typeLabel ) );
+			
+			// TODO:oldmodel 
 			typeUri = uri ( "biosd", "exp-prop-type/" + parentAcc + "#" + pvalHash );
 			
 			// Bottom line: it's an experimental factor
 			assertIndividual ( onto, valUri, uri ( "efo", "EFO_0000001" ) );
 			
+			// And has these labels for the type
+			assertData ( onto, valUri, uri ( "dc-terms", "type" ), typeLabel );
+			assertAnnotationData ( onto, valUri, uri ( "atlas", "propertyType" ), typeLabel );
+			
+			
+			// TODO:oldmodel
 			// Another basic fact: it has a type defined as per the original data
 			assertLink ( onto, valUri, uri ( "biosd-terms", "has-bio-characteristic-type" ), typeUri );
 			assertIndividual ( onto, typeUri, uri ( "efo", "EFO_0000001" ) ); // Experimental factor
@@ -322,6 +330,9 @@ public class ExpPropValueRdfMapper<T extends Accessible> extends PropertyRdfMapp
 			// it makes sense to take the first ones top-ranked by Zooma. 
 			if( discoveredTypeUri != null )
 			{
+				assertIndividual ( onto, valUri, discoveredTypeUri );
+
+				// TODO:oldmodel
 				String typeUri1 = uri ( "biosd", "exp-prop-type/zooma-concept#" + hashUriSignature ( discoveredTypeUri ) );
 				assertLink ( onto, valUri, uri ( "biosd-terms", "has-bio-characteristic-type" ), typeUri1 );
 				assertIndividual ( onto, typeUri1, discoveredTypeUri );
