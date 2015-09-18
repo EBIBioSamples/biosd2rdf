@@ -54,6 +54,9 @@ public class BioSdOntologyTermResolver
 		StatsZOOMASearchFilter zoomaSearcher = new StatsZOOMASearchFilter ( new ZOOMASearchClient () );
 		zoomaSearcher.setSamplingTimeMs ( 1000 * 60 * 5 );
 		zoomaSearcher.setThrottleMode ( true );
+		zoomaSearcher.setMinCallDelay ( Long.valueOf ( System.getProperty ( 
+			"uk.ac.ebi.fg.biosd.biosd2rdf.minZoomaCallDelay", "0" 
+		)));
 		this.ontoTermDiscoverer = new BioSDCachedOntoTermDiscoverer (	new ZoomaOntoTermDiscoverer ( zoomaSearcher ) );
 	}
 	

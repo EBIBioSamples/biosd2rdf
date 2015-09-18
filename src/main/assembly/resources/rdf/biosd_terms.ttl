@@ -83,6 +83,12 @@ biosdterms:has-knowledgeable-person rdf:type :AnnotationProperty .
 #################################################################
 
 
+###  http://purl.obolibrary.org/obo/RO_0000086
+
+obo:RO_0000086 rdf:type :ObjectProperty .
+
+
+
 ###  http://rdf.ebi.ac.uk/terms/biosd/child-of
 
 biosdterms:child-of rdf:type :ObjectProperty ;
@@ -129,17 +135,9 @@ biosdterms:has-bio-characteristic rdf:type :ObjectProperty ;
                                   
                                   rdfs:label "biological characteristic"@en ;
                                   
-                                  obo:IAO_0000116 "PLEASE NOTE: This cannot be iao:is about, since that assumes the domain is an ICE, which is not always true in BioSD (when the subject is a sample)."@en ;
+                                  obo:IAO_0000115 "Relates a biological sample to a biological property that it has, such as the disease state or the organism it derives from. This correponds to the characteristic column in formats such as SampleTab or MAGE-TAB. As such, this relation might establish a not-too-formal associatios. For instance, an association to mus-musculus might mean  either that the samle is a mouse, or that it is a part of a mouse."@en ;
                                   
-                                  obo:IAO_0000115 "Relates a biological sample to a biological property that it has, such as the disease state or the organism it derives from. This correponds to the characteristic column in formats such as SampleTab or MAGE-TAB and, because of that, it's a not-too-formal associations. For instance, an association to mus-musculus might mean  either that the samle is a mouse, or that it is a part of a mouse."@en ;
-                                  
-                                  rdfs:subPropertyOf sio:SIO_000008 ;
-                                  
-                                  rdfs:domain [ rdf:type :Class ;
-                                                :unionOf ( biosdterms:Sample
-                                                           biosdterms:SampleGroup
-                                                         )
-                                              ] .
+                                  rdfs:subPropertyOf biosdterms:has-sample-attribute .
 
 
 
@@ -149,9 +147,13 @@ biosdterms:has-bio-characteristic-type rdf:type :ObjectProperty ;
                                        
                                        rdfs:label "biological characteristic type"@en ;
                                        
+                                       :deprecated "true"^^xsd:boolean ;
+                                       
                                        obo:IAO_0000116 "PLEASE NOTE: This cannot be iao:is about, since that assumes the domain is an ICE, which is not always true in BioSD."@en ;
                                        
                                        obo:IAO_0000115 "The type of a biological characteristic. This usually comes from data file annotations, for instance, one has a '10C' attribute value, of type x, where x is an instance of 'temperature', or 'mus-musculus 123' attribute value, of type x, where x is an instance of the class mus-musculus."@en ;
+                                       
+                                       obo:IAO_0000116 "This was used in an initial version of BioSD Linked Data model. Now an attribute/characteristic value can be instance of an ontology class if known, in addition to having the attributes rdfs:label + dcterms:title for the value, and dc:type + atlas:propertyType for the type. See TODO for details."@en ;
                                        
                                        rdfs:subPropertyOf sio:SIO_000332 .
 
@@ -172,6 +174,25 @@ biosdterms:has-knowledgeable-person rdf:type :ObjectProperty ;
                                     
                                     rdfs:subPropertyOf dcterms:contributor ,
                                                        schema:contributor .
+
+
+
+###  http://rdf.ebi.ac.uk/terms/biosd/has-sample-attribute
+
+biosdterms:has-sample-attribute rdf:type :ObjectProperty ;
+                                
+                                rdfs:label "sample attribute"@en ;
+                                
+                                obo:IAO_0000115 "Relates a sample or sample group to one of its attributes, not necessarily an attributes that is strictly related to biological qualities. For instance: provider name, identification code. This corresponds to attribute columns from formats like SampleTab or MAGE-TAB, such that the column header doesn't necessarily  refer to a biological characteristic explicitly,e.g., 'Comment[Sample Provider]'.  This relation might establish a not-too-formal associatios. For instance, an association from sample group to 'sample provider' might mean the group contains some samples coming from that provider."@en ;
+                                
+                                rdfs:subPropertyOf obo:RO_0000086 ,
+                                                   sio:SIO_000008 ;
+                                
+                                rdfs:domain [ rdf:type :Class ;
+                                              :unionOf ( biosdterms:Sample
+                                                         biosdterms:SampleGroup
+                                                       )
+                                            ] .
 
 
 
@@ -262,6 +283,42 @@ schema:sameAs rdf:type :ObjectProperty ,
 
 
 
+###  http://semanticscience.org/resource/SIO_000008
+
+sio:SIO_000008 rdf:type :ObjectProperty .
+
+
+
+###  http://semanticscience.org/resource/SIO_000244
+
+sio:SIO_000244 rdf:type :ObjectProperty .
+
+
+
+###  http://semanticscience.org/resource/SIO_000245
+
+sio:SIO_000245 rdf:type :ObjectProperty .
+
+
+
+###  http://semanticscience.org/resource/SIO_000332
+
+sio:SIO_000332 rdf:type :ObjectProperty .
+
+
+
+###  http://www.w3.org/ns/prov#hadDerivation
+
+prov:hadDerivation rdf:type :ObjectProperty .
+
+
+
+###  http://www.w3.org/ns/prov#wasDerivedFrom
+
+prov:wasDerivedFrom rdf:type :ObjectProperty .
+
+
+
 
 
 #################################################################
@@ -346,6 +403,12 @@ schema:description rdf:type :DatatypeProperty .
 obo:IAO_0000311 rdfs:subClassOf <http://purl.org/ontology/bibo/Document> ,
                                 <http://purl.org/spar/fabio/Work> ,
                                 <http://xmlns.com/foaf/0.1/Document> .
+
+
+
+###  http://purl.org/spar/fabio/Work
+
+<http://purl.org/spar/fabio/Work> rdf:type :Class .
 
 
 
@@ -446,6 +509,30 @@ biosdterms:SampleGroup rdf:type :Class ;
 ###  http://schema.org/Organization
 
 schema:Organization rdf:type :Class .
+
+
+
+###  http://schema.org/Person
+
+schema:Person rdf:type :Class .
+
+
+
+###  http://semanticscience.org/resource/SIO_000088
+
+sio:SIO_000088 rdf:type :Class .
+
+
+
+###  http://semanticscience.org/resource/SIO_000616
+
+sio:SIO_000616 rdf:type :Class .
+
+
+
+###  http://semanticscience.org/resource/SIO_010000
+
+sio:SIO_010000 rdf:type :Class .
 
 
 

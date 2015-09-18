@@ -50,7 +50,7 @@ public class SparqlBasedTester
 	/**
 	 * Performs a SPARQL ASK test and asserts via JUnit that the result is true.
 	 *  
-	 * @param errorMessage the error message to report in cas of failure
+	 * @param errorMessage the error message to report in case of failure
 	 * @param sparql the SPARQL/ASK query to run against the triple store passed to the class constructor.
 	 */
 	public void testRDFOutput ( String errorMessage, String sparql )

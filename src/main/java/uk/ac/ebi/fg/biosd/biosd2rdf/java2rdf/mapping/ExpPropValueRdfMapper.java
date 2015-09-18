@@ -43,6 +43,14 @@ import uk.ac.ebi.fg.java2rdf.utils.Java2RdfUtils;
 public class ExpPropValueRdfMapper<T extends Accessible> extends PropertyRdfMapper<T, ExperimentalPropertyValue>
 {
 	/**
+	 * If this is true, the old linked data model is supported, in addition to the new one.
+	 * See TODO for details.
+	 */
+	public static final boolean OLD_MODEL_SUPPORT_FLAG = true; 
+	
+	private static BioSdOntologyTermResolver otermResolver = new BioSdOntologyTermResolver ();
+
+	/**
 	 * A facility to work out composed numerical/date/unit-equipped values and decompose them into RDF describing
 	 * their components. See below how this is used.
 	 *  
@@ -215,7 +223,6 @@ public class ExpPropValueRdfMapper<T extends Accessible> extends PropertyRdfMapp
 		}
 	}
 	
-	private static BioSdOntologyTermResolver otermResolver = new BioSdOntologyTermResolver ();
 	
 	public ExpPropValueRdfMapper ()
 	{
@@ -305,23 +312,25 @@ public class ExpPropValueRdfMapper<T extends Accessible> extends PropertyRdfMapp
 			// TODO: this would be more correct, if it didn't cause Zooma to discover that 1964 is an NCBI term and
 			// the same property type is both an organism and a year
 			
-			// TODO:oldmodel 
-			typeUri = uri ( "biosd", "exp-prop-type/" + parentAcc + "#" + pvalHash );
+			if ( OLD_MODEL_SUPPORT_FLAG )
+				typeUri = uri ( "biosd", "exp-prop-type/" + parentAcc + "#" + pvalHash );
 			
 			// Bottom line: it's an experimental factor
 			assertIndividual ( onto, valUri, uri ( "efo", "EFO_0000001" ) );
 			
 			// And has these labels for the type
-			assertData ( onto, valUri, uri ( "dc-terms", "type" ), typeLabel );
+			assertData ( onto, valUri, uri ( "dc", "type" ), typeLabel );
 			assertAnnotationData ( onto, valUri, uri ( "atlas", "propertyType" ), typeLabel );
 			
 			
-			// TODO:oldmodel
-			// Another basic fact: it has a type defined as per the original data
-			assertLink ( onto, valUri, uri ( "biosd-terms", "has-bio-characteristic-type" ), typeUri );
-			assertIndividual ( onto, typeUri, uri ( "efo", "EFO_0000001" ) ); // Experimental factor
-			assertAnnotationData ( onto, typeUri, uri ( "rdfs", "label" ), typeLabel );
-			assertAnnotationData ( onto, typeUri, uri ( "dc-terms", "title" ), typeLabel );
+			if ( OLD_MODEL_SUPPORT_FLAG )
+			{
+				// Another basic fact: it has a type defined as per the original data
+				assertLink ( onto, valUri, uri ( "biosd-terms", "has-bio-characteristic-type" ), typeUri );
+				assertIndividual ( onto, typeUri, uri ( "efo", "EFO_0000001" ) ); // Experimental factor
+				assertAnnotationData ( onto, typeUri, uri ( "rdfs", "label" ), typeLabel );
+				assertAnnotationData ( onto, typeUri, uri ( "dc-terms", "title" ), typeLabel );
+			}
 
 			// Now, see if Zooma has something more to say
 			String discoveredTypeUri = otermResolver.getOntoClassUri ( pval, vcomp.isNumberOrDate () );
@@ -332,19 +341,30 @@ public class ExpPropValueRdfMapper<T extends Accessible> extends PropertyRdfMapp
 			{
 				assertIndividual ( onto, valUri, discoveredTypeUri );
 
-				// TODO:oldmodel
-				String typeUri1 = uri ( "biosd", "exp-prop-type/zooma-concept#" + hashUriSignature ( discoveredTypeUri ) );
-				assertLink ( onto, valUri, uri ( "biosd-terms", "has-bio-characteristic-type" ), typeUri1 );
-				assertIndividual ( onto, typeUri1, discoveredTypeUri );
+				if ( OLD_MODEL_SUPPORT_FLAG )
+				{
+					String typeUri1 = uri ( "biosd", "exp-prop-type/zooma-concept#" + hashUriSignature ( discoveredTypeUri ) );
+					assertLink ( onto, valUri, uri ( "biosd-terms", "has-bio-characteristic-type" ), typeUri1 );
+					assertIndividual ( onto, typeUri1, discoveredTypeUri );
+				}
 			}
 			
 			// Establish how to link the prop value to the sample
-			String attributeLinkUri = pval instanceof BioCharacteristicValue  
-				? uri ( "biosd-terms", "has-bio-characteristic" ) // sub-property of sio:SIO_000008 ('has attribute') 
-				: uri ( "sio", "SIO_000332" );	// is about
+			String attributeLinkUri = null;
+			if ( pval instanceof BioCharacteristicValue )  
+				attributeLinkUri = uri ( "biosd-terms", "has-bio-characteristic" ); // a direct sub-property of has-sample-attribute
+			else
+			{
+				attributeLinkUri = uri ( "biosd-terms", "has-sample-attribute" ); // sub-property of sio:SIO_000008 ('has attribute') 
 				
-			// Now we have either *** sample has-biocharacteristic valUri ***, or *** sample is-about valUri ***, depending on 
-			// the Java type. As said above, biosd:has-biocharacteristic is a subproperty of iao:is-about anyway.
+				if ( OLD_MODEL_SUPPORT_FLAG )
+					// This is 'is about' and it's pretty wrong in the case of samples, since it links an information content 
+					// entity to an independent continuant. We're keeping it, but it's deprecated now 
+					assertLink ( onto, mapFact.getUri ( sample, params ), uri ( "sio", "SIO_000332" ), valUri );
+			}
+				
+			// Now we have either *** sample has-biocharacteristic valUri ***, or *** sample has-sample-attribute valUri ***, 
+			// depending on the Java type. Simple inference allows one to match both using the upper-level has-sample-attribute
 			assertLink ( onto, mapFact.getUri ( sample, params ), attributeLinkUri, valUri );
 			
 			return true;

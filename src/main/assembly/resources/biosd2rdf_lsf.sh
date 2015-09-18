@@ -15,12 +15,18 @@ if [ "$BIOSD2RDF_SAMPLE_SIZE" == '' ]; then BIOSD2RDF_SAMPLE_SIZE=100; fi
 # The LSF group used for loading jobs
 if [ "$BIOSD2RDF_LSF_GROUP" == '' ]; then BIOSD2RDF_LSF_GROUP='biosd2rdf'; fi
 
+# Define this from the shell, it delays ZOOMA calls and should help preventing server crashes
+#export OPTS="$OPTS -Duk.ac.ebi.fg.biosd.biosd2rdf.minZoomaCallDelay=120" # 500 calls/min in each thread
+
+
 # If it doesn't already exist, create an LSF group to manage a limited running pool
 if [ "$(bjgroup -s /$BIOSD2RDF_LSF_GROUP 2>&1)" == 'No job group found' ]; then
   bgadd -L $BIOSD2RDF_LSF_NODES /$BIOSD2RDF_LSF_GROUP
 else
   bgmod -L $BIOSD2RDF_LSF_NODES /$BIOSD2RDF_LSF_GROUP # Just to be sure
 fi
+
+
 
 # This is absolutely necessary when you run the exporter through the cluster, since every instance of it sucks up to 
 # 100 DB connections and parallel instances will soon overcome the server limit.

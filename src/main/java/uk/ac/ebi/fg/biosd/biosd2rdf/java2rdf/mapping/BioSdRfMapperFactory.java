@@ -22,7 +22,7 @@ import uk.ac.ebi.fg.java2rdf.mapping.RdfMapperFactory;
  *
  */
 public class BioSdRfMapperFactory extends RdfMapperFactory
-{
+{	
 	static {
 		init ();
 	}

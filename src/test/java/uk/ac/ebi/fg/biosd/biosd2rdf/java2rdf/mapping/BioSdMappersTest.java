@@ -19,6 +19,8 @@ import org.semanticweb.owlapi.model.OWLOntologyStorageException;
 import org.semanticweb.owlapi.vocab.PrefixOWLOntologyFormat;
 
 import uk.ac.ebi.fg.biosd.biosd2rdf.utils.SparqlBasedTester;
+import uk.ac.ebi.fg.biosd.model.expgraph.properties.SampleCommentType;
+import uk.ac.ebi.fg.biosd.model.expgraph.properties.SampleCommentValue;
 import uk.ac.ebi.fg.biosd.model.utils.test.TestModel;
 import uk.ac.ebi.fg.biosd.model.xref.DatabaseRecordRef;
 import uk.ac.ebi.fg.core_model.expgraph.properties.BioCharacteristicType;
@@ -132,9 +134,12 @@ public class BioSdMappersTest
 		biosdModel.smp1.addPropertyValue ( weight );
 		
 		
-		// Zooma should solve this into EFO_0004950 and the value should be an xsd:dateTime
+		// ZOOMA should solve this into EFO_0004950 and the value should be an xsd:dateTime
 		biosdModel.smp1.addPropertyValue ( new BioCharacteristicValue ( "31/12/2012", new BioCharacteristicType ( "Date of Birth" ) ) );
 		
+		// To test 'has-sample-attribute'
+		// This should get the ontology term EFO_0000565
+		biosdModel.smp1.addPropertyValue ( new SampleCommentValue ( "Leukemia", new SampleCommentType ( "Disease State" ) ) );
 		
 		// We currently set this at submission level only
 		biosdModel.msi.setPublicFlag ( true );
@@ -179,6 +184,8 @@ public class BioSdMappersTest
 			+ "}\n"		
 		);
 		
+		
+		
 		tester.testRDFOutput ( "smp1 details not found!", 
 			"ASK {\n"
 			+ "  smp:smp1 a biosd-terms:Sample;\n"
@@ -220,28 +227,12 @@ public class BioSdMappersTest
 			+ "}\n"		
 		);
 		
-		// TODO:oldmodel
-		tester.testRDFOutput ( "explicit ontology annotation not found!", 
-			"ASK {\n"
-			+ "  ?smp a biosd-terms:Sample;\n"
-			+ "  biosd-terms:has-bio-characteristic [ "
-			+ "    biosd-terms:has-bio-characteristic-type ?ptype, ?ptype1;\n"
-			+ "    rdfs:label 'My mouse';\n"
-			+ "  ].\n"
-			+ "\n"
-			+ "  ?ptype a efo:EFO_0000001;\n"
-			+ "    dc-terms:title 'My specie'.\n"
-			+ "\n"
-			+ "  ?ptype1 a efo:EFO_0003013"
-			+ "}\n"		
-		);
-
-		tester.testRDFOutput ( "explicit ontology annotation not found!", 
+		tester.testRDFOutput ( "Explicit ontology annotation not found!", 
 			"ASK {\n"
 			+ "  ?smp a biosd-terms:Sample;\n"
 			+ "  biosd-terms:has-bio-characteristic [ "
 			+ "    a efo:EFO_0000001, efo:EFO_0003013;\n"
-			+ "    dc-terms:type 'My specie';\n"
+			+ "    dc:type 'My specie';\n"
 			+ "    atlas:propertyType 'My specie';\n"
 			+ "    rdfs:label 'My mouse';\n"
 			+ "    atlas:propertyValue 'My mouse'\n"
@@ -249,8 +240,38 @@ public class BioSdMappersTest
 			+ "}\n"		
 		);
 		
-		// TODO:oldmodel
+		if ( ExpPropValueRdfMapper.OLD_MODEL_SUPPORT_FLAG )
+			tester.testRDFOutput ( "Explicit ontology annotation not found (old model)!", 
+				"ASK {\n"
+				+ "  ?smp a biosd-terms:Sample;\n"
+				+ "  biosd-terms:has-bio-characteristic [ "
+				+ "    biosd-terms:has-bio-characteristic-type ?ptype, ?ptype1;\n"
+				+ "    rdfs:label 'My mouse';\n"
+				+ "  ].\n"
+				+ "\n"
+				+ "  ?ptype a efo:EFO_0000001;\n"
+				+ "    dc-terms:title 'My specie'.\n"
+				+ "\n"
+				+ "  ?ptype1 a efo:EFO_0003013"
+				+ "}\n"		
+		);
+		
+		
 		tester.testRDFOutput ( "Direct-URI ontology annotation not found!", 
+			"ASK {\n"
+			+ "  ?smp a biosd-terms:Sample;\n"
+			+ "  biosd-terms:has-bio-characteristic [ "
+			+ "    a efo:EFO_0000001, <http://sig.uw.edu/fma#Liver>;\n"
+			+ "    dc:type 'Organ';\n"
+			+ "    atlas:propertyType 'Organ';\n"
+			+ "    rdfs:label 'Liver';\n"
+			+ "    atlas:propertyValue 'Liver'\n"
+			+ "  ]\n"
+			+ "}\n"		
+		);
+		
+		if ( ExpPropValueRdfMapper.OLD_MODEL_SUPPORT_FLAG )
+			tester.testRDFOutput ( "Direct-URI ontology annotation not found (old model)!", 
 				"ASK {\n"
 				+ "  ?smp a biosd-terms:Sample;\n"
 				+ "  biosd-terms:has-bio-characteristic [ "
@@ -263,23 +284,24 @@ public class BioSdMappersTest
 				+ "\n"
 				+ "  ?ptype1 a <http://sig.uw.edu/fma#Liver>"
 				+ "}\n"		
-			);
-
-		tester.testRDFOutput ( "Direct-URI ontology annotation not found!", 
+		);
+				
+		
+		tester.testRDFOutput ( "ZOOMA-based annotation not found!", 
 			"ASK {\n"
 			+ "  ?smp a biosd-terms:Sample;\n"
 			+ "  biosd-terms:has-bio-characteristic [ "
-			+ "    a efo:EFO_0000001, <http://sig.uw.edu/fma#Liver>;\n"
-			+ "    dc-terms:type 'Organ';\n"
-			+ "    atlas:propertyType 'Organ';\n"
-			+ "    rdfs:label 'Liver';\n"
-			+ "    atlas:propertyValue 'Liver'\n"
+			+ "    a efo:EFO_0000001, obo:NCBITaxon_10090;\n"
+			+ "    dc:type 'Organism';\n"
+			+ "    atlas:propertyType 'Organism';\n"
+			+ "    rdfs:label 'Mus Musculus';\n"
+			+ "    atlas:propertyValue 'Mus Musculus'\n"
 			+ "  ]\n"
 			+ "}\n"		
 		);
-		
-		// TODO:oldmodel
-		tester.testRDFOutput ( "ZOOMA-based annotation not found!", 
+
+		if ( ExpPropValueRdfMapper.OLD_MODEL_SUPPORT_FLAG )
+			tester.testRDFOutput ( "ZOOMA-based annotation not found (old model)!", 
 				"ASK {\n"
 				+ "  ?smp a biosd-terms:Sample;\n"
 				+ "  biosd-terms:has-bio-characteristic [ "
@@ -292,21 +314,40 @@ public class BioSdMappersTest
 				+ "\n"
 				+ "  ?ptype1 a obo:NCBITaxon_10090"
 				+ "}\n"		
-			);
+		);
 		
+
+		// Check that has-sample-attribute was used for Comment[]
+		//
 		tester.testRDFOutput ( "ZOOMA-based annotation not found!", 
 			"ASK {\n"
 			+ "  ?smp a biosd-terms:Sample;\n"
-			+ "  biosd-terms:has-bio-characteristic [ "
-			+ "    a efo:EFO_0000001, obo:NCBITaxon_10090;\n"
-			+ "    dc-terms:type 'Organism';\n"
-			+ "    atlas:propertyType 'Organism';\n"
-			+ "    rdfs:label 'Mus Musculus';\n"
-			+ "    atlas:propertyValue 'Mus Musculus'\n"
+			+ "  biosd-terms:has-sample-attribute [ "
+			+ "    a efo:EFO_0000001, efo:EFO_0000565;\n"
+			+ "    dc:type 'Disease State';\n"
+			+ "    atlas:propertyType 'Disease State';\n"
+			+ "    rdfs:label 'Leukemia';\n"
+			+ "    atlas:propertyValue 'Leukemia'\n"
 			+ "  ]\n"
 			+ "}\n"		
 		);
 		
+		if ( ExpPropValueRdfMapper.OLD_MODEL_SUPPORT_FLAG )
+			tester.testRDFOutput ( "ZOOMA-based annotation not found (old model)!", 
+				"ASK {\n"
+				+ "  ?smp a biosd-terms:Sample;\n"
+				+ "  sio:SIO_000332 [ " // is about
+				+ "    a efo:EFO_0000001;"
+				+ "    rdfs:label 'Leukemia';\n"
+				+ " 	 biosd-terms:has-bio-characteristic-type\n"
+				+ "		   [ a efo:EFO_0000565 ],\n"
+				+ "	     [ a efo:EFO_0000001; rdfs:label 'Disease State' ]\n"
+				+ "  ]\n"
+				+ "}\n"		
+		);
+
+		
+	
 		
 		
 		tester.testRDFOutput ( "Publication statements not found!", 
