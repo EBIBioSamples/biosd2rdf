@@ -10,6 +10,7 @@ import static uk.ac.ebi.fg.java2rdf.utils.OwlApiUtils.assertLink;
 
 import java.text.ParseException;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
@@ -196,7 +197,7 @@ public class ExpPropValueRdfMapper<T extends Accessible> extends PropertyRdfMapp
 			// Or date+time?
 			if ( this.dateTime != null ) {
 				// has value
-				assertData ( onto, pvalUri, uri ( "sio", "SIO_000300") , DataTypeAdapter.printDateTime ( this.date ), XSDVocabulary.DATE_TIME.toString () );
+				assertData ( onto, pvalUri, uri ( "sio", "SIO_000300") , DataTypeAdapter.printDateTime ( this.dateTime ), XSDVocabulary.DATE_TIME.toString () );
 				return;
 			}
 			
@@ -308,11 +309,9 @@ public class ExpPropValueRdfMapper<T extends Accessible> extends PropertyRdfMapp
 			// Define its label and possible additional stuff, such as the numerical value, unit, range (see above)
 			vcomp.map ( valUri );
 			
-			// Define a type URI that is specific to this type and a generic subclass of efo:experimental factor
-			// TODO: this would be more correct, if it didn't cause Zooma to discover that 1964 is an NCBI term and
-			// the same property type is both an organism and a year
 			
 			if ( OLD_MODEL_SUPPORT_FLAG )
+				// Define a type URI that is specific to this type and a generic subclass of efo:experimental factor
 				typeUri = uri ( "biosd", "exp-prop-type/" + parentAcc + "#" + pvalHash );
 			
 			// Bottom line: it's an experimental factor
@@ -332,20 +331,23 @@ public class ExpPropValueRdfMapper<T extends Accessible> extends PropertyRdfMapp
 				assertAnnotationData ( onto, typeUri, uri ( "dc-terms", "title" ), typeLabel );
 			}
 
-			// Now, see if Zooma has something more to say
-			String discoveredTypeUri = otermResolver.getOntoClassUri ( pval, vcomp.isNumberOrDate () );
+			// Now, see if the onto discoverer has something more to say
+			List<String> discoveredTypeUris = otermResolver.getOntoClassUris ( pval, vcomp.isNumberOrDate () );
 
 			// And in case it has, state that as additional types TODO: only one of such type is for the moment available, 
-			// it makes sense to take the first ones top-ranked by Zooma. 
-			if( discoveredTypeUri != null )
+			// it makes sense to take the first ones top-ranked. 
+			if( !discoveredTypeUris.isEmpty () )
 			{
-				assertIndividual ( onto, valUri, discoveredTypeUri );
-
-				if ( OLD_MODEL_SUPPORT_FLAG )
+				for ( String discoveredTypeUri: discoveredTypeUris )
 				{
-					String typeUri1 = uri ( "biosd", "exp-prop-type/zooma-concept#" + hashUriSignature ( discoveredTypeUri ) );
-					assertLink ( onto, valUri, uri ( "biosd-terms", "has-bio-characteristic-type" ), typeUri1 );
-					assertIndividual ( onto, typeUri1, discoveredTypeUri );
+					assertIndividual ( onto, valUri, discoveredTypeUri );
+
+					if ( OLD_MODEL_SUPPORT_FLAG )
+					{
+						String typeUri1 = uri ( "biosd", "exp-prop-type/ann-based-concept#" + hashUriSignature ( discoveredTypeUri ) );
+						assertLink ( onto, valUri, uri ( "biosd-terms", "has-bio-characteristic-type" ), typeUri1 );
+						assertIndividual ( onto, typeUri1, discoveredTypeUri );
+					}
 				}
 			}
 			

@@ -8,10 +8,10 @@ import java.util.Set;
 
 import org.apache.lucene.queryparser.flexible.standard.QueryParserUtil;
 
-import uk.ac.ebi.fgpt.zooma.search.ontodiscover.CachedOntoTermDiscoverer;
-import uk.ac.ebi.fgpt.zooma.search.ontodiscover.OntoTermDiscoveryCache;
-import uk.ac.ebi.fgpt.zooma.search.ontodiscover.OntologyDiscoveryException;
-import uk.ac.ebi.fgpt.zooma.search.ontodiscover.OntologyTermDiscoverer;
+import uk.ac.ebi.onto_discovery.api.CachedOntoTermDiscoverer;
+import uk.ac.ebi.onto_discovery.api.OntoTermDiscoveryCache;
+import uk.ac.ebi.onto_discovery.api.OntologyDiscoveryException;
+import uk.ac.ebi.onto_discovery.api.OntologyTermDiscoverer;
 import au.com.bytecode.opencsv.CSVReader;
 
 /**
@@ -72,21 +72,19 @@ public class BioSDCachedOntoTermDiscoverer extends CachedOntoTermDiscoverer
 	
 
 	/**
-	 * If typeLabel is in {@link #nonOntologyTypes}, it 
+	 * If typeLabel is in {@link #nonOntologyTypes}, the value is ignored and it attempts to associate an ontology term
+	 * to the type only. 
 	 */
 	@Override
-	public List<DiscoveredTerm> getOntologyTermUris ( String valueLabel, String typeLabel ) throws OntologyDiscoveryException
+	public List<DiscoveredTerm> getOntologyTerms ( String valueLabel, String typeLabel ) throws OntologyDiscoveryException
 	{
 		if ( typeLabel != null && nonOntologyTypes.contains ( typeLabel.trim ().toLowerCase () ) )
 		{
 			valueLabel = typeLabel;
 			typeLabel = null;
 		}
-		
-		if ( valueLabel != null ) valueLabel = QueryParserUtil.escape ( valueLabel );
-		if ( typeLabel != null ) typeLabel = QueryParserUtil.escape ( typeLabel );
-		
-		return super.getOntologyTermUris ( valueLabel, typeLabel );
+				
+		return super.getOntologyTerms ( valueLabel, typeLabel );
 	}
 	
 }

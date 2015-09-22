@@ -46,7 +46,7 @@ public class BioSDCachedDiscovererTest
 	{
 		// Assertion inside MyZOOMASearchClient
 		BioSDCachedOntoTermDiscoverer discoverer = new BioSDCachedOntoTermDiscoverer (	new ZoomaOntoTermDiscoverer ( new MyZOOMASearchClient () ) );
-		discoverer.getOntologyTermUris ( "123", "sample_title" );
-		discoverer.getOntologyTermUris ( "ABC", "Synonym" );
+		discoverer.getOntologyTerms ( "123", "sample_title" );
+		discoverer.getOntologyTerms ( "ABC", "Synonym" );
 	}
 }

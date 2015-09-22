@@ -53,7 +53,7 @@ public class BioSdMappersTest
 
 		TestModel biosdModel = new TestModel ();
 		
-		biosdModel.cv1.setTermText ( "Mus Musculus" ); // ZOOMA likes this more than 'mus-mus'
+		biosdModel.cv1.setTermText ( "Mus Musculus" );
 		
 		biosdModel.msi.setTitle ( "A test SampleTab Submission" );
 		biosdModel.msi.setDescription ( "Hey! This is just a test! And this is a bad XML char: \u0015" );
@@ -287,7 +287,7 @@ public class BioSdMappersTest
 		);
 				
 		
-		tester.testRDFOutput ( "ZOOMA-based annotation not found!", 
+		tester.testRDFOutput ( "Text mining-based annotation not found!", 
 			"ASK {\n"
 			+ "  ?smp a biosd-terms:Sample;\n"
 			+ "  biosd-terms:has-bio-characteristic [ "
@@ -301,7 +301,7 @@ public class BioSdMappersTest
 		);
 
 		if ( ExpPropValueRdfMapper.OLD_MODEL_SUPPORT_FLAG )
-			tester.testRDFOutput ( "ZOOMA-based annotation not found (old model)!", 
+			tester.testRDFOutput ( "Text mining-based annotation not found (old model)!", 
 				"ASK {\n"
 				+ "  ?smp a biosd-terms:Sample;\n"
 				+ "  biosd-terms:has-bio-characteristic [ "
@@ -319,7 +319,7 @@ public class BioSdMappersTest
 
 		// Check that has-sample-attribute was used for Comment[]
 		//
-		tester.testRDFOutput ( "ZOOMA-based annotation not found!", 
+		tester.testRDFOutput ( "Text mining-based annotation not found!", 
 			"ASK {\n"
 			+ "  ?smp a biosd-terms:Sample;\n"
 			+ "  biosd-terms:has-sample-attribute [ "
@@ -333,7 +333,7 @@ public class BioSdMappersTest
 		);
 		
 		if ( ExpPropValueRdfMapper.OLD_MODEL_SUPPORT_FLAG )
-			tester.testRDFOutput ( "ZOOMA-based annotation not found (old model)!", 
+			tester.testRDFOutput ( "Text mining-based annotation not found (old model)!", 
 				"ASK {\n"
 				+ "  ?smp a biosd-terms:Sample;\n"
 				+ "  sio:SIO_000332 [ " // is about

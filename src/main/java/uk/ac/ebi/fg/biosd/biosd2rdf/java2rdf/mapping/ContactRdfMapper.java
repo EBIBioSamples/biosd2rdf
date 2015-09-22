@@ -71,7 +71,7 @@ public class ContactRdfMapper extends BeanRdfMapper<Contact>
 		this.addPropertyMapper ( "affiliation", new OwlDatatypePropRdfMapper<Contact, String> ( uri ( "biosd-terms", "has-affiliation-line" ) ) );
 		this.addPropertyMapper ( "url", new UriStringPropRdfMapper<Contact> ( uri ( "foaf", "page" ), true ) );
 		
-		// TODO: These need to be checked against Zooma
+		// TODO: These need to be checked against onto-disvovery
 		// c.getContactRoles ();
 	}
 

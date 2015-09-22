@@ -58,7 +58,7 @@ public class OrganizationRdfMapper extends BeanRdfMapper<Organization>
 		this.addPropertyMapper ( "address", new OwlDatatypePropRdfMapper<Organization, String> ( uri ( "biosd-terms", "has-address-line" ) ) );
 		this.addPropertyMapper ( "url", new UriStringPropRdfMapper<Organization> ( uri ( "foaf", "page" ), true ) );
 		
-		// TODO: These need to be checked against Zooma
+		// TODO: These need to be checked against the discoverer
 		// o.getRole ();
 	}
 }

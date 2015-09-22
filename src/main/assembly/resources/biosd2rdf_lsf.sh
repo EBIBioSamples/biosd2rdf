@@ -15,9 +15,6 @@ if [ "$BIOSD2RDF_SAMPLE_SIZE" == '' ]; then BIOSD2RDF_SAMPLE_SIZE=100; fi
 # The LSF group used for loading jobs
 if [ "$BIOSD2RDF_LSF_GROUP" == '' ]; then BIOSD2RDF_LSF_GROUP='biosd2rdf'; fi
 
-# Define this from the shell, it delays ZOOMA calls and should help preventing server crashes
-#export OPTS="$OPTS -Duk.ac.ebi.fg.biosd.biosd2rdf.minZoomaCallDelay=120" # 500 calls/min in each thread
-
 
 # If it doesn't already exist, create an LSF group to manage a limited running pool
 if [ "$(bjgroup -s /$BIOSD2RDF_LSF_GROUP 2>&1)" == 'No job group found' ]; then
@@ -34,6 +31,17 @@ fi
 #
 nthreads=$(( 105 / $BIOSD2RDF_LSF_NODES ))
 export OPTS="$OPTS -Duk.ac.ebi.fg.biosd.biosd2rdf.maxThreads=$nthreads" 
+
+# Which service to use to get ontology annotations from text labels about sample properties 
+#export OPTS="$OPTS -Duk.ac.ebi.fg.biosd.biosd2rdf.ontoDiscoverer=bioportal"
+
+# This is also important with Bioportal. It doesn't accept more than 15 calls/min per each process
+#min_call_delay=$(( $nthreads * 1000 / 15 ))
+#min_call_delay=5000
+
+# This parameter can be used with 'uk.ac...ontoDiscoverer=zooma' as well
+#export OPTS="$OPTS -Duk.ac.ebi.fg.biosd.biosd2rdf.minCallDelay=${min_call_delay}"
+
 
 # Create bsub invocations for every data chunk
 # I know, there is xargs for this, but it turns out that it sucks and I cannot find a way to tell it to split arguments when I want.
