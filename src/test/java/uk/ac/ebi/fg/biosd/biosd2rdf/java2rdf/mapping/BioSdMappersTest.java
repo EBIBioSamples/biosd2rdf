@@ -78,6 +78,14 @@ public class BioSdMappersTest
 		BioCharacteristicValue sameAsRel = new BioCharacteristicValue ( "smp1bis", new BioCharacteristicType ( "Same As" ) );
 		biosdModel.smp1.addPropertyValue ( sameAsRel );
 		
+		// Testing "Child Of/Parent Of"
+		BioCharacteristicValue childOfRel = new BioCharacteristicValue ( "smp1Parent", new BioCharacteristicType ( "Child Of" ) );
+		biosdModel.smp1.addPropertyValue ( childOfRel );
+		BioCharacteristicValue parentOfRel = new BioCharacteristicValue ( "smp1Child", new BioCharacteristicType ( "Parent Of" ) );
+		biosdModel.smp1.addPropertyValue ( parentOfRel );
+
+		
+		
 		
 		Publication pub1 = new Publication ( "doi://123", "123" );
 		pub1.setTitle ( "A test publication 1" );
@@ -226,6 +234,21 @@ public class BioSdMappersTest
 			+ "  smp:smp1bis owl:sameAs smp:smp1.\n"
 			+ "}\n"		
 		);
+
+		tester.testRDFOutput ( "smp1 biosd-terms:sample-child-of smp1Parent not found! ", 
+			"ASK {\n"
+			+ "  smp:smp1 biosd-terms:sample-child-of smp:smp1Parent.\n"
+			+ "  smp:smp1Parent biosd-terms:sample-parent-of smp:smp1.\n"
+			+ "}\n"		
+		);
+
+		tester.testRDFOutput ( "smp1 biosd-terms:sample-parent-of smp1Child not found! ", 
+			"ASK {\n"
+			+ "  smp:smp1 biosd-terms:sample-parent-of smp:smp1Child.\n"
+			+ "  smp:smp1Child biosd-terms:sample-child-of smp:smp1.\n"
+			+ "}\n"		
+		);
+		
 		
 		tester.testRDFOutput ( "Explicit ontology annotation not found!", 
 			"ASK {\n"
