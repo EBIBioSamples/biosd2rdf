@@ -1,0 +1,19 @@
+#
+# Samples reporting latitude and longitude
+#
+ASK
+{
+  ?item biosd-terms:has-bio-characteristic ?latPv, ?longPv.
+
+  ?latPv
+    dc:type ?latLabel;
+    sio:SIO_000300 ?latVal. # sio:has value
+
+  FILTER ( LCASE ( STR ( ?latLabel ) ) = "latitude" ).
+
+  ?longPv
+    dc:type ?longLabel;
+    sio:SIO_000300 ?longVal. # sio:has value
+
+  FILTER ( LCASE ( STR ( ?longLabel ) ) = "longitude" ).
+}

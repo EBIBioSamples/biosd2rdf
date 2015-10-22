@@ -1,0 +1,28 @@
+#
+# Property values with ranges
+#
+ASK
+{
+  ?item biosd-terms:has-bio-characteristic ?pv.
+
+  ?pv
+    biosd-terms:has-bio-characteristic-type ?ptype;
+    biosd-terms:has-low-value ?lo;
+    biosd-terms:has-high-value ?hi;
+    rdfs:label ?vlabel. # contains a string composed with value and unit
+
+  ?ptype
+    rdfs:label ?pTypeLabel.
+
+  FILTER ( ?ptype != sio:SIO_000944 ). # interval, obvious
+
+
+  OPTIONAL {
+    ?pv
+      sio:SIO_000221 [ # sio:has unit
+      a ?unitClass;
+    ].
+    FILTER ( ?unitClass != owl:NamedIndividual ).
+    FILTER ( ?unitClass != sio:SIO_000074 ). # unit, obvious
+  }
+}

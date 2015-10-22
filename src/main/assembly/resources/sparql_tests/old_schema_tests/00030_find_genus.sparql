@@ -1,0 +1,18 @@
+#
+## All samples that derives from a given genus (Mus)
+#
+ASK
+{
+  ?smp biosd-terms:has-bio-characteristic ?pv.
+  
+  ?pv biosd-terms:has-bio-characteristic-type ?pvType;
+      rdfs:label ?pvLabel.
+  
+  ?pvType a ?pvTypeClass.
+  
+  # Mus
+  ?pvTypeClass 
+    rdfs:label ?propTypeLabel;
+    # '*' gives you transitive closure, even when inference is disabled  
+    rdfs:subClassOf* <http://purl.obolibrary.org/obo/NCBITaxon_10088>    
+}

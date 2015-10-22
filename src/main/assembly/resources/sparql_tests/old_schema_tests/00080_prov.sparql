@@ -1,0 +1,8 @@
+#
+# Derivation relationships
+#
+ASK
+{
+	{ ?smpTo prov:wasDerivedFrom ?smpFrom } # Every statement like this has also sio:SIO_000244 (derived from)
+		UNION { ?smpFrom sio:SIO_000245 ?smpTo } # this is derived into and there is no equivalent in prov
+}

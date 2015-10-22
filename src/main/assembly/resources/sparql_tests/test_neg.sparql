@@ -1,0 +1,2 @@
+# Stupid test used to ensure sparql_ask actually fails when it has to
+ASK { ?item a biosd-terms:Foo.  }

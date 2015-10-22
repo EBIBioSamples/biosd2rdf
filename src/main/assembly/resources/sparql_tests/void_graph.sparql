@@ -1,0 +1,2 @@
+# VOID-related graph, you need a $version for this, see test_all.sh
+ASK { GRAPH <http://rdf.ebi.ac.uk/dataset/biosamples/$version> { ?s ?p ?o} }

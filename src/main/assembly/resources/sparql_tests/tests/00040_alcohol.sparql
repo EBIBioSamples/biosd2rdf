@@ -1,0 +1,22 @@
+#
+## All samples treated with a compound of 'alchool' type or a more specific alchool type
+#  this is made through a query over the bioportal sparql endpoint (ie, a federated query)
+#
+ASK
+{
+  SERVICE <http://sparql.bioontology.org/ontologies/sparql/?apikey=c6ae1b27-9f86-4e3c-9dcf-087e1156eabe>
+  {
+    ?pvTypeClass
+      rdfs:subClassOf <http://purl.obolibrary.org/obo/CHEBI_30879>;
+      rdfs:label ?pvTypeLabel.
+  }
+
+  ?pv
+    a ?pvTypeClass;
+    atlas:propertyValue ?pvLabel; # equivalent to rdfs:label, dc:title
+    atlas:propertyType ?pvTypeLabel. # equivalent to dc:type
+
+  ?smp
+    a biosd-terms:Sample;
+    biosd-terms:has-bio-characteristic ?pv.
+}

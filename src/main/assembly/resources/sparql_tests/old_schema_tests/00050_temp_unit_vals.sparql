@@ -1,0 +1,20 @@
+#
+## Samples with temperature attributes. DO REQUIRE Inference enabled
+#
+ASK
+{
+  ?smp
+    a biosd-terms:Sample;
+    biosd-terms:has-bio-characteristic | sio:SIO_000332 ?tPv. # is about
+
+  ?tPv
+    sio:SIO_000300 ?tval; # sio:has value
+    rdfs:label ?tvalLabel; # contains a string composed with value and unit
+    sio:SIO_000221 [ # sio:has unit
+      a obo:UO_0000027; # temperature
+      rdfs:label ?unitLabel
+    ].
+
+  ?tPv biosd-terms:has-bio-characteristic-type ?pvType.
+  ?pvType rdfs:label ?pvTypeLabel
+}

@@ -1,0 +1,5 @@
+ASK {
+  { select ?item WHERE { ?item a biosd-terms:BiosamplesSubmission. } LIMIT 3}
+  UNION { select ?item { ?item a biosd-terms:SampleGroup. } LIMIT 3 }
+  UNION { select ?item { ?item a biosd-terms:Sample. } LIMIT 3 }
+}

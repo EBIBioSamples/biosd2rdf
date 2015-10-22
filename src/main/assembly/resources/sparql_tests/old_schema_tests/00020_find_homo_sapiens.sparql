@@ -1,0 +1,27 @@
+#
+## Samples with a given property value and type, and external links
+## This version doesn't exploit any ontology for sample properties.
+#
+ASK
+{
+  ?smp
+    a biosd-terms:Sample;
+    biosd-terms:has-bio-characteristic | sio:SIO_000332 ?pv; # is about
+    pav:derivedFrom ?webRec.
+
+  ?pv
+    rdfs:label ?pvLabel;
+    biosd-terms:has-bio-characteristic-type ?pvType.
+
+  ?pvType
+    rdfs:label ?propTypeLabel.
+
+
+  FILTER ( LCASE ( STR ( ?propTypeLabel ) ) = "organism" ).
+  FILTER ( LCASE ( STR ( ?pvLabel ) ) = "homo sapiens" ).
+
+  ?webRec
+    dcterms:identifier ?repoAcc;
+    dcterms:source ?repoName;
+    foaf:page ?repoUrl.
+}
