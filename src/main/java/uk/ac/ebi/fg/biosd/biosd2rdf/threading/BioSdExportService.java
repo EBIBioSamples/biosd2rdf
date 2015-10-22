@@ -51,6 +51,7 @@ public class BioSdExportService extends BatchService<BioSdExportTask>
 		
 	private String outputPath = null;
 	private int outputCounter = 0;
+	
 	private Runnable memFlushAction = new Runnable() 
 	{
 		@Override
@@ -59,6 +60,7 @@ public class BioSdExportService extends BatchService<BioSdExportTask>
 		}
 	};
 
+	
 	/**
 	 * This sets up proper parameters for {@link #getPoolSizeTuner()} and initialises the {@link #onto triple store} used
 	 * to save the exporters output.
@@ -100,6 +102,7 @@ public class BioSdExportService extends BatchService<BioSdExportTask>
 		}
 	}
 	
+
 	/** 
 	 * Submits the task of exporting a single SampleTab submission to RDF, of which the database ID is known. This is used by 
 	 * {@link #submitAll(double)} and wraps {@link #submit(BioSdExportTask)}.  
@@ -210,7 +213,7 @@ public class BioSdExportService extends BatchService<BioSdExportTask>
 		//
 		log.info ( "Waiting all tasks to finish, before flusing the RDF triples created so far to stdout/file" );
 		waitAllFinished ();
-
+		
 		OutputStream kbout = null;
 				
 		try
@@ -276,5 +279,6 @@ public class BioSdExportService extends BatchService<BioSdExportTask>
 			if ( this.poolSizeTuner != null ) poolSizeTuner.start ();
 		}
 	} // flushKnowledgeBase
+	
 	
 }

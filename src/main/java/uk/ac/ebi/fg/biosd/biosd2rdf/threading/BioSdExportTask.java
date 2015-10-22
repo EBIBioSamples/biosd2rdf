@@ -99,7 +99,7 @@ public class BioSdExportTask extends BatchServiceTask
 			/* DEBUG log.info ( "Here I should export {}, having a nap instead", msi.getAcc () );
 			Thread.sleep ( RandomUtils.nextLong () % 10000 ); */
 		} 
-		catch ( Exception ex ) 
+		catch ( Throwable ex ) 
 		{
 			// TODO: proper exit code
 			log.error ( "Error while exporting " + msi.getAcc () + ": " + ex.getMessage (), ex );
