@@ -115,15 +115,14 @@ public class Biosd2RdfCmd
 	private static void terminationHandler ()
 	{
 		if ( exCode == 128 ) return; // --help option
-		
-		if ( !"true".equals ( System.getProperty ( "biosd.test_mode" ) ) ) 
-		{
-			EntityManagerFactory emf = Resources.getInstance ().getEntityManagerFactory ();
-			if ( emf != null && emf.isOpen () ) emf.close ();
-		}
-		
+				
 		// Saves the export results in memory, either the unique chunk available, or the last one
 		if ( exportService != null ) exportService.flushKnowledgeBase ();
+		
+		if ( "true".equals ( System.getProperty ( "biosd.test_mode" ) ) ) return; 
+
+		EntityManagerFactory emf = Resources.getInstance ().getEntityManagerFactory ();
+		if ( emf != null && emf.isOpen () ) emf.close ();
 	}
 	
 	
