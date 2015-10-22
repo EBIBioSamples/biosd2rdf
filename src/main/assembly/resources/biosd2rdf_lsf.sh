@@ -35,18 +35,11 @@ export OPTS="$OPTS -Duk.ac.ebi.fg.biosd.biosd2rdf.maxThreads=$nthreads"
 # Which service to use to get ontology annotations from text labels about sample properties 
 #export OPTS="$OPTS -Duk.ac.ebi.fg.biosd.biosd2rdf.ontoDiscoverer=bioportal"
 
-# This is also important with Bioportal. It doesn't accept more than 15 calls/min per each process
-#min_call_delay=$(( $nthreads * 1000 / 15 ))
-#min_call_delay=5000
-
-# This parameter can be used with 'uk.ac...ontoDiscoverer=zooma' as well
-#export OPTS="$OPTS -Duk.ac.ebi.fg.biosd.biosd2rdf.minCallDelay=${min_call_delay}"
-
 
 # Create bsub invocations for every data chunk
 # I know, there is xargs for this, but it turns out that it sucks and I cannot find a way to tell it to split arguments when I want.
 # 
-ct=0; chunk_size=10000; chunkct=0
+ct=0; chunk_size=15000; chunkct=0
 (for acc in $(./biosd2rdf.sh -l -z $BIOSD2RDF_SAMPLE_SIZE )
 do
 	if [ $ct == 0 ]; then 
