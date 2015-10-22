@@ -90,10 +90,9 @@ public class BioSampleRdfMapper extends BeanRdfMapper<BioSample>
 		// we want to show the external non-RDF records and provide with the corresponding links. 
 		// The quickest way to achieve that is to send this Java object to its RDF mapper.
 		DatabaseRecordRef biosdRef = new DatabaseRecordRef ( "EBI Biosamples Database", smp.getAcc (), null );
-		biosdRef.setUrl ( "http://www.ebi.ac.uk/biosamples/sample/" + smp.getAcc () );
-		
+		biosdRef.setUrl ( "http://www.ebi.ac.uk/biosamples/sample/" + smp.getAcc () );		
 		smp.addDatabaseRecordRef ( biosdRef );
-
+		
 		// Add links coming from myEquivalents
 		for ( DatabaseRecordRef dbxref: DbRecRefRdfMapper.getMyEquivalentsLinks ( "ebi.biosamples.samples", smp.getAcc () ) )
 			smp.addDatabaseRecordRef ( dbxref );
@@ -122,17 +121,21 @@ public class BioSampleRdfMapper extends BeanRdfMapper<BioSample>
 			
 			else if ( "Same As".equalsIgnoreCase ( typeLabel ) )
 			{
-				RdfUriGenerator<BioSample> uriGen = this.getRdfUriGenerator ();
-				OWLOntology kb = this.getMapperFactory ().getKnowledgeBase ();
-				String thisUri = uriGen.getUri ( smp, params );
-				String thatUri = uriGen.getUri ( new BioSample ( pvalLabel ), params );
 				String sameAsUri = NamespaceUtils.uri ( "owl", "sameAs" );
-
-				// TODO: should we use schema:sameAs instead?
-				assertLink ( kb, thisUri, sameAsUri, thatUri );
-				assertLink ( kb, thatUri, sameAsUri, thisUri );
+				this.mapSample2SampleLink ( smp, pvalLabel, sameAsUri, sameAsUri, params );
 			}
-			
+			else if ( "Child Of".equalsIgnoreCase ( typeLabel ) )
+			{
+				String sampleChildUri = NamespaceUtils.uri ( "biosd-terms", "sample-child-of" );
+				String sampleParentUri = NamespaceUtils.uri ( "biosd-terms", "sample-parent-of" );
+				this.mapSample2SampleLink ( smp, pvalLabel, sampleChildUri, sampleParentUri, params );
+			}
+			else if ( "Parent Of".equalsIgnoreCase ( typeLabel ) )
+			{
+				String sampleChildUri = NamespaceUtils.uri ( "biosd-terms", "sample-child-of" );
+				String sampleParentUri = NamespaceUtils.uri ( "biosd-terms", "sample-parent-of" );
+				this.mapSample2SampleLink ( smp, pvalLabel, sampleParentUri, sampleChildUri, params );
+			}
 			else if ( "name".equalsIgnoreCase ( typeLabel ) || "sample name".equalsIgnoreCase ( typeLabel ) ) 
 				hasName = true;
 		}
@@ -146,7 +149,10 @@ public class BioSampleRdfMapper extends BeanRdfMapper<BioSample>
 		BioCharacteristicValue nval = new BioCharacteristicValue ( "Sample " + smp.getAcc (), ntype );
 		smp.addPropertyValue ( nval );
 		
-		return super.map ( smp, params ) | true;
+		super.map ( smp, params );
+
+		log.trace ( "Sample {} mapped", smp.getAcc () );
+		return true;
 	}
 	
 	
@@ -159,31 +165,42 @@ public class BioSampleRdfMapper extends BeanRdfMapper<BioSample>
 	 */
 	private void mapDerived ( BioSample smp, String otherAcc, boolean isFrom, Map<String, Object> params )
 	{
-		RdfUriGenerator<BioSample> uriGen = this.getRdfUriGenerator ();
-		OWLOntology kb = this.getMapperFactory ().getKnowledgeBase ();
-		String luri = uriGen.getUri ( smp, params );
-		// We prefer to reuse the URI generator, and this requires a sample
-		String ruri = uriGen.getUri ( new BioSample ( otherAcc ), params );
-		
 		String sioDerivedFrom = uri ( "sio", "SIO_000244" ), sioDerivedInto = uri ( "sio", "SIO_000245" );
 		String provDerivedFrom = uri ( "prov", "wasDerivedFrom" ), provDerivedInto = uri ( "prov", "hadDerivation" );
 		
 		if ( isFrom ) 
 		{
-			assertLink ( kb, luri, sioDerivedFrom, ruri );
-			assertLink ( kb, luri, provDerivedFrom, ruri );
-			assertLink ( kb, ruri, sioDerivedInto, luri );
-			assertLink ( kb, ruri, provDerivedInto, luri );
+			this.mapSample2SampleLink ( smp, otherAcc, sioDerivedFrom, sioDerivedInto, params );
+			this.mapSample2SampleLink ( smp, otherAcc, provDerivedFrom, provDerivedInto, params );
 		}
 		else
 		{
-			assertLink ( kb, luri, sioDerivedInto, ruri );
-			assertLink ( kb, luri, provDerivedInto, ruri );
-			assertLink ( kb, ruri, sioDerivedFrom, luri );
-			assertLink ( kb, ruri, provDerivedFrom, luri );
+			this.mapSample2SampleLink ( smp, otherAcc, sioDerivedInto, sioDerivedFrom, params );
+			this.mapSample2SampleLink ( smp, otherAcc, provDerivedInto, provDerivedFrom, params );
 		}
 	}
 
+	/**
+	 * Maps a sample-to-sample link (e.g., derived from, child-of), assuming there is an inverse relation too.
+	 * @param smp the starting sample
+	 * @param otherAcc the other sample's accession
+	 * @param propUri used to assert (smp propUri otherAcc)
+	 * @param inversePropUri used to assert (otherAcc inversePropUri smp)
+	 * @param params passed to java2rdf methods.
+	 */
+	private void mapSample2SampleLink ( 
+		BioSample smp, String otherAcc, String propUri, String inversePropUri, 
+		Map<String, Object> params 
+	)
+	{
+		RdfUriGenerator<BioSample> uriGen = this.getRdfUriGenerator ();
+		OWLOntology kb = this.getMapperFactory ().getKnowledgeBase ();
+		String thisUri = uriGen.getUri ( smp, params );
+		String thatUri = uriGen.getUri ( new BioSample ( otherAcc ), params );
+
+		assertLink ( kb, thisUri, propUri, thatUri );
+		assertLink ( kb, thatUri, inversePropUri, thisUri );		
+	}
 }
 
 

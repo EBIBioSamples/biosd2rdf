@@ -101,7 +101,7 @@ public class DbRecRefRdfMapper extends BeanRdfMapper<DatabaseRecordRef>
 	}
 	
 	/**
-	 * TODO: comment me!
+	 * Fetches the links coming from myEquivalents and returns them as {@link DatabaseRecordRef}.
 	 */
 	public static DatabaseRecordRef[] getMyEquivalentsLinks ( String serviceName, String acc )
 	{

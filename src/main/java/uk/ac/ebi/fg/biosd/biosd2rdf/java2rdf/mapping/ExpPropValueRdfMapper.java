@@ -255,15 +255,13 @@ public class ExpPropValueRdfMapper<T extends Accessible> extends PropertyRdfMapp
 			// We're ignoring it here, cause the accession is already assigned by the sample mapper.
 			if ( "sample accession".equalsIgnoreCase ( typeLabel ) ) return false;
 
-			// The Sample mapper already deals with this
-			if ( "same as".equals ( typeLabel ) ) return false;
-			
-			
 			String typeLabelLC = typeLabel.toLowerCase ();
 
-			// The Sample mapper already deals with this
-			if ( typeLabelLC.matches ( "derived (from|to)" ) )
-				return false;
+			// The Sample mapper already deals with these
+			if ( "same as".equals ( typeLabel ) 
+			     || typeLabelLC.matches ( "derived (from|to)" ) 
+			     || typeLabelLC.matches ( "(child|parent) of" ) )
+			  return false;
 			
 			RdfMapperFactory mapFact = this.getMapperFactory ();
 			OWLOntology onto = mapFact.getKnowledgeBase ();
@@ -334,8 +332,18 @@ public class ExpPropValueRdfMapper<T extends Accessible> extends PropertyRdfMapp
 			// Now, see if the onto discoverer has something more to say
 			List<String> discoveredTypeUris = otermResolver.getOntoClassUris ( pval, vcomp.isNumberOrDate () );
 
-			// And in case it has, state that as additional types TODO: only one of such type is for the moment available, 
-			// it makes sense to take the first ones top-ranked. 
+			// And in case it has, state that as additional types
+			// TODO: a more correct model would be (for each discoveredTypeUri): 
+			//
+			// newValUri = <URI(value/type labels + discoveredTypeUri)
+			// sample has-attr valUri, newValUri
+			// newValUri a discoveredTypeUri
+			// newValUri computed-from valUri
+			// newValUri <same numeric annotations>
+			// 
+			// it's rather complicated to add the above statements in the current converter, we plan to do that
+			// in the incoming BioSD annotator
+			//
 			if( !discoveredTypeUris.isEmpty () )
 			{
 				for ( String discoveredTypeUri: discoveredTypeUris )

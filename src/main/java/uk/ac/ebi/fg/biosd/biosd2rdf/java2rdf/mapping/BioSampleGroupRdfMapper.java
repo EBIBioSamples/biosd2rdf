@@ -113,7 +113,10 @@ public class BioSampleGroupRdfMapper extends BeanRdfMapper<BioSampleGroup>
 		BioCharacteristicValue nval = new BioCharacteristicValue ( "Sample Group " + sg.getAcc (), ntype );
 		sg.addPropertyValue ( nval );
 		
-		return super.map ( sg, params ) | true;
+		super.map ( sg, params );
+
+		log.trace ( "Sample {} mapped", sg.getAcc () );
+		return true;
 	}
 
 }

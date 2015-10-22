@@ -105,7 +105,10 @@ public class MSIRdfMapper extends BeanRdfMapper<MSI>
 			if ( params == null ) params = new HashMap<String, Object> ();
 			params.put ( "msiAccession", msi.getAcc () );
 
-			return super.map ( msi, params );
+			boolean result = super.map ( msi, params );
+			
+			log.trace ( "Submission {} mapping done", msi.getAcc () );
+			return result;
 		} 
 		catch ( Exception ex ) {
 			throw new RdfMappingException ( String.format ( 
