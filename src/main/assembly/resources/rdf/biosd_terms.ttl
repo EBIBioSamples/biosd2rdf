@@ -14,14 +14,14 @@
 
 <http://rdf.ebi.ac.uk/terms/biosd/> rdf:type :Ontology ;
                                     
-                                    :imports obo:obi.owl ,
-                                             obo:ro.owl ,
-                                             <http://purl.obolibrary.org/obo/iao/iao-main.owl> ,
+                                    :imports <http://purl.obolibrary.org/obo/iao/2011-05-09/iao-main.owl> ,
+                                             <http://purl.obolibrary.org/obo/obi/2015-03-17/obi.owl> ,
+                                             <http://purl.obolibrary.org/obo/ro/releases/2015-04-12/ro.owl> ,
                                              <http://purl.org/ontology/bibo/> ,
                                              <http://purl.org/spar/fabio/> ,
-                                             schema: ,
-                                             <http://semanticscience.org/ontology/sio.owl> ,
-                                             prov: ,
+                                             <http://semanticscience.org/ontology/sio-v1.0.10-release.owl> ,
+                                             <http://topbraid.org/schema/> ,
+                                             <http://www.w3.org/ns/prov-o-20130430> ,
                                              <http://xmlns.com/foaf/0.1/> .
 
 
@@ -52,13 +52,7 @@ biosdterms:has-affiliation-line rdf:type :AnnotationProperty ;
 
 biosdterms:has-authors-list rdf:type :AnnotationProperty ;
                             
-                            rdfs:domain obo:IAO_0000311 ,
-                                        <http://purl.org/ontology/bibo/Document> ,
-                                        <http://purl.org/spar/fabio/Work> ;
-                            
-                            rdfs:subPropertyOf rdfs:comment ;
-                            
-                            rdfs:domain <http://xmlns.com/foaf/0.1/Document> .
+                            rdfs:subPropertyOf rdfs:comment .
 
 
 
@@ -109,6 +103,19 @@ biosdterms:child-of rdf:type :ObjectProperty ;
 
 
 
+###  http://rdf.ebi.ac.uk/terms/biosd/computed-from
+
+biosdterms:computed-from rdf:type :ObjectProperty ;
+                         
+                         rdfs:label "is computed from" ;
+                         
+                         obo:IAO_0000115 "The current entity (usually some data, a document, or other information item) was computed using another one. For instance, an ontology term annotation was computed starting from some free text." ;
+                         
+                         rdfs:subPropertyOf sio:SIO_000244 ,
+                                            prov:wasDerivedFrom .
+
+
+
 ###  http://rdf.ebi.ac.uk/terms/biosd/derived-from-organism
 
 biosdterms:derived-from-organism rdf:type :ObjectProperty ;
@@ -126,6 +133,36 @@ biosdterms:derived-from-organism rdf:type :ObjectProperty ;
                                  rdfs:range sio:SIO_010000 ;
                                  
                                  rdfs:subPropertyOf prov:wasDerivedFrom .
+
+
+
+###  http://rdf.ebi.ac.uk/terms/biosd/has-address-line
+
+biosdterms:has-address-line rdf:type :ObjectProperty ;
+                            
+                            rdfs:range xsd:string .
+
+
+
+###  http://rdf.ebi.ac.uk/terms/biosd/has-affiliation-line
+
+biosdterms:has-affiliation-line rdf:type :ObjectProperty ;
+                                
+                                rdfs:range xsd:string .
+
+
+
+###  http://rdf.ebi.ac.uk/terms/biosd/has-authors-list
+
+biosdterms:has-authors-list rdf:type :ObjectProperty ;
+                            
+                            rdfs:domain obo:IAO_0000311 ,
+                                        <http://purl.org/ontology/bibo/Document> ,
+                                        <http://purl.org/spar/fabio/Work> ;
+                            
+                            rdfs:range xsd:string ;
+                            
+                            rdfs:domain <http://xmlns.com/foaf/0.1/Document> .
 
 
 
@@ -333,9 +370,7 @@ prov:wasDerivedFrom rdf:type :ObjectProperty .
 biosdterms:has-address-line rdf:type :DatatypeProperty ;
                             
                             rdfs:subPropertyOf dcterms:description ,
-                                               schema:description ;
-                            
-                            rdfs:range xsd:string .
+                                               schema:description .
 
 
 
@@ -344,9 +379,7 @@ biosdterms:has-address-line rdf:type :DatatypeProperty ;
 biosdterms:has-affiliation-line rdf:type :DatatypeProperty ;
                                 
                                 rdfs:subPropertyOf dcterms:description ,
-                                                   schema:description ;
-                                
-                                rdfs:range xsd:string .
+                                                   schema:description .
 
 
 
@@ -355,9 +388,7 @@ biosdterms:has-affiliation-line rdf:type :DatatypeProperty ;
 biosdterms:has-authors-list rdf:type :DatatypeProperty ;
                             
                             rdfs:subPropertyOf dcterms:description ,
-                                               schema:description ;
-                            
-                            rdfs:range xsd:string .
+                                               schema:description .
 
 
 
