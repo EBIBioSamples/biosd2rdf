@@ -16,6 +16,7 @@ import org.slf4j.LoggerFactory;
 import uk.ac.ebi.bioportal.webservice.client.BioportalClient;
 import uk.ac.ebi.bioportal.webservice.exceptions.OntologyServiceException;
 import uk.ac.ebi.bioportal.webservice.model.OntologyClass;
+import uk.ac.ebi.bioportal.webservice.utils.BioportalWebServiceUtils;
 import uk.ac.ebi.fg.core_model.expgraph.properties.ExperimentalPropertyType;
 import uk.ac.ebi.fg.core_model.expgraph.properties.ExperimentalPropertyValue;
 import uk.ac.ebi.fg.core_model.terms.OntologyEntry;
@@ -26,8 +27,9 @@ import uk.ac.ebi.fgpt.zooma.search.ontodiscover.ZoomaOntoTermDiscoverer;
 import uk.ac.ebi.onto_discovery.api.OntologyTermDiscoverer;
 import uk.ac.ebi.onto_discovery.api.OntologyTermDiscoverer.DiscoveredTerm;
 import uk.ac.ebi.onto_discovery.bioportal.BioportalOntoTermDiscoverer;
-import uk.ac.ebi.utils.memory.SimpleCache;
 import uk.ac.ebi.utils.regex.RegEx;
+
+import com.google.common.cache.CacheBuilder;
 
 
 /**
@@ -51,25 +53,30 @@ public class BioSdOntologyTermResolver
 	
 	private BioportalClient ontologyService = new BioportalClient ( BIOPORTAL_API_KEY );
 	
-	private final SimpleCache<String, String> ontoCache = new SimpleCache<> ( (int) 500E3 );
+	@SuppressWarnings ( { "unchecked", "rawtypes" } )
+	private final Map<String, String> ontoCache = ( (CacheBuilder) CacheBuilder.newBuilder () 
+		.maximumSize ( (long) 500E3 ) ) 
+		.build ().asMap (); 
+			
 	private Map<String, String> uoUnits;
 
 	private final static RegEx COMMENT_RE = new RegEx ( "(Comment|Characteristic)\\s*\\[\\s*(.+)\\s*\\]", Pattern.CASE_INSENSITIVE );
 	private final Logger log = LoggerFactory.getLogger ( this.getClass () );
 	
+	static
+	{
+		BioportalWebServiceUtils.STATS_WRAPPER.setPopUpExceptions ( false );
+	}
+	
+	
 	{		
 		OntologyTermDiscoverer baseDiscoverer = null;
 		
 		String ontoDiscovererProp = System.getProperty ( ONTO_DISCOVERER_PROP_NAME, "zooma" );
-		long minCallDelay = Long.valueOf ( System.getProperty (	"uk.ac.ebi.fg.biosd.biosd2rdf.minCallDelay", "0" ));
 		
 		if ( "zooma".equalsIgnoreCase ( ontoDiscovererProp ) )
 		{
 			StatsZOOMASearchFilter zoomaSearcher = new StatsZOOMASearchFilter ( new ZOOMASearchClient () );
-			zoomaSearcher.setSamplingTimeMs ( 1000 * 60 * 5 );
-			zoomaSearcher.setThrottleMode ( true );
-			zoomaSearcher.setMinCallDelay ( minCallDelay );
-			
 			baseDiscoverer = new ZoomaOntoTermDiscoverer ( zoomaSearcher );
 		}
 		else if ( "bioportal".equalsIgnoreCase ( ontoDiscovererProp ) )
@@ -78,10 +85,6 @@ public class BioSdOntologyTermResolver
 			((BioportalOntoTermDiscoverer) baseDiscoverer).setPreferredOntologies ( 
 				"EFO,UBERON,CL,CHEBI,BTO,GO,OBI,MESH,FMA,IAO,HP,BAO,MA,ICD10CM,NIFSTD,DOID,IDO,LOINC,OMIM,SIO,CLO,FHHO" 
 			);
-			
-			// They usually forces a limit of 15 calls/sec, then they start spiting HTTP/429 (too many requests) and 
-			// eventually 'connection reset'. The 110 factor is to take multi-threading into account.
-			((BioportalOntoTermDiscoverer) baseDiscoverer).setMinCallDelay ( minCallDelay );
 		}
 		else throw new IllegalArgumentException ( 
 			"Invalid value '" + ontoDiscovererProp + "' for '" + ONTO_DISCOVERER_PROP_NAME + "'" 
@@ -360,4 +363,5 @@ public class BioSdOntologyTermResolver
 		
 		return result;
 	}
+
 }

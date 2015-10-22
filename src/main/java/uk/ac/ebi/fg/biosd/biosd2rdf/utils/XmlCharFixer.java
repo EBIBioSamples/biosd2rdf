@@ -4,8 +4,6 @@ import java.io.FilterWriter;
 import java.io.IOException;
 import java.io.Writer;
 
-import org.apache.commons.lang3.StringEscapeUtils;
-
 /**
  * Fixes certain characters that are not liked by XML parsers and turns them into a more acceptable representation
  * (an hex code at the moment).

@@ -6,8 +6,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.lucene.queryparser.flexible.standard.QueryParserUtil;
-
 import uk.ac.ebi.onto_discovery.api.CachedOntoTermDiscoverer;
 import uk.ac.ebi.onto_discovery.api.OntoTermDiscoveryCache;
 import uk.ac.ebi.onto_discovery.api.OntologyDiscoveryException;
