@@ -48,4 +48,9 @@
 	<!--  logger name = "uk.ac.ebi.fg.java2rdf" level = "ALL" />
 	<logger name = "uk.ac.ebi.fg.ontodiscover" level = "ALL" / -->
 	<logger name = "uk.ac.ebi.fgpt.zooma" level = "INFO" /> 
+	<logger name = "uk.ac.ebi.onto_discovery.bioportal" level = "INFO" />
+	
+	<!-- Statistics, throttling and other reports, mainly about ZOOMA, Bioportal, possibly other web services -->
+	<logger name = "uk.ac.ebi.utils.runcontrol" level = "INFO" />
+	 
 </configuration>
