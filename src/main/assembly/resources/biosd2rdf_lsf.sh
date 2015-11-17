@@ -44,7 +44,7 @@ ct=0; chunk_size=15000; chunkct=0
 do
 	if [ $ct == 0 ]; then 
 	  printf "\n"
-		printf "bsub -J biosd2rdf_$chunkct -g /$BIOSD2RDF_LSF_GROUP -oo ./logs/biosd2rdf_$chunkct.out -M 24000 ./biosd2rdf.sh --output \'${BIOSD2RDF_OUTFILE}_$chunkct.ttl\' "
+		printf "bsub -J biosd2rdf_$chunkct -g /$BIOSD2RDF_LSF_GROUP -oo ./logs/biosd2rdf_$chunkct.out -M 27000 ./biosd2rdf.sh --output \'${BIOSD2RDF_OUTFILE}_$chunkct.ttl\' "
 		((chunkct++))
 	fi
 	printf "$acc "
