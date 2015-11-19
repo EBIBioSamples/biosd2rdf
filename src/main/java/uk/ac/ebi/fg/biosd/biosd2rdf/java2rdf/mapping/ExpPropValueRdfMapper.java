@@ -360,23 +360,24 @@ public class ExpPropValueRdfMapper<T extends Accessible> extends PropertyRdfMapp
 			}
 			
 			// Establish how to link the prop value to the sample
-			String attributeLinkUri = null;
-			if ( pval instanceof BioCharacteristicValue )  
-				attributeLinkUri = uri ( "biosd-terms", "has-bio-characteristic" ); // a direct sub-property of has-sample-attribute
+			String smpUri = mapFact.getUri ( sample, params );
+			if ( pval instanceof BioCharacteristicValue )
+				// a direct sub-property of has-sample-attribute
+				assertLink ( onto, smpUri, uri ( "biosd-terms", "has-bio-characteristic" ), valUri );				
 			else
 			{
-				attributeLinkUri = uri ( "biosd-terms", "has-sample-attribute" ); // sub-property of sio:SIO_000008 ('has attribute') 
-				
 				if ( OLD_MODEL_SUPPORT_FLAG )
 					// This is 'is about' and it's pretty wrong in the case of samples, since it links an information content 
 					// entity to an independent continuant. We're keeping it, but it's deprecated now 
 					assertLink ( onto, mapFact.getUri ( sample, params ), uri ( "sio", "SIO_000332" ), valUri );
 			}
-				
-			// Now we have either *** sample has-biocharacteristic valUri ***, or *** sample has-sample-attribute valUri ***, 
-			// depending on the Java type. Simple inference allows one to match both using the upper-level has-sample-attribute
-			assertLink ( onto, mapFact.getUri ( sample, params ), attributeLinkUri, valUri );
 			
+			// sub-property of sio:SIO_000008 ('has attribute'), we define it redundantly, as a super-property, grouping 
+			// specific cases.
+			assertLink ( onto, mapFact.getUri ( sample, params ), uri ( "biosd-terms", "has-sample-attribute" ), valUri );
+
+			// Now we have has-sample-attribute and possibly more specific properties too
+
 			return true;
 		} 
 		catch ( Exception ex )
