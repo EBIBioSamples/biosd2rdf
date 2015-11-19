@@ -6,7 +6,7 @@ ASK
 {
   ?smp
     a biosd-terms:Sample;
-    biosd-terms:has-bio-characteristic | sio:SIO_000332 ?pv; # is about
+    biosd-terms:has-sample-attribute ?pv;
     pav:derivedFrom ?webRec.
 
   # atlas:propertyValue, atlas:propertyType, dcterms:title are available too, data integration purposes.
