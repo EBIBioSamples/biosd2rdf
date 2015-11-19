@@ -31,7 +31,7 @@
 <http://rdf.ebi.ac.uk/dataset/biosamples/${biosd.version}> a void:Dataset;
      dcterms:title "EBI Biosamples Database"^^xsd:string;
      dcterms:description """RDF representation of the EBI Biosample Database"""^^xsd:string;
-     foaf:homepage <http://rdf.ebi.ac.uk/dataset/biosamples>;
+     foaf:homepage <http://www.ebi.ac.uk/rdf/services/biosamples>;
      dcterms:license <http://www.ebi.ac.uk/Information/termsofuse.html>; ## TODO: check this
      void:uriSpace "http://rdf.ebi.ac.uk/resource/biosamples"^^xsd:string;
      dcterms:publisher biosd:biosamplesTeam;
