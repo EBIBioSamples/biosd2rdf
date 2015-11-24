@@ -60,7 +60,7 @@ public class ContactRdfMapper extends BeanRdfMapper<Contact>
 		this.addPropertyMapper ( "midInitials", new OwlDatatypePropRdfMapper<Contact, String> ( uri ( "sch", "additionalName" ) ) );
 		this.addPropertyMapper ( "lastName", new OwlDatatypePropRdfMapper<Contact, String> ( uri ( "sch", "familyName" ) ) );
 		this.addPropertyMapper ( "phone", new OwlDatatypePropRdfMapper<Contact, String> ( uri ( "sch", "telephone" ) ) );
-		this.addPropertyMapper ( "phone", new OwlDatatypePropRdfMapper<Contact, String> ( uri ( "sch", "faxNumber" ) ) );
+		this.addPropertyMapper ( "fax", new OwlDatatypePropRdfMapper<Contact, String> ( uri ( "sch", "faxNumber" ) ) );
 		
 		// biosd-terms:has-address-line (subprop of dc:description/rdfs:comment)
 		// TODO: possibly more annotations to be considered: 
@@ -82,11 +82,27 @@ public class ContactRdfMapper extends BeanRdfMapper<Contact>
 		{
 			if ( !super.map ( cnt, params ) ) return false;
 			
-			String nameLine = trimToEmpty ( cnt.getFirstName () ) 
-				+ trimToEmpty ( cnt.getMidInitials () ) 
-				+ trimToEmpty ( cnt.getLastName () );
+			String firstName = trimToEmpty ( cnt.getFirstName () );
+			String midInitials = trimToEmpty ( cnt.getMidInitials () );
+			String lastName = trimToEmpty ( cnt.getLastName () );
+			
+			String nameLine = firstName;
+			if ( midInitials.length () > 0 ) 
+			{
+				if ( nameLine.length () > 0 ) nameLine += ' ';
+				nameLine += midInitials;
+			}
+			
+			if ( lastName.length () > 0 ) 
+			{
+				if ( nameLine.length () > 0 ) nameLine += ' ';
+				nameLine += lastName;
+			}
+
 			nameLine = trimToNull ( nameLine );
 
+			if ( nameLine.length () == 0 ) return true;
+			
 			OwlApiUtils.assertData ( this.getMapperFactory ().getKnowledgeBase (), 
 				this.getRdfUriGenerator ().getUri ( cnt, params ), uri ( "dc-terms", "title" ), nameLine 
 			);

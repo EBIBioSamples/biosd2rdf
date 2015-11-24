@@ -5,4 +5,4 @@
 #
 RED=$(echo -e '\033[0;31m')
 BW=$(echo -e '\033[0m')
-./test_all.sh $1 | column -c 120 -s $'\t' -tx | sed -E s/'(.*)FAIL$'/"${RED}\1FAIL${BW}"/
+./test_all.sh $* | column -c 120 -s $'\t' -tx | sed -E s/'(.*)FAIL$'/"${RED}\1FAIL${BW}"/

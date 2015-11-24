@@ -1,0 +1,8 @@
+#
+# child/parent relationships
+#
+ASK
+{
+	?smpTo biosd-terms:sample-child-of ?smpFrom. 
+  ?smpFrom biosd-terms:sample-parent-of ?smpTo.
+}

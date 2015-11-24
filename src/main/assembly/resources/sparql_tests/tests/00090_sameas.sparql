@@ -1,0 +1,8 @@
+#
+# sameAs relationships.
+#
+ASK
+{
+	?smpX owl:sameAs ?smpY. 
+	?smpY owl:sameAs ?smpX. 
+}
