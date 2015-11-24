@@ -8,6 +8,7 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.slf4j.Logger;
@@ -82,20 +83,24 @@ public class DbRecRefRdfMapper extends BeanRdfMapper<DatabaseRecordRef>
 		// A composed string for the title
 		String title = db.getDbName () + ":" + db.getAcc ();
 		RdfUriGenerator<DatabaseRecordRef> uriGen = this.getRdfUriGenerator ();
-		assertData ( kb, uriGen.getUri ( db, params ), uri ( "dc-terms", "title" ), title );
-		assertData ( kb, uriGen.getUri ( db, params ), uri ( "rdfs", "label" ), title );
+		String dburi = uriGen.getUri ( db, params );
+		
+		assertData ( kb, dburi, uri ( "dc-terms", "title" ), title );
+		assertData ( kb, dburi, uri ( "rdfs", "label" ), title );
 		
 		
-		if ( !"ArrayExpress".equalsIgnoreCase ( db.getDbName () ) ) return true;
+		if ( !ArrayUtils.contains ( 
+					new String [] { "arrayexpress", "ebi.arrayexpress" }, 
+					StringUtils.lowerCase ( db.getDbName () )   
+				) ) 
+			return true;
 		
-		// Build a URI that points at the contents of the Gene Expression Atlas data set. 
 		// TODO: The Atlas actually contains a subset of ArrayExpress, we should use the endpoint (or the APIs) to know
 		// if the URI is actually defined. For the moment we are like: if the resource existed, it would have this URI 
 		// and that would return some RDF, when it doesn't exist you don't get any RDF back
-		//
-				
+		//				
 		String atlasUri = "http://rdf.ebi.ac.uk/resource/atlas/" + db.getAcc ();
-		assertLink ( kb, atlasUri, uri ( "pav", "derivedFrom" ), mapf.getUri ( db, params ) );
+		assertLink ( kb, atlasUri, uri ( "pav", "derivedFrom" ), dburi );
 
 		return true;
 	}
