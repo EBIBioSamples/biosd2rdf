@@ -3,6 +3,7 @@ package uk.ac.ebi.fg.biosd.biosd2rdf.java2rdf.mapping;
 import static uk.ac.ebi.fg.java2rdf.utils.NamespaceUtils.registerNs;
 
 import org.semanticweb.owlapi.model.OWLOntology;
+import org.semanticweb.owlapi.vocab.Namespaces;
 
 import uk.ac.ebi.fg.biosd.model.expgraph.BioSample;
 import uk.ac.ebi.fg.biosd.model.organizational.BioSampleGroup;
@@ -39,10 +40,11 @@ public class BioSdRfMapperFactory extends RdfMapperFactory
 		registerNs ( "prism", 					"http://prismstandard.org/namespaces/basic/2.0/" ); // top-level for fabio
 		registerNs ( "bibo", 						"http://purl.org/ontology/bibo/" ); // The Bibliographic ontology
 		registerNs ( "sch",							"http://schema.org/" );
-		registerNs ( "foaf",						"http://xmlns.com/foaf/0.1/" );
+		registerNs ( "foaf",						Namespaces.FOAF.toString () );
 		registerNs ( "pav", 						"http://purl.org/pav/2.0/" );
 		registerNs ( "prov", 						"http://www.w3.org/ns/prov#" );	
 		registerNs ( "sio",							"http://semanticscience.org/resource/" );
+		registerNs ( "oac",							"http://www.openannotation.org/ns/" );
 	}
 	
 	{

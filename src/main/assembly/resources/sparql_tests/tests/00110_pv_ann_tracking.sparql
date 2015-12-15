@@ -1,0 +1,19 @@
+
+PREFIX oac: <http://www.openannotation.org/ns/>
+
+#
+# We should have instances of this pv annotation provenance tracking.
+#
+ASK {
+  ?smp a biosd-terms:Sample;
+    biosd-terms:has-bio-characteristic ?pv.
+
+  ?pv a ?ptype.
+
+  ?ann a biosd-terms:SampleAttributeOntologyAnnotation;
+       oac:hasTarget ?pv; 
+       oac:hasBody ?ptype;
+       dc:creator ?prov; 
+       biosd-terms:has-percent-score ?score
+}
+       

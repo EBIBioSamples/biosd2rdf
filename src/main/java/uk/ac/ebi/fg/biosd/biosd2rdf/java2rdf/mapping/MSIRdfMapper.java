@@ -22,6 +22,7 @@ import uk.ac.ebi.fg.java2rdf.mapping.properties.CompositePropRdfMapper;
 import uk.ac.ebi.fg.java2rdf.mapping.properties.InversePropRdfMapper;
 import uk.ac.ebi.fg.java2rdf.mapping.properties.OwlDatatypePropRdfMapper;
 import uk.ac.ebi.fg.java2rdf.mapping.properties.OwlObjPropRdfMapper;
+import uk.ac.ebi.fg.java2rdf.mapping.properties.UriStringPropRdfMapper;
 import uk.ac.ebi.fg.java2rdf.mapping.urigen.RdfUriGenerator;
 
 
@@ -91,7 +92,34 @@ public class MSIRdfMapper extends BeanRdfMapper<MSI>
 			)
 		)));
 
-		// TODO: more
+		this.addPropertyMapper ( "sampleRefs", new CollectionPropRdfMapper<MSI, String> ( 
+			new UriStringPropRdfMapper<MSI> ( uri ( "rdfs", "seeAlso" ) ) 
+			{{
+				this.setRdfUriGenerator ( new RdfUriGenerator<String>() 
+				{
+					@Override
+					public String getUri ( String referredSmpAcc, Map<String, Object> params )
+					{
+						return uri ( "biosd", "sample/" + urlEncode ( referredSmpAcc ) );
+					}
+				});
+			}}
+		));
+		
+		this.addPropertyMapper ( "sampleGroupRefs", new CollectionPropRdfMapper<MSI, String> ( 
+			new UriStringPropRdfMapper<MSI> ( uri ( "rdfs", "seeAlso" ) ) 
+			{{
+				this.setRdfUriGenerator ( new RdfUriGenerator<String>() 
+				{
+					@Override
+					public String getUri ( String referredSgAcc, Map<String, Object> params )
+					{
+						return uri ( "biosd", "sample-group/" + urlEncode ( referredSgAcc ) );
+					}
+				});
+			}}
+		));
+		
 	}
 
 	@Override

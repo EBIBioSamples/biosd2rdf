@@ -84,8 +84,12 @@ public class BioSdMappersTest
 		BioCharacteristicValue parentOfRel = new BioCharacteristicValue ( "smp1Child", new BioCharacteristicType ( "Parent Of" ) );
 		biosdModel.smp1.addPropertyValue ( parentOfRel );
 
-		
-		
+		// References
+		biosdModel.msi.addSampleRef ( "referredSmp1" );
+		biosdModel.msi.addSampleRef ( "referredSmp2" );
+		biosdModel.msi.addSampleGroupRef ( "referredSG1" );
+		biosdModel.msi.addSampleGroupRef ( "referredSG2" );
+
 		
 		Publication pub1 = new Publication ( "doi://123", "123" );
 		pub1.setTitle ( "A test publication 1" );
@@ -248,7 +252,19 @@ public class BioSdMappersTest
 			+ "  smp:smp1Child biosd-terms:sample-child-of smp:smp1.\n"
 			+ "}\n"		
 		);
+
 		
+		tester.testRDFOutput ( "References from msi1 to samples not found!", 
+			"ASK {\n"
+			+ "  msi:msi1 rdfs:seeAlso smp:referredSmp1, smp:referredSmp1.\n"
+			+ "}\n"		
+		);
+
+		tester.testRDFOutput ( "References from msi1 to sample group not found!", 
+			"ASK {\n"
+			+ "  msi:msi1 rdfs:seeAlso sg:referredSG1, sg:referredSG2.\n"
+			+ "}\n"		
+		);		
 		
 		tester.testRDFOutput ( "Explicit ontology annotation not found!", 
 			"ASK {\n"

@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rdf:RDF
+  xmlns:owl="http://www.w3.org/2002/07/owl#"
+  xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+  xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+>
+  <rdfs:Class rdf:about="http://www.openannotation.org/ns/SvgConstraint">
+    <rdfs:isDefinedBy>
+      <owl:Ontology rdf:about="http://www.openannotation.org/ns/">
+        <owl:versionInfo>alpha3</owl:versionInfo>
+      </owl:Ontology>
+    </rdfs:isDefinedBy>
+    <rdfs:subClassOf rdf:resource="http://www.openannotation.org/ns/Constraint"/>
+    <rdfs:label>SvgConstraint</rdfs:label>
+  </rdfs:Class>
+  <rdf:Property rdf:about="http://www.openannotation.org/ns/constrains">
+    <rdfs:isDefinedBy rdf:resource="http://www.openannotation.org/ns/"/>
+    <rdfs:comment>The relationship from the ConstrainedTarget or ConstrainedBody to the full resource being constrained</rdfs:comment>
+    <rdfs:label>constrains</rdfs:label>
+  </rdf:Property>
+  <rdfs:Class rdf:about="http://www.openannotation.org/ns/Reply">
+    <rdfs:isDefinedBy rdf:resource="http://www.openannotation.org/ns/"/>
+    <rdfs:comment>A subClass of Annotation which has another Annotation as its Target</rdfs:comment>
+    <rdfs:subClassOf rdf:resource="http://www.openannotation.org/ns/Annotation"/>
+    <rdfs:label>Reply</rdfs:label>
+  </rdfs:Class>
+  <rdf:Property rdf:about="http://www.openannotation.org/ns/constrainedBy">
+    <rdfs:isDefinedBy rdf:resource="http://www.openannotation.org/ns/"/>
+    <rdfs:comment>The relationship from the ConstrainedTarget or ConstrainedBody to the Constraint resource that describes how the full resource is constrained</rdfs:comment>
+    <rdfs:label>constrainedBy</rdfs:label>
+    <rdfs:range rdf:resource="http://www.openannotation.org/ns/Constraint"/>
+  </rdf:Property>
+  <rdf:Property rdf:about="http://www.openannotation.org/ns/when">
+    <rdfs:isDefinedBy rdf:resource="http://www.openannotation.org/ns/"/>
+    <rdfs:comment>The timestamp at which the resource(s) should be interpreted. If attached to an Annotation, it refers to the Content and Targets. If attached to a ConstrainedResource, it refers to the resource which that resource constrains.</rdfs:comment>
+    <rdfs:range rdf:resource="http://www.w3.org/2000/01/rdf-schema#Literal"/>
+    <rdfs:label>when</rdfs:label>
+  </rdf:Property>
+  <rdfs:Class rdf:about="http://www.openannotation.org/ns/ConstrainedBody">
+    <rdfs:isDefinedBy rdf:resource="http://www.openannotation.org/ns/"/>
+    <rdfs:subClassOf rdf:resource="http://www.openannotation.org/ns/Body"/>
+    <rdfs:label>ConstrainedBody</rdfs:label>
+  </rdfs:Class>
+  <rdfs:Class rdf:about="http://www.openannotation.org/ns/TimeConstraint">
+    <rdfs:isDefinedBy rdf:resource="http://www.openannotation.org/ns/"/>
+    <rdfs:subClassOf rdf:resource="http://www.openannotation.org/ns/Constraint"/>
+    <rdfs:label>TimeConstraint</rdfs:label>
+  </rdfs:Class>
+  <rdf:Property rdf:about="http://www.openannotation.org/ns/hasBody">
+    <rdfs:domain rdf:resource="http://www.openannotation.org/ns/Annotation"/>
+    <rdfs:range rdf:resource="http://www.openannotation.org/ns/Body"/>
+    <rdfs:isDefinedBy rdf:resource="http://www.openannotation.org/ns/"/>
+    <rdfs:comment>The relationship between Annotation and Body</rdfs:comment>
+    <rdfs:label>hasBody</rdfs:label>
+  </rdf:Property>
+  <rdfs:Class rdf:about="http://www.openannotation.org/ns/ConstrainedTarget">
+    <rdfs:isDefinedBy rdf:resource="http://www.openannotation.org/ns/"/>
+    <rdfs:comment>The ConstrainedTarget is the target of the annotation. It is constrained from another resource (the full resource, of which the target is a part) and constrained by a third resource, the Constraint.</rdfs:comment>
+    <rdfs:subClassOf rdf:resource="http://www.openannotation.org/ns/Target"/>
+    <rdfs:label>ConstrainedTarget</rdfs:label>
+  </rdfs:Class>
+  <rdf:Property rdf:about="http://www.openannotation.org/ns/hasTarget">
+    <rdfs:domain rdf:resource="http://www.openannotation.org/ns/Annotation"/>
+    <rdfs:range rdf:resource="http://www.openannotation.org/ns/Target"/>
+    <rdfs:isDefinedBy rdf:resource="http://www.openannotation.org/ns/"/>
+    <rdfs:comment>The relationship between Annotation and Target</rdfs:comment>
+    <rdfs:label>hasTarget</rdfs:label>
+  </rdf:Property>
+  <rdfs:Class rdf:about="http://www.openannotation.org/ns/Constraint">
+    <rdfs:isDefinedBy rdf:resource="http://www.openannotation.org/ns/"/>
+    <rdfs:comment>The Constraint is a resource which describes how to constrain another resource in a particular way.</rdfs:comment>
+    <rdfs:label>Constraint</rdfs:label>
+  </rdfs:Class>
+  <rdfs:Class rdf:about="http://www.openannotation.org/ns/Target">
+    <rdfs:isDefinedBy rdf:resource="http://www.openannotation.org/ns/"/>
+    <rdfs:comment>The resource that is being annotated</rdfs:comment>
+    <rdfs:label>Target</rdfs:label>
+  </rdfs:Class>
+  <rdfs:Class rdf:about="http://www.openannotation.org/ns/Body">
+    <rdfs:isDefinedBy rdf:resource="http://www.openannotation.org/ns/"/>
+    <rdfs:comment>The Body is somehow about the Target resource. It is the information which is annotating the Target.</rdfs:comment>
+    <rdfs:label>Body</rdfs:label>
+  </rdfs:Class>
+  <rdfs:Class rdf:about="http://www.openannotation.org/ns/Annotation">
+    <rdfs:isDefinedBy rdf:resource="http://www.openannotation.org/ns/"/>
+    <rdfs:comment>A document identified by an HTTP URI that describes, at least, the Body and Target resources involved in the annotation.</rdfs:comment>
+    <rdfs:label>Annotation</rdfs:label>
+  </rdfs:Class>
+</rdf:RDF>
