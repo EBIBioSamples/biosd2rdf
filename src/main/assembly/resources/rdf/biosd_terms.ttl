@@ -21,6 +21,7 @@
                                              <http://purl.org/spar/fabio/> ,
                                              <http://semanticscience.org/ontology/sio-v1.0.10-release.owl> ,
                                              <http://topbraid.org/schema/> ,
+                                             <http://www.openannotation.org/ns/> ,
                                              <http://www.w3.org/ns/prov-o-20130430> ,
                                              <http://xmlns.com/foaf/0.1/> .
 
@@ -91,15 +92,15 @@ biosdterms:child-of rdf:type :ObjectProperty ;
                     
                     obo:IAO_0000115 "x child-of y iff the organism x is the biological direct offspring of y. " ;
                     
-                    rdfs:range obo:OBI_0100026 ;
-                    
                     rdfs:domain obo:OBI_0100026 ;
+                    
+                    rdfs:range obo:OBI_0100026 ;
                     
                     rdfs:subPropertyOf obo:RO_0002202 ;
                     
-                    rdfs:range sio:SIO_010000 ;
+                    rdfs:domain sio:SIO_010000 ;
                     
-                    rdfs:domain sio:SIO_010000 .
+                    rdfs:range sio:SIO_010000 .
 
 
 
@@ -140,6 +141,8 @@ biosdterms:derived-from-organism rdf:type :ObjectProperty ;
 
 biosdterms:has-address-line rdf:type :ObjectProperty ;
                             
+                            rdfs:subPropertyOf schema:description ;
+                            
                             rdfs:range xsd:string .
 
 
@@ -147,6 +150,8 @@ biosdterms:has-address-line rdf:type :ObjectProperty ;
 ###  http://rdf.ebi.ac.uk/terms/biosd/has-affiliation-line
 
 biosdterms:has-affiliation-line rdf:type :ObjectProperty ;
+                                
+                                rdfs:subPropertyOf schema:description ;
                                 
                                 rdfs:range xsd:string .
 
@@ -159,6 +164,8 @@ biosdterms:has-authors-list rdf:type :ObjectProperty ;
                             rdfs:domain obo:IAO_0000311 ,
                                         <http://purl.org/ontology/bibo/Document> ,
                                         <http://purl.org/spar/fabio/Work> ;
+                            
+                            rdfs:subPropertyOf schema:description ;
                             
                             rdfs:range xsd:string ;
                             
@@ -190,7 +197,7 @@ biosdterms:has-bio-characteristic-type rdf:type :ObjectProperty ;
                                        
                                        obo:IAO_0000115 "The type of a biological characteristic. This usually comes from data file annotations, for instance, one has a '10C' attribute value, of type x, where x is an instance of 'temperature', or 'mus-musculus 123' attribute value, of type x, where x is an instance of the class mus-musculus."@en ;
                                        
-                                       obo:IAO_0000116 "This was used in an initial version of BioSD Linked Data model. Now an attribute/characteristic value can be instance of an ontology class if known, in addition to having the attributes rdfs:label + dcterms:title for the value, and dc:type + atlas:propertyType for the type. See TODO for details."@en ;
+                                       obo:IAO_0000116 "This was used in an initial version of BioSD Linked Data model. Now an attribute/characteristic value can be instance of an ontology class if known, in addition to having the attributes rdfs:label + dcterms:title for the value, and dc:type + atlas:propertyType for the type. See http://www.ebi.ac.uk/rdf/biosd/newschema16 for details."@en ;
                                        
                                        rdfs:subPropertyOf sio:SIO_000332 .
 
@@ -241,9 +248,9 @@ biosdterms:parent-of rdf:type :ObjectProperty ;
                      
                      obo:IAO_0000115 "x parent-of y iff the organism x is the biological parent of y. " ;
                      
-                     rdfs:range obo:OBI_0100026 ;
-                     
                      rdfs:domain obo:OBI_0100026 ;
+                     
+                     rdfs:range obo:OBI_0100026 ;
                      
                      rdfs:subPropertyOf obo:RO_0002226 ;
                      
@@ -286,9 +293,9 @@ biosdterms:sample-parent-of rdf:type :ObjectProperty ;
                             
                             obo:IAO_0000115 "A sample x is sample-parent-of y iff x derives from organism xo, y derives from organism yo and xo is the biological parent of yo. In other words, the two samples are taken from two organisms having a biological parentage relationship. We have used OWL-2 chain axioms, PROV-O, RO to formalise this relationship." ;
                             
-                            rdfs:domain biosdterms:Sample ;
-                            
                             rdfs:range biosdterms:Sample ;
+                            
+                            rdfs:domain biosdterms:Sample ;
                             
                             :inverseOf biosdterms:sample-child ;
                             
@@ -306,6 +313,12 @@ biosdterms:sample-parent-of rdf:type :ObjectProperty ;
 ###  http://schema.org/contributor
 
 schema:contributor rdf:type :ObjectProperty .
+
+
+
+###  http://schema.org/description
+
+schema:description rdf:type :ObjectProperty .
 
 
 
@@ -369,8 +382,7 @@ prov:wasDerivedFrom rdf:type :ObjectProperty .
 
 biosdterms:has-address-line rdf:type :DatatypeProperty ;
                             
-                            rdfs:subPropertyOf dcterms:description ,
-                                               schema:description .
+                            rdfs:subPropertyOf dcterms:description .
 
 
 
@@ -378,8 +390,7 @@ biosdterms:has-address-line rdf:type :DatatypeProperty ;
 
 biosdterms:has-affiliation-line rdf:type :DatatypeProperty ;
                                 
-                                rdfs:subPropertyOf dcterms:description ,
-                                                   schema:description .
+                                rdfs:subPropertyOf dcterms:description .
 
 
 
@@ -387,8 +398,7 @@ biosdterms:has-affiliation-line rdf:type :DatatypeProperty ;
 
 biosdterms:has-authors-list rdf:type :DatatypeProperty ;
                             
-                            rdfs:subPropertyOf dcterms:description ,
-                                               schema:description .
+                            rdfs:subPropertyOf dcterms:description .
 
 
 
@@ -411,6 +421,20 @@ biosdterms:has-low-value rdf:type :DatatypeProperty ,
                          rdfs:label "has low value"@en ;
                          
                          obo:IAO_0000115 "A low end value for those structures that admit one, such as intervals (eg, SIO_000944)."@en .
+
+
+
+###  http://rdf.ebi.ac.uk/terms/biosd/has-percent-score
+
+biosdterms:has-percent-score rdf:type :DatatypeProperty ;
+                             
+                             rdfs:label "has percent score" ;
+                             
+                             obo:IAO_0000115 "A score ranging from 0 to 100, representing the confidence we have that the element bearing this property (e.g. estimate, ontology mapping) is true/valid/significant/etc" ;
+                             
+                             rdfs:subPropertyOf sio:SIO_000300 ;
+                             
+                             sio:narrowerThan sio:SIO_000257, obo:OBI_0000071.
 
 
 
@@ -522,6 +546,14 @@ biosdterms:Sample rdf:type :Class ;
 
 
 
+###  http://rdf.ebi.ac.uk/terms/biosd/SampleAttributeOntologyAnnotation
+
+biosdterms:SampleAttributeOntologyAnnotation rdf:type :Class ;
+                                             
+                                             rdfs:subClassOf <http://www.openannotation.org/ns/Annotation> .
+
+
+
 ###  http://rdf.ebi.ac.uk/terms/biosd/SampleGroup
 
 biosdterms:SampleGroup rdf:type :Class ;
@@ -588,6 +620,12 @@ biosdterms:has-knowledgeable-person rdfs:label "has knowledgeable person"@en ;
 
 
 
+biosdterms:has-authors-list rdfs:label "authors list"@en ;
+                            
+                            obo:IAO_0000115 "The list of authors of a publication or document, in the form of a simple text (i.e., a string). This can be used for those cases where extracting a proper list of authors (e.g., from a database record) is too complicated."@en .
+
+
+
 biosdterms:has-address-line rdfs:label "postal address"@en ;
                             
                             obo:IAO_0000115 "A postal address in the form of simple text (i.e., string). This can be used for those cases where it's too complicated to achieve a proper structure for an address."@en .
@@ -597,12 +635,6 @@ biosdterms:has-address-line rdfs:label "postal address"@en ;
 biosdterms:has-affiliation-line rdfs:label "affiliation"@en ;
                                 
                                 obo:IAO_0000115 "An affiliation description for a person (e.g., department+university), in the form of simple text (i.e., string). This can be used for those cases where it's too complicated to achieve a proper structure for an affiliation."@en .
-
-
-
-biosdterms:has-authors-list rdfs:label "authors list"@en ;
-                            
-                            obo:IAO_0000115 "The list of authors of a publication or document, in the form of a simple text (i.e., a string). This can be used for those cases where extracting a proper list of authors (e.g., from a database record) is too complicated."@en .
 
 
 
