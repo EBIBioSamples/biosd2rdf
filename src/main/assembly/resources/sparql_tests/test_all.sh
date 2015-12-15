@@ -35,8 +35,8 @@ for server in $servers
 do
   for query in \
     void_graph.sparql\
-    $(find tests -name '*.sparql')\
-    $(find old_schema_tests -name '*.sparql')
+    $(find tests -name '*.sparql' | sort --ignore-case)\
+    $(find old_schema_tests -name '*.sparql' | sort --ignore-case)
   do
     if [ "$query" == 'void_graph.sparql' ]; then
       sed s/'\$version'/$version/g $query | ./sparql_ask.sh $server 2>/dev/null
