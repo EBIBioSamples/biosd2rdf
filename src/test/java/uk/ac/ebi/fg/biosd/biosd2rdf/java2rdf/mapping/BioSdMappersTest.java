@@ -323,6 +323,20 @@ public class BioSdMappersTest
 			+ "}\n"		
 		);
 
+		tester.testRDFOutput ( "Text mining-based annotation provenance not found!", 
+			"ASK {\n"
+			+ "  ?smp a biosd-terms:Sample;\n"
+			+ "  biosd-terms:has-bio-characteristic ?pv.\n"
+			+ "  ?pv a obo:NCBITaxon_10090.\n"
+			+ "  ?ann a biosd-terms:SampleAttributeOntologyAnnotation;\n"
+			+ "       oac:hasTarget ?pv; oac:hasBody obo:NCBITaxon_10090;\n"
+			+ "       dc:creator ?prov; biosd-terms:has-percent-score ?score"
+			+ "}\n"		
+		);
+
+		
+		
+		
 		if ( ExpPropValueRdfMapper.OLD_MODEL_SUPPORT_FLAG )
 			tester.testRDFOutput ( "Text mining-based annotation not found (old model)!", 
 				"ASK {\n"

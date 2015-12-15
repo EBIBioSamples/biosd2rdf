@@ -1,6 +1,7 @@
 package uk.ac.ebi.fg.biosd.biosd2rdf.utils;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -24,6 +25,7 @@ import uk.ac.ebi.fg.core_model.xref.ReferenceSource;
 import uk.ac.ebi.fgpt.zooma.search.StatsZOOMASearchFilter;
 import uk.ac.ebi.fgpt.zooma.search.ZOOMASearchClient;
 import uk.ac.ebi.fgpt.zooma.search.ontodiscover.ZoomaOntoTermDiscoverer;
+import uk.ac.ebi.onto_discovery.api.MergingChainedOntoTermDiscoverer;
 import uk.ac.ebi.onto_discovery.api.OntologyTermDiscoverer;
 import uk.ac.ebi.onto_discovery.api.OntologyTermDiscoverer.DiscoveredTerm;
 import uk.ac.ebi.onto_discovery.bioportal.BioportalOntoTermDiscoverer;
@@ -48,6 +50,12 @@ public class BioSdOntologyTermResolver
 	public static final String ONTO_DISCOVERER_PROP_NAME = "uk.ac.ebi.fg.biosd.biosd2rdf.ontoDiscoverer";
 	
 	private static final String BIOPORTAL_API_KEY = "07732278-7854-4c4f-8af1-7a80a1ffc1bb";
+	
+	/**
+	 * We give priority to these
+	 */
+	private static final String BIOPORTAL_ONTOLOGIES = 
+	  "EFO,UBERON,CL,CHEBI,BTO,GO,OBI,MESH,FMA,IAO,HP,BAO,MA,ICD10CM,NIFSTD,DOID,IDO,LOINC,OMIM,SIO,CLO,FHHO";
 
 	private OntologyTermDiscoverer ontoTermDiscoverer; 
 	
@@ -82,9 +90,17 @@ public class BioSdOntologyTermResolver
 		else if ( "bioportal".equalsIgnoreCase ( ontoDiscovererProp ) )
 		{
 			baseDiscoverer = new BioportalOntoTermDiscoverer ( BIOPORTAL_API_KEY );
-			((BioportalOntoTermDiscoverer) baseDiscoverer).setPreferredOntologies ( 
-				"EFO,UBERON,CL,CHEBI,BTO,GO,OBI,MESH,FMA,IAO,HP,BAO,MA,ICD10CM,NIFSTD,DOID,IDO,LOINC,OMIM,SIO,CLO,FHHO" 
-			);
+			((BioportalOntoTermDiscoverer) baseDiscoverer).setPreferredOntologies ( BIOPORTAL_ONTOLOGIES );
+		}
+		else if ( "both".equalsIgnoreCase ( ontoDiscovererProp ) )
+		{
+			StatsZOOMASearchFilter zoomaSearcher = new StatsZOOMASearchFilter ( new ZOOMASearchClient () );
+			OntologyTermDiscoverer zoomaDiscoverer = new ZoomaOntoTermDiscoverer ( zoomaSearcher );
+
+			BioportalOntoTermDiscoverer bpDiscoverer = new BioportalOntoTermDiscoverer ( BIOPORTAL_API_KEY );
+			bpDiscoverer.setPreferredOntologies ( BIOPORTAL_ONTOLOGIES );
+			
+			baseDiscoverer = new MergingChainedOntoTermDiscoverer ( Arrays.asList ( zoomaDiscoverer, bpDiscoverer ) );
 		}
 		else throw new IllegalArgumentException ( 
 			"Invalid value '" + ontoDiscovererProp + "' for '" + ONTO_DISCOVERER_PROP_NAME + "'" 
@@ -112,38 +128,40 @@ public class BioSdOntologyTermResolver
 	 * 
 	 * returns the URI found, or null in case it could not get anything sensible. The result is cached.
 	 */
-	public List<String> getOntoClassUris ( ExperimentalPropertyValue<?> pval, boolean isNumberOrDate ) 
+	public List<DiscoveredTerm> getOntoClassUris ( ExperimentalPropertyValue<?> pval, boolean isNumberOrDate ) 
 	{
-		if ( pval == null ) return new ArrayList<String> ();
+		if ( pval == null ) return new ArrayList<> ();
 		
 		// First, see if it has a defined OE 
 		String uri = getOntologyTermURI ( pval.getOntologyTerms (), pval.getTermText () );
-		if ( uri != null ) return new ArrayList<String> ( Collections.singletonList ( uri ) );
+		if ( uri != null ) return new ArrayList<> ( 
+			Collections.singletonList ( new DiscoveredTerm ( uri, 100d, "submitter-provided" ) ) 
+		);
 		
 		String pvalLabel = pval.getTermText ();
 		ExperimentalPropertyType ptype = pval.getType ();
-		if ( ptype == null ) return new ArrayList<String> (); 
+		if ( ptype == null ) return new ArrayList<> (); 
 		
 		String pvalTypeLabel = getExpPropTypeLabel ( ptype );
-		if ( pvalTypeLabel == null ) return new ArrayList<String> ();
+		if ( pvalTypeLabel == null ) return new ArrayList<> ();
 		
 		// Next, see if it is a number
 		// Try to resolve the type instead of the value
 		if ( isNumberOrDate ) {
 			// TODO: for the moment we keep the first result, we'd like to add the others too
-			return discoveredTerms2Uris ( ontoTermDiscoverer.getOntologyTerms ( null, pvalTypeLabel ) );
+			return ontoTermDiscoverer.getOntologyTerms ( null, pvalTypeLabel );
 		}
 
 		// OK, we have a value, no ontology term attached, no URI, no number, no date, try to resolve the value string 
 		// (via onto term discoverer)
 
 		// First use both value and type labels
-		List<String> uris = discoveredTerms2Uris ( ontoTermDiscoverer.getOntologyTerms ( pvalLabel, pvalTypeLabel )	);
+		List<DiscoveredTerm> uris = ontoTermDiscoverer.getOntologyTerms ( pvalLabel, pvalTypeLabel );
 		if ( !uris.isEmpty () ) return uris;
 		
 		// If failed, try type-only as well, this should allow to catch stuff like 'del(7herc2-mkrn3)13frdni', 'gene symbol'
 		// Note that the ZOOMA/Bioportal clients don't understand val = null, type = x, but it gets the reverse
-		return discoveredTerms2Uris ( ontoTermDiscoverer.getOntologyTerms ( pvalTypeLabel, null ) );
+		return ontoTermDiscoverer.getOntologyTerms ( pvalTypeLabel, null );
 	}
 	
 	

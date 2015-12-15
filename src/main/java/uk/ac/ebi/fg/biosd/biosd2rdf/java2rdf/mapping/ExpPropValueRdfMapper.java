@@ -30,6 +30,7 @@ import uk.ac.ebi.fg.java2rdf.mapping.RdfMapperFactory;
 import uk.ac.ebi.fg.java2rdf.mapping.RdfMappingException;
 import uk.ac.ebi.fg.java2rdf.mapping.properties.PropertyRdfMapper;
 import uk.ac.ebi.fg.java2rdf.utils.Java2RdfUtils;
+import uk.ac.ebi.onto_discovery.api.OntologyTermDiscoverer.DiscoveredTerm;
 
 /**
  * Maps a sample property like 'Characteristics[organism]' to proper RDF/OWL statements. OBI and other relevant ontologies
@@ -330,7 +331,7 @@ public class ExpPropValueRdfMapper<T extends Accessible> extends PropertyRdfMapp
 			}
 
 			// Now, see if the onto discoverer has something more to say
-			List<String> discoveredTypeUris = otermResolver.getOntoClassUris ( pval, vcomp.isNumberOrDate () );
+			List<DiscoveredTerm> discoveredTerms = otermResolver.getOntoClassUris ( pval, vcomp.isNumberOrDate () );
 
 			// And in case it has, state that as additional types
 			// TODO: a more correct model would be (for each discoveredTypeUri): 
@@ -344,12 +345,36 @@ public class ExpPropValueRdfMapper<T extends Accessible> extends PropertyRdfMapp
 			// it's rather complicated to add the above statements in the current converter, we plan to do that
 			// in the incoming BioSD annotator
 			//
-			if( !discoveredTypeUris.isEmpty () )
+			if( !discoveredTerms.isEmpty () )
 			{
-				for ( String discoveredTypeUri: discoveredTypeUris )
+				for ( DiscoveredTerm dterm: discoveredTerms )
 				{
+					String discoveredTypeUri = dterm.getIri ();
 					assertIndividual ( onto, valUri, discoveredTypeUri );
+					
+					/* Let's track provenance too */
+					String dtermProv = StringUtils.trimToNull ( dterm.getProvenance () );
+					if ( dtermProv != null )
+					{
+						String annUri = uri ( "biosd", "pvalanntracking#" + hashUriSignature ( valUri + discoveredTypeUri + dtermProv ) );
+						
+						assertIndividual ( onto, annUri, uri ( "biosd-terms", "SampleAttributeOntologyAnnotation" ) );
+						assertData ( onto, annUri, uri ( "dc", "creator"), dtermProv );
+						assertLink ( onto, annUri, uri ( "oac", "hasTarget" ), valUri );
+						assertLink ( onto, annUri, uri ( "oac", "hasBody" ), discoveredTypeUri );
+						
+						Double dtermScore = dterm.getScore ();
+						if ( dtermScore != null )
+							assertData ( 
+								onto, 
+								annUri, 
+								uri ( "biosd-terms", "has-percent-score"), 
+								String.valueOf ( dtermScore ), 
+								XSDVocabulary.DOUBLE.toString () 
+							);
+					}
 
+					
 					if ( OLD_MODEL_SUPPORT_FLAG )
 					{
 						String typeUri1 = uri ( "biosd", "exp-prop-type/ann-based-concept#" + hashUriSignature ( discoveredTypeUri ) );
