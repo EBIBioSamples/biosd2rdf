@@ -37,7 +37,7 @@ import uk.ac.ebi.utils.threading.BatchService;
  * Here we keep a single OWL triple store, where all the threads pour their output and we flush it to a (numbered) file, 
  * when we see that we are running out of RAM.
  * 
- * The parallelisation is realised on a per-submission basis, i.e. each {@link BioSdExportTask} is a thread that exports
+ * The parallelisation is realised on a per-submission basis, i.e. each {@link MSIExportTask} is a thread that exports
  * everything contained in a SampleTab submission.
  *
  * <dl><dt>date</dt><dd>19 Jul 2013</dd></dl>
@@ -105,26 +105,24 @@ public class BioSdExportService extends BatchService<BioSdExportTask>
 
 	/** 
 	 * Submits the task of exporting a single SampleTab submission to RDF, of which the database ID is known. This is used by 
-	 * {@link #submitAll(double)} and wraps {@link #submit(BioSdExportTask)}.  
+	 * {@link #submitAll(double)} and wraps {@link #submit(MSIExportTask)}.  
 	 * 
 	 */
 	public void submit ( Long msiId ) {
-		this.submit ( new BioSdExportTask ( rdfMapFactory, msiId ) );
+		this.submit ( new MSIExportTask ( rdfMapFactory, this, msiId ) );
 	}
 	
 	public void submit ( String msiAcc ) {
-		this.submit ( new BioSdExportTask ( rdfMapFactory, msiAcc ) );
+		this.submit ( new MSIExportTask ( rdfMapFactory, this, msiAcc ) );
 	}
 
 	/** 
 	 * Submits the task of exporting a single SampleTab to RDF submission, available as {@link MSI MSI object}. 
-	 * This is used mainly for testing purposes and wraps {@link #submit(BioSdExportTask)}. 
+	 * This is used mainly for testing purposes and wraps {@link #submit(MSIExportTask)}. 
 	 */
 	public void submit ( MSI msi ) {
-		this.submit ( new BioSdExportTask ( rdfMapFactory, msi ) );
+		this.submit ( new MSIExportTask ( rdfMapFactory, this, msi ) );
 	}
-
-	
 	
 	/**
 	 * Submits a new BioSD exporter task. This will work on a single SampleTab submission and will be run as a thread in 
@@ -161,7 +159,7 @@ public class BioSdExportService extends BatchService<BioSdExportTask>
 
 	/**
 	 * Exports the SampleTab submissions having the parameter accessions. Used in the corresponding form of 
-	 * the command line, uses {@link BioSdExportTask#BioSdExportTask(BioSdRfMapperFactory, String)}.  
+	 * the command line, uses {@link MSIExportTask#BioSdExportTask(BioSdRfMapperFactory, String)}.  
 	 */
 	public void submitAll ( String... msiAccs )
 	{
