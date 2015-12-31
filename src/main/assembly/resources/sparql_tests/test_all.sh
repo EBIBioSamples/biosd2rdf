@@ -20,14 +20,14 @@ EOT
   exit 2
 fi
 
-servers="http://rdf-hx-01.ebi.ac.uk:8151/sparql
+servers="http://www.ebi.ac.uk/rdf/services/biosamples/sparql"
+
+if [ ! $prod ]; then
+	servers="http://rdf-hx-01.ebi.ac.uk:8151/sparql
   http://rdf-hx-02.ebi.ac.uk:8151/sparql
   http://rdf-pg-01.ebi.ac.uk:8151/sparql
-  http://rdf-oy-01.ebi.ac.uk:8151/sparql"
-
-if [ $prod ]; then
-  servers="$server
-    http://www.ebi.ac.uk/rdf/services/biosamples/sparql"
+  http://rdf-oy-01.ebi.ac.uk:8151/sparql
+  $servers"		
 fi
 
 success=0
