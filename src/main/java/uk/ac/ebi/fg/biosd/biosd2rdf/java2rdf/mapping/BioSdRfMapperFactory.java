@@ -45,6 +45,7 @@ public class BioSdRfMapperFactory extends RdfMapperFactory
 		registerNs ( "prov", 						"http://www.w3.org/ns/prov#" );	
 		registerNs ( "sio",							"http://semanticscience.org/resource/" );
 		registerNs ( "oac",							"http://www.openannotation.org/ns/" );
+		registerNs ( "skos",						Namespaces.SKOS.toString () );
 	}
 	
 	{

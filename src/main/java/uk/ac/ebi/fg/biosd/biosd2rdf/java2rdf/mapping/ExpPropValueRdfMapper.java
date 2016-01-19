@@ -1,5 +1,6 @@
 package uk.ac.ebi.fg.biosd.biosd2rdf.java2rdf.mapping;
 
+import static uk.ac.ebi.fg.biosd.biosd2rdf.utils.BioSdOntologyTermResolver.BIOPORTAL_ONTOLOGIES;
 import static uk.ac.ebi.fg.java2rdf.utils.Java2RdfUtils.hashUriSignature;
 import static uk.ac.ebi.fg.java2rdf.utils.Java2RdfUtils.urlEncode;
 import static uk.ac.ebi.fg.java2rdf.utils.NamespaceUtils.uri;
@@ -20,6 +21,9 @@ import org.apache.cxf.xjc.runtime.DataTypeAdapter;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.vocab.XSDVocabulary;
 
+import uk.ac.ebi.bioportal.webservice.client.BioportalClient;
+import uk.ac.ebi.bioportal.webservice.model.OntologyClass;
+import uk.ac.ebi.bioportal.webservice.model.OntologyClassMapping;
 import uk.ac.ebi.fg.biosd.biosd2rdf.utils.BioSdOntologyTermResolver;
 import uk.ac.ebi.fg.core_model.expgraph.properties.BioCharacteristicValue;
 import uk.ac.ebi.fg.core_model.expgraph.properties.ExperimentalPropertyType;
@@ -45,13 +49,23 @@ import uk.ac.ebi.onto_discovery.api.OntologyTermDiscoverer.DiscoveredTerm;
 public class ExpPropValueRdfMapper<T extends Accessible> extends PropertyRdfMapper<T, ExperimentalPropertyValue>
 {
 	/**
-	 * If this is true, the old linked data model is supported, in addition to the new one.
-	 * See TODO for details.
+	 * If true, the Bioportal ontology mappings service is used to fetch mappings between ontology terms that are discovered
+	 * by ZOOMA.
 	 */
-	public static final boolean OLD_MODEL_SUPPORT_FLAG = true; 
+	public static final String FETCH_ONTOLOGY_MAPPINGS_PROP_NAME = "uk.ac.ebi.fg.biosd.biosd2rdf.fetchOntologyMappings";
+	
+	/**
+	 * If this is true, the old linked data model is supported, in addition to the new one.
+	 * See <a href = 'https://www.ebi.ac.uk/rdf/biosd/newschema16'>here</a> for details.
+	 */
+	public static final boolean OLD_MODEL_SUPPORT_FLAG = false; 
 	
 	private static BioSdOntologyTermResolver otermResolver = new BioSdOntologyTermResolver ();
 
+	public final boolean fetchOntologyMappings = "true".equals ( 
+		System.getProperty ( FETCH_ONTOLOGY_MAPPINGS_PROP_NAME, "false" )
+	);
+	
 	/**
 	 * A facility to work out composed numerical/date/unit-equipped values and decompose them into RDF describing
 	 * their components. See below how this is used.
@@ -333,18 +347,6 @@ public class ExpPropValueRdfMapper<T extends Accessible> extends PropertyRdfMapp
 			// Now, see if the onto discoverer has something more to say
 			List<DiscoveredTerm> discoveredTerms = otermResolver.getOntoClassUris ( pval, vcomp.isNumberOrDate () );
 
-			// And in case it has, state that as additional types
-			// TODO: a more correct model would be (for each discoveredTypeUri): 
-			//
-			// newValUri = <URI(value/type labels + discoveredTypeUri)
-			// sample has-attr valUri, newValUri
-			// newValUri a discoveredTypeUri
-			// newValUri computed-from valUri
-			// newValUri <same numeric annotations>
-			// 
-			// it's rather complicated to add the above statements in the current converter, we plan to do that
-			// in the incoming BioSD annotator
-			//
 			if( !discoveredTerms.isEmpty () )
 			{
 				for ( DiscoveredTerm dterm: discoveredTerms )
@@ -352,7 +354,8 @@ public class ExpPropValueRdfMapper<T extends Accessible> extends PropertyRdfMapp
 					String discoveredTypeUri = dterm.getIri ();
 					assertIndividual ( onto, valUri, discoveredTypeUri );
 					
-					/* Let's track provenance too */
+					// Let's track provenance too
+					//
 					String dtermProv = StringUtils.trimToNull ( dterm.getProvenance () );
 					if ( dtermProv != null )
 					{
@@ -372,7 +375,53 @@ public class ExpPropValueRdfMapper<T extends Accessible> extends PropertyRdfMapp
 								String.valueOf ( dtermScore ), 
 								XSDVocabulary.DOUBLE.toString () 
 							);
-					}
+					
+						
+					  // And now the mappings coming from Bioportal Mapping Service
+						// 
+						if ( this.fetchOntologyMappings )
+						{
+							List<OntologyClassMapping> ontoMaps = null;
+							BioportalClient bpcli = otermResolver.getOntologyService ();
+							synchronized ( bpcli )
+							{
+								OntologyClass bpClass = bpcli.getOntologyClass ( null, discoveredTypeUri );
+								//OntologyClass bpClass = null;
+								if ( bpClass != null ) 
+									ontoMaps = bpcli.getOntologyClassMappings ( bpClass, BIOPORTAL_ONTOLOGIES, false );
+							}
+							
+							if ( ontoMaps != null ) for ( OntologyClassMapping ontoMap: ontoMaps )
+							{
+								String targetUri = ontoMap.getTargetClassRef ().getClassIri ();
+								if ( discoveredTypeUri.equals ( targetUri ) ) continue;
+
+								String mapSrc = StringUtils.trimToNull ( ontoMap.getSource () );
+								String matchUri = "LOOM,UMLS,REST".contains ( mapSrc ) ? "close"
+									: "SAME_URI".equals ( mapSrc ) ? null 
+									: "related";
+								
+								if ( matchUri == null ) continue;
+	 							
+								matchUri = uri ( "skos", matchUri + "Match" );
+	
+								assertLink ( onto, discoveredTypeUri, matchUri, targetUri );
+								
+								// The provenance too!
+								String provStr = "Bioportal Mapping Service" +  ( mapSrc == null ? "" : " (" + mapSrc + " source)" );
+								String mapAnnUri = uri ( 
+									"biosd", 
+									"mapanntracking#" + hashUriSignature ( discoveredTypeUri + targetUri + provStr ) 
+								);
+								
+								assertIndividual ( onto, mapAnnUri, uri ( "biosd-terms", "OntologyMappingAnnotation" ) );
+								assertData ( onto, mapAnnUri, uri ( "dc", "creator"), provStr );
+								assertLink ( onto, mapAnnUri, uri ( "oac", "hasTarget" ), discoveredTypeUri );
+								assertLink ( onto, mapAnnUri, uri ( "oac", "hasBody" ), targetUri );
+								
+							} // for each mapping
+						} // fetchOntologyMappings flag
+					} // dtermProv != null
 
 					
 					if ( OLD_MODEL_SUPPORT_FLAG )
