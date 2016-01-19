@@ -1,0 +1,100 @@
+?type	?value	?score
+Organism	Homo sapiens	2224535
+Organism	Mus musculus	490390
+model	Generic	467338
+Sex	male	353393
+organism part	haematopoietic_and_lymphoid_tissue	303937
+tumour origin	primary	296150
+package	Generic.1.0	286696
+Sex	female	281028
+Material	blood-bone marrow	278838
+disease state	carcinoma : adenocarcinoma	221467
+Material	surgery-fixed	220552
+package	Generic	182036
+organism part	lung	151885
+Material	surgery fresh/frozen	146542
+non-mutated gene	BRAF	132219
+disease state	haematopoietic_neoplasm : acute_myeloid_leukaemia	128566
+Stage	Some Stage data are given in publication	122971
+Material	surgery - NOS	117838
+organism part	large_intestine	110164
+Organism	Rattus norvegicus	108992
+Grade	Some Grade data are given in publication	106357
+organism part	liver	105217
+Organism	Saccharomyces cerevisiae	99707
+,Stage	Some Stage data are given in publication	95648
+non-mutated gene	KRAS	95238
+Material	ES Cell	87582
+host	Homo sapiens	83174
+genotype	wild type	63605
+disease state	carcinoma	63380
+non-mutated gene	EGFR	62898
+organism part	blood	61151
+organism part	thyroid	58809
+Organism	Arabidopsis thaliana	57018
+strain	C57BL/6	55110
+organism part	mammary gland	54709
+non-mutated gene	FLT3	54636
+non-mutated gene	JAK2	54626
+model	MIMS.me	49872
+non-mutated gene	TP53	49614
+Organism	Drosophila melanogaster	46320
+package	Pathogen.cl.1.0	45467
+non-mutated gene	NRAS	44677
+disease state	carcinoma : non_small_cell_carcinoma	44197
+Organism	human gut metagenome	42334
+model	Pathogen.cl	39700
+developmental stage	adult	39681
+model	Model organism or animal	39357
+disease state	normal	38441
+non-mutated gene	PIK3CA	38293
+disease state	carcinoma : papillary_carcinoma	37361
+Material	cell line	37359
+organism part	central_nervous_system : brain	36762
+organism part	skin	36211
+mutated gene	BRAF	35844
+package	Metagenome.environmental.1.0	35765
+model	Metagenome or environmental	35765
+mutated gene	JAK2	35253
+model	Plant	34938
+package	Plant.1.0	34887
+package	Model.organism.animal.1.0	34690
+disease state	carcinoma : squamous_cell_carcinoma	34404
+model	Microbe, viral or environmental	33737
+package	Microbe.1.0	33730
+non-mutated gene	IDH1	33150
+cell type	B-Lymphocyte	33124
+organism part	kidney	32430
+model	Human	32285
+Organism	Oryza sativa Japonica Group	31531
+depth	0	31427
+package	Pathogen.env.1.0	31286
+investigation type	metagenome	30974
+race	Caucasian	30684
+geographic location	USA	30283
+disease state	haematopoietic_neoplasm : myeloproliferative_neoplasm	30195
+organism part	large_intestine : colon	29299
+cultivar	Nipponbare	29223
+mutated gene	KRAS	29075
+Organism	synthetic construct	28947
+model	MIMARKS.survey	28822
+package	Human.1.0	28770
+altitude	0	28285
+country	GAZ:United States of America	27722
+model	environmental/food/other	26461
+non-mutated gene	IDH2	26370
+Species	Streptococcus pneumoniae	26211
+Organism	soil metagenome	25911
+,Grade	Some Grade data are given in publication	25755
+BioSourceType	frozen_sample	25710
+organism part	leaf	25629
+sub species	enterica	25597
+organism part	ovary	25191
+host taxid	9606	24749
+env feature	ENVO:human-associated habitat	24267
+disease state	malignant_melanoma	24173
+organism part	bone marrow	23158
+ethnicity	Caucasian	22827
+Organism	Salmonella enterica	22564
+non-mutated gene	CTNNB1	22507
+Material	embryo	22419
