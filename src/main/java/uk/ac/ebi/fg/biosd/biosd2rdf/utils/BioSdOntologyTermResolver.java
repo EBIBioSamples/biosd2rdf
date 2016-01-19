@@ -25,6 +25,7 @@ import uk.ac.ebi.fg.core_model.xref.ReferenceSource;
 import uk.ac.ebi.fgpt.zooma.search.StatsZOOMASearchFilter;
 import uk.ac.ebi.fgpt.zooma.search.ZOOMASearchClient;
 import uk.ac.ebi.fgpt.zooma.search.ontodiscover.ZoomaOntoTermDiscoverer;
+import uk.ac.ebi.onto_discovery.api.ChainedOntoTermDiscoverer;
 import uk.ac.ebi.onto_discovery.api.MergingChainedOntoTermDiscoverer;
 import uk.ac.ebi.onto_discovery.api.OntologyTermDiscoverer;
 import uk.ac.ebi.onto_discovery.api.OntologyTermDiscoverer.DiscoveredTerm;
@@ -47,14 +48,22 @@ import com.google.common.cache.CacheBuilder;
  */
 public class BioSdOntologyTermResolver
 {
+	/**
+	 * The service to be used to discover ontology terms from {@link ExperimentalPropertyValue value/type} pairs about
+	 * sample attributes. Values are: 'bioportal', 'zooma', 'zooma-first', 'both'. In the case of zooma-first, inputs that
+	 * find something via ZOOMA are not passed to Bioportal too, which happens in the case of 'both', with provenance-tracking
+	 * triples describing multiple sources from which an ontology annotation was computed. Beware that 'both' might be
+	 * really slow.
+	 * 
+	 */
 	public static final String ONTO_DISCOVERER_PROP_NAME = "uk.ac.ebi.fg.biosd.biosd2rdf.ontoDiscoverer";
 	
-	private static final String BIOPORTAL_API_KEY = "07732278-7854-4c4f-8af1-7a80a1ffc1bb";
+	public static final String BIOPORTAL_API_KEY = "07732278-7854-4c4f-8af1-7a80a1ffc1bb";
 	
 	/**
 	 * We give priority to these
 	 */
-	private static final String BIOPORTAL_ONTOLOGIES = 
+	public static final String BIOPORTAL_ONTOLOGIES = 
 	  "EFO,UBERON,CL,CHEBI,BTO,GO,OBI,MESH,FMA,IAO,HP,BAO,MA,ICD10CM,NIFSTD,DOID,IDO,LOINC,OMIM,SIO,CLO,FHHO";
 
 	private OntologyTermDiscoverer ontoTermDiscoverer; 
@@ -92,7 +101,7 @@ public class BioSdOntologyTermResolver
 			baseDiscoverer = new BioportalOntoTermDiscoverer ( BIOPORTAL_API_KEY );
 			((BioportalOntoTermDiscoverer) baseDiscoverer).setPreferredOntologies ( BIOPORTAL_ONTOLOGIES );
 		}
-		else if ( "both".equalsIgnoreCase ( ontoDiscovererProp ) )
+		else if ( "zooma-first".equalsIgnoreCase ( ontoDiscovererProp ) || "both".equalsIgnoreCase ( ontoDiscovererProp ))
 		{
 			StatsZOOMASearchFilter zoomaSearcher = new StatsZOOMASearchFilter ( new ZOOMASearchClient () );
 			OntologyTermDiscoverer zoomaDiscoverer = new ZoomaOntoTermDiscoverer ( zoomaSearcher );
@@ -100,7 +109,9 @@ public class BioSdOntologyTermResolver
 			BioportalOntoTermDiscoverer bpDiscoverer = new BioportalOntoTermDiscoverer ( BIOPORTAL_API_KEY );
 			bpDiscoverer.setPreferredOntologies ( BIOPORTAL_ONTOLOGIES );
 			
-			baseDiscoverer = new MergingChainedOntoTermDiscoverer ( Arrays.asList ( zoomaDiscoverer, bpDiscoverer ) );
+			baseDiscoverer = "zooma-first".equals ( ontoDiscovererProp )
+				? new MergingChainedOntoTermDiscoverer ( Arrays.asList ( zoomaDiscoverer, bpDiscoverer ) )
+			  : new ChainedOntoTermDiscoverer ( Arrays.asList ( zoomaDiscoverer, bpDiscoverer ) );
 		}
 		else throw new IllegalArgumentException ( 
 			"Invalid value '" + ontoDiscovererProp + "' for '" + ONTO_DISCOVERER_PROP_NAME + "'" 
@@ -367,6 +378,16 @@ public class BioSdOntologyTermResolver
 		return chunks [ 2 ];
 	}
 	
+	
+	/**
+	 * The BioportalClient used as ontology look up service. Note that this is not synchronized.
+	 */
+	public BioportalClient getOntologyService ()
+	{
+		return ontologyService;
+	}
+
+
 	private static String getFirstDiscoveredUri ( List<DiscoveredTerm> dterms )
 	{
 		return dterms == null || dterms.isEmpty () ? null : dterms.get ( 0 ).getIri ();
