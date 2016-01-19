@@ -204,13 +204,13 @@ public class BioSdOntologyTermResolver
 			else
 				// Let's do a final attempt using the term label
 				return getFirstDiscoveredUri ( 
-					ontoTermDiscoverer.getOntologyTerms ( null, oeLabel == null ? oeLabel : oe.getLabel () )
+					ontoTermDiscoverer.getOntologyTerms ( null, oeLabel != null ? oeLabel : oe.getLabel () )
 				);
 		}
 		
 		String srcAcc = StringUtils.trimToNull ( src.getAcc () );
 		if ( srcAcc == null ) return getFirstDiscoveredUri ( 
-			ontoTermDiscoverer.getOntologyTerms ( null, oeLabel == null ? oeLabel : oe.getLabel () )
+			ontoTermDiscoverer.getOntologyTerms ( null, oeLabel != null ? oeLabel : oe.getLabel () )
 		);
 		
 		return this.getOntologyTermURI ( oeAcc, srcAcc );
@@ -393,14 +393,4 @@ public class BioSdOntologyTermResolver
 		return dterms == null || dterms.isEmpty () ? null : dterms.get ( 0 ).getIri ();
 	}
 	
-	private static List<String> discoveredTerms2Uris ( List<DiscoveredTerm> dterms )
-	{
-		List<String> result = new ArrayList<String> ();
-		if ( dterms == null || dterms.isEmpty () ) return result;
-		for ( DiscoveredTerm dterm: dterms )
-			result.add ( dterm.getIri () );
-		
-		return result;
-	}
-
 }
