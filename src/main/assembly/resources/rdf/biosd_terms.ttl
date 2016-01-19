@@ -1,6 +1,5 @@
 @prefix : <http://www.w3.org/2002/07/owl#> .
 @prefix obo: <http://purl.obolibrary.org/obo/> .
-@prefix owl: <http://www.w3.org/2002/07/owl#> .
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix sio: <http://semanticscience.org/resource/> .
 @prefix xml: <http://www.w3.org/XML/1998/namespace> .
@@ -10,634 +9,424 @@
 @prefix schema: <http://schema.org/> .
 @prefix dcterms: <http://purl.org/dc/terms/> .
 @prefix biosdterms: <http://rdf.ebi.ac.uk/terms/biosd/> .
-@base <http://rdf.ebi.ac.uk/terms/biosd/> .
 
-<http://rdf.ebi.ac.uk/terms/biosd/> rdf:type :Ontology ;
-                                    
-                                    :imports <http://purl.obolibrary.org/obo/iao/2011-05-09/iao-main.owl> ,
-                                             <http://purl.obolibrary.org/obo/obi/2015-03-17/obi.owl> ,
-                                             <http://purl.obolibrary.org/obo/ro/releases/2015-04-12/ro.owl> ,
-                                             <http://purl.org/ontology/bibo/> ,
-                                             <http://purl.org/spar/fabio/> ,
-                                             <http://semanticscience.org/ontology/sio-v1.0.10-release.owl> ,
-                                             <http://topbraid.org/schema/> ,
-                                             <http://www.openannotation.org/ns/> ,
-                                             <http://www.w3.org/ns/prov-o-20130430> ,
-                                             <http://xmlns.com/foaf/0.1/> .
-
-
-#################################################################
-#
-#    Annotation properties
-#
-#################################################################
-
-
-###  http://rdf.ebi.ac.uk/terms/biosd/has-address-line
-
-biosdterms:has-address-line rdf:type :AnnotationProperty ;
-                            
-                            rdfs:subPropertyOf rdfs:comment .
-
-
-
-###  http://rdf.ebi.ac.uk/terms/biosd/has-affiliation-line
-
-biosdterms:has-affiliation-line rdf:type :AnnotationProperty ;
-                                
-                                rdfs:subPropertyOf rdfs:comment .
-
-
-
-###  http://rdf.ebi.ac.uk/terms/biosd/has-authors-list
-
-biosdterms:has-authors-list rdf:type :AnnotationProperty ;
-                            
-                            rdfs:subPropertyOf rdfs:comment .
-
-
-
-###  http://rdf.ebi.ac.uk/terms/biosd/has-knowledgeable-organization
-
-biosdterms:has-knowledgeable-organization rdf:type :AnnotationProperty .
-
-
-
-###  http://rdf.ebi.ac.uk/terms/biosd/has-knowledgeable-person
-
-biosdterms:has-knowledgeable-person rdf:type :AnnotationProperty .
-
-
-
-
-
-#################################################################
-#
-#    Object Properties
-#
-#################################################################
-
-
-###  http://purl.obolibrary.org/obo/RO_0000086
-
-obo:RO_0000086 rdf:type :ObjectProperty .
-
-
-
-###  http://rdf.ebi.ac.uk/terms/biosd/child-of
-
-biosdterms:child-of rdf:type :ObjectProperty ;
-                    
-                    rdfs:label "child of" ;
-                    
-                    obo:IAO_0000115 "x child-of y iff the organism x is the biological direct offspring of y. " ;
-                    
-                    rdfs:domain obo:OBI_0100026 ;
-                    
-                    rdfs:range obo:OBI_0100026 ;
-                    
-                    rdfs:subPropertyOf obo:RO_0002202 ;
-                    
-                    rdfs:domain sio:SIO_010000 ;
-                    
-                    rdfs:range sio:SIO_010000 .
-
-
-
-###  http://rdf.ebi.ac.uk/terms/biosd/computed-from
-
-biosdterms:computed-from rdf:type :ObjectProperty ;
-                         
-                         rdfs:label "is computed from" ;
-                         
-                         obo:IAO_0000115 "The current entity (usually some data, a document, or other information item) was computed using another one. For instance, an ontology term annotation was computed starting from some free text." ;
-                         
-                         rdfs:subPropertyOf sio:SIO_000244 ,
-                                            prov:wasDerivedFrom .
-
-
-
-###  http://rdf.ebi.ac.uk/terms/biosd/derived-from-organism
-
-biosdterms:derived-from-organism rdf:type :ObjectProperty ;
-                                 
-                                 rdfs:label "derived from organism" ;
-                                 
-                                 obo:IAO_0000115 "a sample directly taken from an organism, or from another sample, which is taken from an organism." ;
-                                 
-                                 rdfs:range obo:OBI_0100026 ;
-                                 
-                                 rdfs:domain biosdterms:Sample ;
-                                 
-                                 rdfs:subPropertyOf sio:SIO_000244 ;
-                                 
-                                 rdfs:range sio:SIO_010000 ;
-                                 
-                                 rdfs:subPropertyOf prov:wasDerivedFrom .
-
-
-
-###  http://rdf.ebi.ac.uk/terms/biosd/has-address-line
-
-biosdterms:has-address-line rdf:type :ObjectProperty ;
-                            
-                            rdfs:subPropertyOf schema:description ;
-                            
-                            rdfs:range xsd:string .
-
-
-
-###  http://rdf.ebi.ac.uk/terms/biosd/has-affiliation-line
-
-biosdterms:has-affiliation-line rdf:type :ObjectProperty ;
-                                
-                                rdfs:subPropertyOf schema:description ;
-                                
-                                rdfs:range xsd:string .
-
-
-
-###  http://rdf.ebi.ac.uk/terms/biosd/has-authors-list
-
-biosdterms:has-authors-list rdf:type :ObjectProperty ;
-                            
-                            rdfs:domain obo:IAO_0000311 ,
-                                        <http://purl.org/ontology/bibo/Document> ,
-                                        <http://purl.org/spar/fabio/Work> ;
-                            
-                            rdfs:subPropertyOf schema:description ;
-                            
-                            rdfs:range xsd:string ;
-                            
-                            rdfs:domain <http://xmlns.com/foaf/0.1/Document> .
-
-
-
-###  http://rdf.ebi.ac.uk/terms/biosd/has-bio-characteristic
-
-biosdterms:has-bio-characteristic rdf:type :ObjectProperty ;
-                                  
-                                  rdfs:label "biological characteristic"@en ;
-                                  
-                                  obo:IAO_0000115 "Relates a biological sample to a biological property that it has, such as the disease state or the organism it derives from. This correponds to the characteristic column in formats such as SampleTab or MAGE-TAB. As such, this relation might establish a not-too-formal associatios. For instance, an association to mus-musculus might mean  either that the samle is a mouse, or that it is a part of a mouse."@en ;
-                                  
-                                  rdfs:subPropertyOf biosdterms:has-sample-attribute .
-
-
-
-###  http://rdf.ebi.ac.uk/terms/biosd/has-bio-characteristic-type
-
-biosdterms:has-bio-characteristic-type rdf:type :ObjectProperty ;
-                                       
-                                       rdfs:label "biological characteristic type"@en ;
-                                       
-                                       :deprecated "true"^^xsd:boolean ;
-                                       
-                                       obo:IAO_0000116 "PLEASE NOTE: This cannot be iao:is about, since that assumes the domain is an ICE, which is not always true in BioSD."@en ;
-                                       
-                                       obo:IAO_0000115 "The type of a biological characteristic. This usually comes from data file annotations, for instance, one has a '10C' attribute value, of type x, where x is an instance of 'temperature', or 'mus-musculus 123' attribute value, of type x, where x is an instance of the class mus-musculus."@en ;
-                                       
-                                       obo:IAO_0000116 "This was used in an initial version of BioSD Linked Data model. Now an attribute/characteristic value can be instance of an ontology class if known, in addition to having the attributes rdfs:label + dcterms:title for the value, and dc:type + atlas:propertyType for the type. See http://www.ebi.ac.uk/rdf/biosd/newschema16 for details."@en ;
-                                       
-                                       rdfs:subPropertyOf sio:SIO_000332 .
-
-
-
-###  http://rdf.ebi.ac.uk/terms/biosd/has-knowledgeable-organization
-
-biosdterms:has-knowledgeable-organization rdf:type :ObjectProperty ;
-                                          
-                                          rdfs:subPropertyOf dcterms:contributor ,
-                                                             schema:contributor .
-
-
-
-###  http://rdf.ebi.ac.uk/terms/biosd/has-knowledgeable-person
-
-biosdterms:has-knowledgeable-person rdf:type :ObjectProperty ;
-                                    
-                                    rdfs:subPropertyOf dcterms:contributor ,
-                                                       schema:contributor .
-
-
-
-###  http://rdf.ebi.ac.uk/terms/biosd/has-sample-attribute
-
-biosdterms:has-sample-attribute rdf:type :ObjectProperty ;
-                                
-                                rdfs:label "sample attribute"@en ;
-                                
-                                obo:IAO_0000115 "Relates a sample or sample group to one of its attributes, not necessarily an attributes that is strictly related to biological qualities. For instance: provider name, identification code. This corresponds to attribute columns from formats like SampleTab or MAGE-TAB, such that the column header doesn't necessarily  refer to a biological characteristic explicitly,e.g., 'Comment[Sample Provider]'.  This relation might establish a not-too-formal associatios. For instance, an association from sample group to 'sample provider' might mean the group contains some samples coming from that provider."@en ;
-                                
-                                rdfs:subPropertyOf obo:RO_0000086 ,
-                                                   sio:SIO_000008 ;
-                                
-                                rdfs:domain [ rdf:type :Class ;
-                                              :unionOf ( biosdterms:Sample
-                                                         biosdterms:SampleGroup
-                                                       )
-                                            ] .
-
-
-
-###  http://rdf.ebi.ac.uk/terms/biosd/parent-of
-
-biosdterms:parent-of rdf:type :ObjectProperty ;
-                     
-                     rdfs:label "parent of" ;
-                     
-                     obo:IAO_0000115 "x parent-of y iff the organism x is the biological parent of y. " ;
-                     
-                     rdfs:domain obo:OBI_0100026 ;
-                     
-                     rdfs:range obo:OBI_0100026 ;
-                     
-                     rdfs:subPropertyOf obo:RO_0002226 ;
-                     
-                     :inverseOf biosdterms:child-of ;
-                     
-                     rdfs:range sio:SIO_010000 ;
-                     
-                     rdfs:domain sio:SIO_010000 .
-
-
-
-###  http://rdf.ebi.ac.uk/terms/biosd/sample-child
-
-biosdterms:sample-child rdf:type :ObjectProperty ;
-                        
-                        rdfs:label "sample-child of" ;
-                        
-                        obo:IAO_0000115 "A sample x is sample-child-of y iff x derives from organism xo, y derives from organism yo and xo is the biological child of yo. In other words, the two samples are taken from two orgranisms having a biological parentage relationship. We have used OWL-2 chain axioms, PROV-O, RO to formalise this relationship." ;
-                        
-                        rdfs:domain biosdterms:Sample ;
-                        
-                        rdfs:range biosdterms:Sample ;
-                        
-                        rdfs:subPropertyOf sio:SIO_000244 ,
-                                           prov:wasDerivedFrom ;
-                        
-                        :propertyChainAxiom ( biosdterms:derived-from-organism
-                                              biosdterms:child-of
-                                              [ :inverseOf biosdterms:derived-from-organism
-                                              ]
-                                            ) .
-
-
-
-###  http://rdf.ebi.ac.uk/terms/biosd/sample-parent-of
-
-biosdterms:sample-parent-of rdf:type :ObjectProperty ;
-                            
-                            rdfs:label "sample-parent of" ;
-                            
-                            obo:IAO_0000115 "A sample x is sample-parent-of y iff x derives from organism xo, y derives from organism yo and xo is the biological parent of yo. In other words, the two samples are taken from two organisms having a biological parentage relationship. We have used OWL-2 chain axioms, PROV-O, RO to formalise this relationship." ;
-                            
-                            rdfs:range biosdterms:Sample ;
-                            
-                            rdfs:domain biosdterms:Sample ;
-                            
-                            :inverseOf biosdterms:sample-child ;
-                            
-                            rdfs:subPropertyOf sio:SIO_000245 ,
-                                               prov:hadDerivation ;
-                            
-                            :propertyChainAxiom ( biosdterms:derived-from-organism
-                                                  biosdterms:parent-of
-                                                  [ :inverseOf biosdterms:derived-from-organism
-                                                  ]
-                                                ) .
-
-
-
-###  http://schema.org/contributor
-
-schema:contributor rdf:type :ObjectProperty .
-
-
-
-###  http://schema.org/description
-
-schema:description rdf:type :ObjectProperty .
-
-
-
-###  http://schema.org/sameAs
-
-schema:sameAs rdf:type :ObjectProperty ,
-                       :ReflexiveProperty ,
-                       :SymmetricProperty ,
-                       :TransitiveProperty ;
-              
-              rdfs:comment "We change schema:sameAs to be reflexive/symmetric/transitive, since it's pretty clear the semantics of this property implies that, it's practical to change it this way and it doesn't hurt to make this minimal changes to a third-party ontology (we make them in our files anyway)." .
-
-
-
-###  http://semanticscience.org/resource/SIO_000008
-
-sio:SIO_000008 rdf:type :ObjectProperty .
-
-
-
-###  http://semanticscience.org/resource/SIO_000244
-
-sio:SIO_000244 rdf:type :ObjectProperty .
-
-
-
-###  http://semanticscience.org/resource/SIO_000245
-
-sio:SIO_000245 rdf:type :ObjectProperty .
-
-
-
-###  http://semanticscience.org/resource/SIO_000332
-
-sio:SIO_000332 rdf:type :ObjectProperty .
-
-
-
-###  http://www.w3.org/ns/prov#hadDerivation
-
-prov:hadDerivation rdf:type :ObjectProperty .
-
-
-
-###  http://www.w3.org/ns/prov#wasDerivedFrom
-
-prov:wasDerivedFrom rdf:type :ObjectProperty .
-
-
-
-
-
-#################################################################
-#
-#    Data properties
-#
-#################################################################
-
-
-###  http://rdf.ebi.ac.uk/terms/biosd/has-address-line
-
-biosdterms:has-address-line rdf:type :DatatypeProperty ;
-                            
-                            rdfs:subPropertyOf dcterms:description .
-
-
-
-###  http://rdf.ebi.ac.uk/terms/biosd/has-affiliation-line
-
-biosdterms:has-affiliation-line rdf:type :DatatypeProperty ;
-                                
-                                rdfs:subPropertyOf dcterms:description .
-
-
-
-###  http://rdf.ebi.ac.uk/terms/biosd/has-authors-list
-
-biosdterms:has-authors-list rdf:type :DatatypeProperty ;
-                            
-                            rdfs:subPropertyOf dcterms:description .
-
-
-
-###  http://rdf.ebi.ac.uk/terms/biosd/has-high-value
-
-biosdterms:has-high-value rdf:type :DatatypeProperty ,
-                                   :FunctionalProperty ;
-                          
-                          rdfs:label "has high value"@en ;
-                          
-                          obo:IAO_0000115 "A high end value for those structures that admit one, such as intervals (eg, SIO_000944)."@en .
-
-
-
-###  http://rdf.ebi.ac.uk/terms/biosd/has-low-value
-
-biosdterms:has-low-value rdf:type :DatatypeProperty ,
-                                  :FunctionalProperty ;
-                         
-                         rdfs:label "has low value"@en ;
-                         
-                         obo:IAO_0000115 "A low end value for those structures that admit one, such as intervals (eg, SIO_000944)."@en .
-
-
-
-###  http://rdf.ebi.ac.uk/terms/biosd/has-percent-score
-
-biosdterms:has-percent-score rdf:type :DatatypeProperty ;
-                             
-                             rdfs:label "has percent score" ;
-                             
-                             obo:IAO_0000115 "A score ranging from 0 to 100, representing the confidence we have that the element bearing this property (e.g. estimate, ontology mapping) is true/valid/significant/etc" ;
-                             
-                             rdfs:subPropertyOf sio:SIO_000300 ;
-                             
-                             sio:narrowerThan sio:SIO_000257, obo:OBI_0000071.
-
-
-
-###  http://schema.org/description
-
-schema:description rdf:type :DatatypeProperty .
-
-
-
-
-
-#################################################################
-#
-#    Classes
-#
-#################################################################
-
-
-###  http://purl.obolibrary.org/obo/IAO_0000311
-
-obo:IAO_0000311 rdfs:subClassOf <http://purl.org/ontology/bibo/Document> ,
-                                <http://purl.org/spar/fabio/Work> ,
-                                <http://xmlns.com/foaf/0.1/Document> .
-
-
-
-###  http://purl.org/spar/fabio/Work
-
-<http://purl.org/spar/fabio/Work> rdf:type :Class .
-
-
-
-###  http://rdf.ebi.ac.uk/terms/biosd/BiosamplesSubmission
-
-biosdterms:BiosamplesSubmission rdf:type :Class ;
-                                
-                                rdfs:label "Biosamples Database submission"@en ;
-                                
-                                rdfs:subClassOf obo:IAO_0000310 ,
-                                                <http://purl.org/ontology/bibo/Document> ,
-                                                <http://purl.org/spar/fabio/Work> ,
-                                                <http://xmlns.com/foaf/0.1/Document> ;
-                                
-                                obo:IAO_0000115 "A chunk of data that is submitted into the Biosamples Database, typically defined in a single document, such as a SampleTab file."@en .
-
-
-
-###  http://rdf.ebi.ac.uk/terms/biosd/ContactOrganization
-
-biosdterms:ContactOrganization rdf:type :Class ;
-                               
-                               rdfs:label "contact organization"@en ;
-                               
-                               rdfs:subClassOf schema:Organization ,
-                                               <http://xmlns.com/foaf/0.1/Organization> ,
-                                               [ rdf:type :Restriction ;
-                                                 :onProperty obo:BFO_0000053 ;
-                                                 :someValuesFrom obo:BFO_0000023
-                                               ] ;
-                               
-                               obo:IAO_0000115 "An organization having some role, such as being a reference organization for the submission of an experimental data-set."@en .
-
-
-
-###  http://rdf.ebi.ac.uk/terms/biosd/ContactPerson
-
-biosdterms:ContactPerson rdf:type :Class ;
-                         
-                         rdfs:label "contact person"@en ;
-                         
-                         rdfs:subClassOf schema:Person ,
-                                         <http://xmlns.com/foaf/0.1/Person> ,
-                                         [ rdf:type :Restriction ;
-                                           :onProperty obo:BFO_0000053 ;
-                                           :someValuesFrom obo:OBI_0001687
-                                         ] ;
-                         
-                         obo:IAO_0000115 "A person that is a reference contact for some entity, such as an experimental data-set."@en .
-
-
-
-###  http://rdf.ebi.ac.uk/terms/biosd/RepositoryWebRecord
-
-biosdterms:RepositoryWebRecord rdf:type :Class ;
-                               
-                               rdfs:label "Repository Web Record"@en ;
-                               
-                               rdfs:subClassOf obo:IAO_0000310 ,
-                                               <http://purl.org/ontology/bibo/Document> ,
-                                               <http://purl.org/spar/fabio/Work> ,
-                                               sio:SIO_000088 ,
-                                               <http://xmlns.com/foaf/0.1/Document> ;
-                               
-                               obo:IAO_0000115 "A web page in a repository that represents a record about an entity, such as a biological sample or an experiment."@en .
-
-
-
-###  http://rdf.ebi.ac.uk/terms/biosd/Sample
-
-biosdterms:Sample rdf:type :Class ;
-                  
-                  rdfs:label "Biosample"@en ;
-                  
-                  rdfs:subClassOf obo:OBI_0000747 ;
-                  
-                  obo:IAO_0000115 "A biological sample, for which a record exists (or potentially exists) in the EBI Biosamples database."@en ;
-                  
-                  rdfs:comment "TODO: an axiom to state that the origin of a biosample is BioSD (use the same individual used in Void)."@en .
-
-
-
-###  http://rdf.ebi.ac.uk/terms/biosd/SampleAttributeOntologyAnnotation
-
-biosdterms:SampleAttributeOntologyAnnotation rdf:type :Class ;
-                                             
-                                             rdfs:subClassOf <http://www.openannotation.org/ns/Annotation> .
-
-
-
-###  http://rdf.ebi.ac.uk/terms/biosd/SampleGroup
-
-biosdterms:SampleGroup rdf:type :Class ;
-                       
-                       rdfs:label "biosample group"@en ;
-                       
-                       rdfs:subClassOf obo:IAO_0000314 ,
-                                       sio:SIO_000616 ;
-                       
-                       obo:IAO_0000115 "A collection of biological samples stored in the EBI Biosamples database. Sample membership to a group is assigned by submitters or via automatic tools (i.e., it's a fiat relationship)."@en ;
-                       
-                       rdfs:comment "TODO: an axiom to state that the origin of a biosample group is BioSD (use the same individual used in Void)."@en .
-
-
-
-###  http://schema.org/Organization
-
-schema:Organization rdf:type :Class .
-
-
-
-###  http://schema.org/Person
-
-schema:Person rdf:type :Class .
-
-
-
-###  http://semanticscience.org/resource/SIO_000088
-
-sio:SIO_000088 rdf:type :Class .
-
-
-
-###  http://semanticscience.org/resource/SIO_000616
-
-sio:SIO_000616 rdf:type :Class .
-
-
-
-###  http://semanticscience.org/resource/SIO_010000
-
-sio:SIO_010000 rdf:type :Class .
-
-
-
-
-
-#################################################################
-#
-#    Annotations
-#
-#################################################################
-
-
-biosdterms:has-knowledgeable-organization rdfs:label "has knowledgeable organization"@en ;
-                                          
-                                          obo:IAO_0000115 "An organization that is somehow involved with the subject of this relation, for example because it is its creator, or the maintainer, or alike."@en .
-
-
-
-biosdterms:has-knowledgeable-person rdfs:label "has knowledgeable person"@en ;
-                                    
-                                    obo:IAO_0000115 "A person that is somehow involved with the subject of this relation, for example because he/she is its creator, or the maintainer, or alike."@en .
-
-
-
-biosdterms:has-authors-list rdfs:label "authors list"@en ;
-                            
-                            obo:IAO_0000115 "The list of authors of a publication or document, in the form of a simple text (i.e., a string). This can be used for those cases where extracting a proper list of authors (e.g., from a database record) is too complicated."@en .
-
-
-
-biosdterms:has-address-line rdfs:label "postal address"@en ;
-                            
-                            obo:IAO_0000115 "A postal address in the form of simple text (i.e., string). This can be used for those cases where it's too complicated to achieve a proper structure for an address."@en .
-
-
-
-biosdterms:has-affiliation-line rdfs:label "affiliation"@en ;
-                                
-                                obo:IAO_0000115 "An affiliation description for a person (e.g., department+university), in the form of simple text (i.e., string). This can be used for those cases where it's too complicated to achieve a proper structure for an affiliation."@en .
-
-
-
-
-###  Generated by the OWL API (version 3.5.1) http://owlapi.sourceforge.net
-
+<http://rdf.ebi.ac.uk/terms/biosd/> a :Ontology ;
+	:imports <http://semanticscience.org/ontology/sio-v1.0.10-release.owl> , <http://www.openannotation.org/ns/> , <http://topbraid.org/schema/> , <http://purl.obolibrary.org/obo/ro/releases/2015-04-12/ro.owl> , <http://purl.obolibrary.org/obo/iao/2011-05-09/iao-main.owl> , <http://purl.org/ontology/bibo/> , <http://purl.org/spar/fabio/> , <http://www.w3.org/ns/prov-o-20130430> , <http://purl.obolibrary.org/obo/obi/2015-03-17/obi.owl> , <http://xmlns.com/foaf/0.1/> .
+# 
+# 
+# #################################################################
+# #
+# #    Annotation properties
+# #
+# #################################################################
+# 
+# 
+# http://rdf.ebi.ac.uk/terms/biosd/has-address-line
+
+biosdterms:has-address-line a :AnnotationProperty ;
+	rdfs:subPropertyOf rdfs:comment ;
+	rdfs:range xsd:string .
+# 
+# http://rdf.ebi.ac.uk/terms/biosd/has-affiliation-line
+
+biosdterms:has-affiliation-line a :AnnotationProperty ;
+	rdfs:subPropertyOf rdfs:comment ;
+	rdfs:range xsd:string .
+# 
+# http://rdf.ebi.ac.uk/terms/biosd/has-authors-list
+
+biosdterms:has-authors-list a :AnnotationProperty ;
+	rdfs:subPropertyOf rdfs:comment ;
+	rdfs:range xsd:string .
+# 
+# http://rdf.ebi.ac.uk/terms/biosd/has-knowledgeable-organization
+
+biosdterms:has-knowledgeable-organization a :AnnotationProperty .
+# 
+# http://rdf.ebi.ac.uk/terms/biosd/has-knowledgeable-person
+
+biosdterms:has-knowledgeable-person a :AnnotationProperty .
+# 
+# 
+# 
+# #################################################################
+# #
+# #    Object Properties
+# #
+# #################################################################
+# 
+# 
+# http://purl.obolibrary.org/obo/RO_0000086
+
+obo:RO_0000086 a :ObjectProperty .
+# 
+# http://rdf.ebi.ac.uk/terms/biosd/child-of
+
+biosdterms:child-of a :ObjectProperty ;
+	rdfs:subPropertyOf obo:RO_0002202 ;
+	:inverseOf biosdterms:parent-of ;
+	rdfs:domain obo:OBI_0100026 , sio:SIO_010000 ;
+	rdfs:range obo:OBI_0100026 , sio:SIO_010000 ;
+	obo:IAO_0000115 "x child-of y iff the organism x is the biological direct offspring of y. " ;
+	rdfs:label "child of" .
+# 
+# http://rdf.ebi.ac.uk/terms/biosd/computed-from
+
+biosdterms:computed-from a :ObjectProperty ;
+	rdfs:subPropertyOf sio:SIO_000244 , prov:wasDerivedFrom ;
+	obo:IAO_0000115 "The current entity (usually some data, a document, or other information item) was computed using another one. For instance, an ontology term annotation was computed starting from some free text." ;
+	rdfs:label "is computed from" .
+# 
+# http://rdf.ebi.ac.uk/terms/biosd/derived-from-organism
+
+biosdterms:derived-from-organism a :ObjectProperty ;
+	rdfs:subPropertyOf sio:SIO_000244 , prov:wasDerivedFrom ;
+	rdfs:domain biosdterms:Sample ;
+	rdfs:range obo:OBI_0100026 , sio:SIO_010000 ;
+	obo:IAO_0000115 "a sample directly taken from an organism, or from another sample, which is taken from an organism." ;
+	rdfs:label "derived from organism" .
+# 
+# http://rdf.ebi.ac.uk/terms/biosd/has-address-line
+
+biosdterms:has-address-line a :ObjectProperty ;
+	rdfs:subPropertyOf schema:description .
+# 
+# http://rdf.ebi.ac.uk/terms/biosd/has-affiliation-line
+
+biosdterms:has-affiliation-line a :ObjectProperty ;
+	rdfs:subPropertyOf schema:description .
+# 
+# http://rdf.ebi.ac.uk/terms/biosd/has-authors-list
+
+biosdterms:has-authors-list a :ObjectProperty ;
+	rdfs:subPropertyOf schema:description ;
+	rdfs:domain obo:IAO_0000311 , <http://purl.org/ontology/bibo/Document> , <http://purl.org/spar/fabio/Work> , <http://xmlns.com/foaf/0.1/Document> .
+# 
+# http://rdf.ebi.ac.uk/terms/biosd/has-bio-characteristic
+
+biosdterms:has-bio-characteristic a :ObjectProperty ;
+	rdfs:subPropertyOf biosdterms:has-sample-attribute ;
+	obo:IAO_0000115 "Relates a biological sample to a biological property that it has, such as the disease state or the organism it derives from. This correponds to the characteristic column in formats such as SampleTab or MAGE-TAB. As such, this relation might establish a not-too-formal associatios. For instance, an association to mus-musculus might mean  either that the samle is a mouse, or that it is a part of a mouse."@en ;
+	rdfs:label "biological characteristic"@en .
+# 
+# http://rdf.ebi.ac.uk/terms/biosd/has-bio-characteristic-type
+
+biosdterms:has-bio-characteristic-type a :ObjectProperty ;
+	rdfs:subPropertyOf sio:SIO_000332 ;
+	obo:IAO_0000115 "The type of a biological characteristic. This usually comes from data file annotations, for instance, one has a '10C' attribute value, of type x, where x is an instance of 'temperature', or 'mus-musculus 123' attribute value, of type x, where x is an instance of the class mus-musculus."@en ;
+	obo:IAO_0000116 "PLEASE NOTE: This cannot be iao:is about, since that assumes the domain is an ICE, which is not always true in BioSD."@en , "This was used in an initial version of BioSD Linked Data model. Now an attribute/characteristic value can be instance of an ontology class if known, in addition to having the attributes rdfs:label + dcterms:title for the value, and dc:type + atlas:propertyType for the type. See http://www.ebi.ac.uk/rdf/biosd/newschema16 for details."@en ;
+	rdfs:label "biological characteristic type"@en ;
+	:deprecated "true"^^xsd:boolean .
+# 
+# http://rdf.ebi.ac.uk/terms/biosd/has-knowledgeable-organization
+
+biosdterms:has-knowledgeable-organization a :ObjectProperty ;
+	rdfs:subPropertyOf dcterms:contributor , schema:contributor .
+# 
+# http://rdf.ebi.ac.uk/terms/biosd/has-knowledgeable-person
+
+biosdterms:has-knowledgeable-person a :ObjectProperty ;
+	rdfs:subPropertyOf dcterms:contributor , schema:contributor .
+# 
+# http://rdf.ebi.ac.uk/terms/biosd/has-sample-attribute
+
+biosdterms:has-sample-attribute a :ObjectProperty ;
+	rdfs:subPropertyOf obo:RO_0000086 , sio:SIO_000008 ;
+	rdfs:domain _:genid1 .
+
+_:genid1 a :Class ;
+	:unionOf _:genid3 .
+
+_:genid3 a rdf:List ;
+	rdf:first biosdterms:Sample ;
+	rdf:rest _:genid2 .
+
+_:genid2 a rdf:List ;
+	rdf:first biosdterms:SampleGroup ;
+	rdf:rest rdf:nil .
+
+biosdterms:has-sample-attribute obo:IAO_0000115 "Relates a sample or sample group to one of its attributes, not necessarily an attributes that is strictly related to biological qualities. For instance: provider name, identification code. This corresponds to attribute columns from formats like SampleTab or MAGE-TAB, such that the column header doesn't necessarily  refer to a biological characteristic explicitly,e.g., 'Comment[Sample Provider]'.  This relation might establish a not-too-formal associatios. For instance, an association from sample group to 'sample provider' might mean the group contains some samples coming from that provider."@en ;
+	rdfs:label "sample attribute"@en .
+# 
+# http://rdf.ebi.ac.uk/terms/biosd/parent-of
+
+biosdterms:parent-of a :ObjectProperty ;
+	rdfs:subPropertyOf obo:RO_0002226 ;
+	rdfs:domain obo:OBI_0100026 , sio:SIO_010000 ;
+	rdfs:range obo:OBI_0100026 , sio:SIO_010000 ;
+	obo:IAO_0000115 "x parent-of y iff the organism x is the biological parent of y. " ;
+	rdfs:label "parent of" .
+# 
+# http://rdf.ebi.ac.uk/terms/biosd/sample-child
+
+biosdterms:sample-child a :ObjectProperty ;
+	rdfs:subPropertyOf sio:SIO_000244 , prov:wasDerivedFrom ;
+	:inverseOf biosdterms:sample-parent-of ;
+	rdfs:domain biosdterms:Sample ;
+	rdfs:range biosdterms:Sample ;
+	:propertyChainAxiom _:genid7 .
+
+_:genid7 a rdf:List ;
+	rdf:first biosdterms:derived-from-organism ;
+	rdf:rest _:genid6 .
+
+_:genid6 a rdf:List ;
+	rdf:first biosdterms:child-of ;
+	rdf:rest _:genid4 .
+
+_:genid4 a rdf:List ;
+	rdf:first _:genid5 .
+
+_:genid5 :inverseOf biosdterms:derived-from-organism .
+
+_:genid4 rdf:rest rdf:nil .
+
+biosdterms:sample-child obo:IAO_0000115 "A sample x is sample-child-of y iff x derives from organism xo, y derives from organism yo and xo is the biological child of yo. In other words, the two samples are taken from two orgranisms having a biological parentage relationship. We have used OWL-2 chain axioms, PROV-O, RO to formalise this relationship." ;
+	rdfs:label "sample-child of" .
+# 
+# http://rdf.ebi.ac.uk/terms/biosd/sample-parent-of
+
+biosdterms:sample-parent-of a :ObjectProperty ;
+	rdfs:subPropertyOf sio:SIO_000245 , prov:hadDerivation ;
+	rdfs:domain biosdterms:Sample ;
+	rdfs:range biosdterms:Sample ;
+	:propertyChainAxiom _:genid11 .
+
+_:genid11 a rdf:List ;
+	rdf:first biosdterms:derived-from-organism ;
+	rdf:rest _:genid10 .
+
+_:genid10 a rdf:List ;
+	rdf:first biosdterms:parent-of ;
+	rdf:rest _:genid8 .
+
+_:genid8 a rdf:List ;
+	rdf:first _:genid9 .
+
+_:genid9 :inverseOf biosdterms:derived-from-organism .
+
+_:genid8 rdf:rest rdf:nil .
+
+biosdterms:sample-parent-of obo:IAO_0000115 "A sample x is sample-parent-of y iff x derives from organism xo, y derives from organism yo and xo is the biological parent of yo. In other words, the two samples are taken from two organisms having a biological parentage relationship. We have used OWL-2 chain axioms, PROV-O, RO to formalise this relationship." ;
+	rdfs:label "sample-parent of" .
+# 
+# http://schema.org/contributor
+
+schema:contributor a :ObjectProperty .
+# 
+# http://schema.org/description
+
+schema:description a :ObjectProperty .
+# 
+# http://schema.org/sameAs
+
+schema:sameAs a :ObjectProperty , :SymmetricProperty , :TransitiveProperty , :ReflexiveProperty ;
+	rdfs:comment "We change schema:sameAs to be reflexive/symmetric/transitive, since it's pretty clear the semantics of this property implies that, it's practical to change it this way and it doesn't hurt to make this minimal changes to a third-party ontology (we make them in our files anyway)." .
+# 
+# http://semanticscience.org/resource/SIO_000008
+
+sio:SIO_000008 a :ObjectProperty .
+# 
+# http://semanticscience.org/resource/SIO_000244
+
+sio:SIO_000244 a :ObjectProperty .
+# 
+# http://semanticscience.org/resource/SIO_000245
+
+sio:SIO_000245 a :ObjectProperty .
+# 
+# http://semanticscience.org/resource/SIO_000332
+
+sio:SIO_000332 a :ObjectProperty .
+# 
+# http://www.w3.org/ns/prov#hadDerivation
+
+prov:hadDerivation a :ObjectProperty .
+# 
+# http://www.w3.org/ns/prov#wasDerivedFrom
+
+prov:wasDerivedFrom a :ObjectProperty .
+# 
+# 
+# 
+# #################################################################
+# #
+# #    Data properties
+# #
+# #################################################################
+# 
+# 
+# http://rdf.ebi.ac.uk/terms/biosd/has-address-line
+
+biosdterms:has-address-line a :DatatypeProperty ;
+	rdfs:subPropertyOf dcterms:description .
+# 
+# http://rdf.ebi.ac.uk/terms/biosd/has-affiliation-line
+
+biosdterms:has-affiliation-line a :DatatypeProperty ;
+	rdfs:subPropertyOf dcterms:description .
+# 
+# http://rdf.ebi.ac.uk/terms/biosd/has-authors-list
+
+biosdterms:has-authors-list a :DatatypeProperty ;
+	rdfs:subPropertyOf dcterms:description .
+# 
+# http://rdf.ebi.ac.uk/terms/biosd/has-high-value
+
+biosdterms:has-high-value a :DatatypeProperty , :FunctionalProperty ;
+	obo:IAO_0000115 "A high end value for those structures that admit one, such as intervals (eg, SIO_000944)."@en ;
+	rdfs:label "has high value"@en .
+# 
+# http://rdf.ebi.ac.uk/terms/biosd/has-low-value
+
+biosdterms:has-low-value a :DatatypeProperty , :FunctionalProperty ;
+	obo:IAO_0000115 "A low end value for those structures that admit one, such as intervals (eg, SIO_000944)."@en ;
+	rdfs:label "has low value"@en .
+# 
+# http://rdf.ebi.ac.uk/terms/biosd/has-percent-score
+
+biosdterms:has-percent-score a :DatatypeProperty ;
+	rdfs:subPropertyOf sio:SIO_000300 ;
+	obo:IAO_0000115 "A score ranging from 0 to 100, representing the confidence we have that the element bearing this property (e.g. estimate, ontology mapping) is true/valid/significant/etc" ;
+	sio:narrowerThan obo:OBI_0000071 , sio:SIO_000257 ;
+	rdfs:label "has percent score" .
+# 
+# http://schema.org/description
+
+schema:description a :DatatypeProperty .
+# 
+# 
+# 
+# #################################################################
+# #
+# #    Classes
+# #
+# #################################################################
+# 
+# 
+# http://purl.obolibrary.org/obo/IAO_0000311
+
+obo:IAO_0000311 rdfs:subClassOf <http://purl.org/ontology/bibo/Document> , <http://purl.org/spar/fabio/Work> , <http://xmlns.com/foaf/0.1/Document> .
+# 
+# http://purl.org/spar/fabio/Work
+
+<http://purl.org/spar/fabio/Work> a :Class .
+# 
+# http://rdf.ebi.ac.uk/terms/biosd/BiosamplesSubmission
+
+biosdterms:BiosamplesSubmission a :Class ;
+	rdfs:subClassOf obo:IAO_0000310 , <http://purl.org/ontology/bibo/Document> , <http://purl.org/spar/fabio/Work> , <http://xmlns.com/foaf/0.1/Document> ;
+	obo:IAO_0000115 "A chunk of data that is submitted into the Biosamples Database, typically defined in a single document, such as a SampleTab file."@en ;
+	rdfs:label "Biosamples Database submission"@en .
+# 
+# http://rdf.ebi.ac.uk/terms/biosd/ContactOrganization
+
+biosdterms:ContactOrganization a :Class ;
+	rdfs:subClassOf schema:Organization , <http://xmlns.com/foaf/0.1/Organization> , _:genid12 .
+
+_:genid12 a :Restriction ;
+	:onProperty obo:BFO_0000053 ;
+	:someValuesFrom obo:BFO_0000023 .
+
+biosdterms:ContactOrganization obo:IAO_0000115 "An organization having some role, such as being a reference organization for the submission of an experimental data-set."@en ;
+	rdfs:label "contact organization"@en .
+# 
+# http://rdf.ebi.ac.uk/terms/biosd/ContactPerson
+
+biosdterms:ContactPerson a :Class ;
+	rdfs:subClassOf schema:Person , <http://xmlns.com/foaf/0.1/Person> , _:genid13 .
+
+_:genid13 a :Restriction ;
+	:onProperty obo:BFO_0000053 ;
+	:someValuesFrom obo:OBI_0001687 .
+
+biosdterms:ContactPerson obo:IAO_0000115 "A person that is a reference contact for some entity, such as an experimental data-set."@en ;
+	rdfs:label "contact person"@en .
+# 
+# http://rdf.ebi.ac.uk/terms/biosd/OntologyMappingAnnotation
+
+biosdterms:OntologyMappingAnnotation a :Class ;
+	rdfs:subClassOf <http://www.openannotation.org/ns/Annotation> ;
+	obo:IAO_0000115 "A subclass from the Open Annotation Model, to track the provenance of a mapping between two ontology terms. For instance, a term might have been passed as input to the Bioportal Mapping service and terms mapped from the input might have been returned. In such a case, for each returned term an OntologyMappingAnnotation is created, where the initial term is the annotation target and returned term is the annotation body."@en ;
+	rdfs:label "Ontology Mapping Annotation"@en .
+# 
+# http://rdf.ebi.ac.uk/terms/biosd/RepositoryWebRecord
+
+biosdterms:RepositoryWebRecord a :Class ;
+	rdfs:subClassOf obo:IAO_0000310 , <http://purl.org/ontology/bibo/Document> , <http://purl.org/spar/fabio/Work> , sio:SIO_000088 , <http://xmlns.com/foaf/0.1/Document> ;
+	obo:IAO_0000115 "A web page in a repository that represents a record about an entity, such as a biological sample or an experiment."@en ;
+	rdfs:label "Repository Web Record"@en .
+# 
+# http://rdf.ebi.ac.uk/terms/biosd/Sample
+
+biosdterms:Sample a :Class ;
+	rdfs:subClassOf obo:OBI_0000747 ;
+	obo:IAO_0000115 "A biological sample, for which a record exists (or potentially exists) in the EBI Biosamples database."@en ;
+	rdfs:comment "TODO: an axiom to state that the origin of a biosample is BioSD (use the same individual used in Void)."@en ;
+	rdfs:label "Biosample"@en .
+# 
+# http://rdf.ebi.ac.uk/terms/biosd/SampleAttributeOntologyAnnotation
+
+biosdterms:SampleAttributeOntologyAnnotation a :Class ;
+	rdfs:subClassOf <http://www.openannotation.org/ns/Annotation> ;
+	obo:IAO_0000115 "A subclass from the Open Annotation Model, to track the provenance of an ontology term annotation (body) regarding a BioSD sample attribute (target)."@en ;
+	rdfs:label "Sample Attribute Annotation"@en .
+# 
+# http://rdf.ebi.ac.uk/terms/biosd/SampleGroup
+
+biosdterms:SampleGroup a :Class ;
+	rdfs:subClassOf obo:IAO_0000314 , sio:SIO_000616 ;
+	obo:IAO_0000115 "A collection of biological samples stored in the EBI Biosamples database. Sample membership to a group is assigned by submitters or via automatic tools (i.e., it's a fiat relationship)."@en ;
+	rdfs:comment "TODO: an axiom to state that the origin of a biosample group is BioSD (use the same individual used in Void)."@en ;
+	rdfs:label "biosample group"@en .
+# 
+# http://schema.org/Organization
+
+schema:Organization a :Class .
+# 
+# http://schema.org/Person
+
+schema:Person a :Class .
+# 
+# http://semanticscience.org/resource/SIO_000088
+
+sio:SIO_000088 a :Class .
+# 
+# http://semanticscience.org/resource/SIO_000616
+
+sio:SIO_000616 a :Class .
+# 
+# http://semanticscience.org/resource/SIO_010000
+
+sio:SIO_010000 a :Class .
+# 
+# 
+# 
+# #################################################################
+# #
+# #    Annotations
+# #
+# #################################################################
+# 
+# 
+
+biosdterms:has-address-line obo:IAO_0000115 "A postal address in the form of simple text (i.e., string). This can be used for those cases where it's too complicated to achieve a proper structure for an address."@en ;
+	rdfs:label "postal address"@en .
+# 
+
+biosdterms:has-affiliation-line obo:IAO_0000115 "An affiliation description for a person (e.g., department+university), in the form of simple text (i.e., string). This can be used for those cases where it's too complicated to achieve a proper structure for an affiliation."@en ;
+	rdfs:label "affiliation"@en .
+# 
+
+biosdterms:has-authors-list obo:IAO_0000115 "The list of authors of a publication or document, in the form of a simple text (i.e., a string). This can be used for those cases where extracting a proper list of authors (e.g., from a database record) is too complicated."@en ;
+	rdfs:label "authors list"@en .
+# 
+
+biosdterms:has-knowledgeable-organization obo:IAO_0000115 "An organization that is somehow involved with the subject of this relation, for example because it is its creator, or the maintainer, or alike."@en ;
+	rdfs:label "has knowledgeable organization"@en .
+# 
+
+biosdterms:has-knowledgeable-person obo:IAO_0000115 "A person that is somehow involved with the subject of this relation, for example because he/she is its creator, or the maintainer, or alike."@en ;
+	rdfs:label "has knowledgeable person"@en .
+# 
+# Generated by the OWL API (version 4.1.3.20151118-2017) https://github.com/owlcs/owlapi
