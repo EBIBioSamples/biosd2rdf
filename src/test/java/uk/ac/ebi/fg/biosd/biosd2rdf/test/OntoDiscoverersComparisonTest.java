@@ -28,8 +28,9 @@ import org.slf4j.LoggerFactory;
 import uk.ac.ebi.bioportal.webservice.client.BioportalClient;
 import uk.ac.ebi.bioportal.webservice.exceptions.OntologyServiceException;
 import uk.ac.ebi.bioportal.webservice.model.OntologyClass;
+import uk.ac.ebi.fg.biosd.annotator.ontodiscover.OntoResolverAndAnnotator;
 import uk.ac.ebi.fg.biosd.biosd2rdf.java2rdf.mapping.BioSdRfMapperFactory;
-import uk.ac.ebi.fg.biosd.biosd2rdf.utils.BioSdOntologyTermResolver;
+import uk.ac.ebi.fg.biosd.biosd2rdf.utils.AnnotatorHelper;
 import uk.ac.ebi.fg.biosd.model.expgraph.BioSample;
 import uk.ac.ebi.fg.biosd.model.organizational.MSI;
 import uk.ac.ebi.fg.core_model.expgraph.properties.ExperimentalPropertyType;
@@ -42,6 +43,9 @@ import com.opencsv.CSVWriter;
 
 /**
  * Generates some info that is needed to manually compare together annotations created with ZOOMA and Bioportal.
+ * 
+ * TODO: <b>CURRENTLY NOT WORKING DUE TO MIGRATION TO THE FEATURE ANNOTATOR</b>, because the latter supports ZOOMA
+ * only. 
  * 
  * @author brandizi
  * <dl><dt>Date:</dt><dd>15 Jan 2016</dd></dl>
@@ -74,12 +78,16 @@ public class OntoDiscoverersComparisonTest
 	 * Takes a TSV of BioSD labels of interest (value/type strings) and annotate them with ZOOMA or Bioportal.
 	 * It does so by means of the BioSD RDF exporter, since it's quick to do and we want to test how that component works.
 	 */
-	private void generateRDF ( String discovererProp, String inputBaseName, String outBaseName ) 
-		throws Exception
+	private void generateRDF ( String discovererProp, String inputBaseName, String outBaseName ) throws Exception
 	{
 		log.info ( "Generating Annotations for {} - {}", discovererProp, inputBaseName );
 		
-		System.setProperty ( BioSdOntologyTermResolver.ONTO_DISCOVERER_PROP_NAME, discovererProp );
+		if ( !"zooma".equals ( discovererProp ) ) throw new UnsupportedOperationException ( 
+			"This needs to be updated, the feature annotator supports ZOOMA only"
+		);
+		
+		// TODO: fix it! 
+		// System.setProperty ( BioSdOntologyTermResolver.ONTO_DISCOVERER_PROP_NAME, discovererProp );
 		InputStream in = this.getClass ().getResourceAsStream ( "/attr_cmp_test/" + inputBaseName + ".tsv" );
 
 		// Generate a foo submission, with a foo sample
@@ -102,6 +110,13 @@ public class OntoDiscoverersComparisonTest
 				value, new ExperimentalPropertyType ( type ) 
 			));
 		}
+		
+		// Invoke the annotator
+		AnnotatorHelper annHelper = new AnnotatorHelper ();
+		annHelper.begin ();
+		annHelper.annotate ( msi );
+		annHelper.commit ();
+		
 		
 		// Annotate the resulting BioSD submission, a bit convoluted, but it's easy with the already-existing code.
 		//
@@ -144,7 +159,7 @@ public class OntoDiscoverersComparisonTest
 		);
 		csvw.writeNext ( new String[] { "type", "value", "term uri", "term label", "term synonims" } );
 		
-		BioportalClient bpcli = new BioportalClient ( BioSdOntologyTermResolver.BIOPORTAL_API_KEY );
+		BioportalClient bpcli = new BioportalClient ( OntoResolverAndAnnotator.BIOPORTAL_API_KEY );
 		
 		int lineNo = 0;
 		for ( String[] line = null;  ( line = csvr.readNext () ) != null;  )

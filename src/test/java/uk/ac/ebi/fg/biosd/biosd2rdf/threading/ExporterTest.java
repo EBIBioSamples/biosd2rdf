@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import uk.ac.ebi.fg.biosd.biosd2rdf.Biosd2RdfCmd;
+import uk.ac.ebi.fg.biosd.biosd2rdf.utils.AnnotatorHelper;
 import uk.ac.ebi.fg.biosd.model.utils.test.TestModel;
 import uk.ac.ebi.fg.biosd.sampletab.persistence.Persister;
 import uk.ac.ebi.fg.core_model.terms.OntologyEntry;
@@ -33,42 +34,28 @@ public class ExporterTest
 		for ( long id = 1; id <= 50; id++ )
 		{
 			TestModel tm = new TestModel ( "test." + id + "." );
-
+			tm.cv3.addOntologyTerm ( new OntologyEntry ( "FOO ACC", new ReferenceSource ( "FOO ONTO", null ) ) );
+			
+			// These are prefixed and they ain't very good here too
+			//
+			tm.cv1.getOntologyTerms ().clear ();
+      tm.cv1.addOntologyTerm ( tm.oe1 = new OntologyEntry ( "123", tm.src1  ) );
+      tm.cv1.addOntologyTerm ( tm.oe2 = new OntologyEntry ( "456", tm.src2 ) );
+			
 			// We currently set this at submission level only
 			tm.msi.setPublicFlag ( true );
 			
 			persister.persist ( tm.msi );
 			log.info ( "{} persisted", tm.msi.getAcc () );
 		}
+
+		AnnotatorHelper annHelper = new AnnotatorHelper ();
+		annHelper.annotateAll ();
 		
 		System.setProperty ( "biosd.test_mode", "true" );
 		Biosd2RdfCmd.main ( "-o", "target/biosd_test.ttl" );
 	}
 	
-	/**
-	 * Creates mock-up SampleTab submissions and export them, without involving any relational DB.
-	 */
-	@Test 
-	public void testNoDbExport ()
-	{
-		BioSdExportService xservice = new BioSdExportService ( "target/biosd_nodb_test.ttl" );
-		
-		for ( long id = 1; id <= 50; id++ )
-		{
-			TestModel tm = new TestModel ( "test." + id + "." );
-
-			// We currently set this at submission level only
-			tm.msi.setPublicFlag ( true );
-
-			
-			tm.cv3.addOntologyTerm ( new OntologyEntry ( "FOO ACC", new ReferenceSource ( "FOO ONTO", null ) ) );
-			log.debug ( "Exporting {}", tm.msi.getAcc () );
-			xservice.submit ( tm.msi );
-		}
-		
-		xservice.waitAllFinished ();
-		xservice.flushKnowledgeBase ();
-	}
 
 	/**
 	 * Exports whatever it finds in the POM-configured DB

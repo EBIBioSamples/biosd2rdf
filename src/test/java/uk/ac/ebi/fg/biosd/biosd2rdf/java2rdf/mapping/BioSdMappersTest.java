@@ -18,6 +18,7 @@ import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.model.OWLOntologyStorageException;
 import org.semanticweb.owlapi.vocab.PrefixOWLOntologyFormat;
 
+import uk.ac.ebi.fg.biosd.biosd2rdf.utils.AnnotatorHelper;
 import uk.ac.ebi.fg.biosd.biosd2rdf.utils.SparqlBasedTester;
 import uk.ac.ebi.fg.biosd.model.expgraph.properties.SampleCommentType;
 import uk.ac.ebi.fg.biosd.model.expgraph.properties.SampleCommentValue;
@@ -155,6 +156,12 @@ public class BioSdMappersTest
 		
 		// We currently set this at submission level only
 		biosdModel.msi.setPublicFlag ( true );
+		
+		// Generate the annotations to be used for RDF
+		AnnotatorHelper annHelper = new AnnotatorHelper ();
+		annHelper.begin ();
+		annHelper.annotate ( biosdModel.msi );
+		annHelper.commit ();
 		
 		new BioSdRfMapperFactory ( onto ).map ( biosdModel.msi );
 		
