@@ -125,17 +125,18 @@ public class BioSdExportService extends BatchService<BioSdExportTask>
 	}
 	
 	/**
-	 * Submits a new BioSD exporter task. This will work on a single SampleTab submission and will be run as a thread in 
-	 * thread pool, managed by this service.
+	 * Submits a new BioSD exporter task. This is either an {@link MSIExportTask}, or, triggered by the latter, a
+	 * {@link BioSdExportTask}.
+	 * 
 	 */
 	@Override
-	public void submit ( BioSdExportTask batchServiceTask )
+	public void submit ( BioSdExportTask biosdXportTask )
 	{
 		// This will flush the triples to the disk when the memory is too full and will also invoke the GC
 		MemoryUtils.checkMemory ( this.memFlushAction, 0.25 );
 		// DEBUG if ( completedTasks > 0 && completedTasks % 20 == 0 ) flushKnowledgeBase ();
 
-		super.submit ( batchServiceTask );
+		super.submit ( biosdXportTask );
 	}
 
 	/**

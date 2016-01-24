@@ -11,7 +11,7 @@ import uk.ac.ebi.fg.core_model.resources.Resources;
 
 /**
  * Exports a single {@link BioSample}. This is invoked by the {@link MSIExportTask} constructor, when a submission has 
- * too many samples. We have this behaviour, because when this happens, the serial export of samples takes too much 
+ * many samples. We have this behaviour, because when this happens, the serial export of samples takes too much 
  * time. 
  *  
  * @author brandizi

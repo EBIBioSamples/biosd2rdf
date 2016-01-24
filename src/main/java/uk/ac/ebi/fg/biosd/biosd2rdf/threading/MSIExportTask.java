@@ -16,6 +16,8 @@ import uk.ac.ebi.fg.core_model.resources.Resources;
 /**
  * Exports a single SampleTab submission, using {@link BioSdRfMapperFactory} and the definitions based on the 
  * Java2RDF framework.
+ * 
+ * If the submission has many samples, it triggers parallel sample exports, using {@link BioSdExportTask}.
  *
  * <dl><dt>date</dt><dd>19 Jul 2013</dd></dl>
  * @author Marco Brandizi
