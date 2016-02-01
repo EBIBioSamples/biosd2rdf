@@ -12,6 +12,10 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Random;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.PriorityBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
@@ -31,6 +35,8 @@ import uk.ac.ebi.fg.biosd.model.organizational.MSI;
 import uk.ac.ebi.fg.core_model.resources.Resources;
 import uk.ac.ebi.utils.memory.MemoryUtils;
 import uk.ac.ebi.utils.threading.BatchService;
+import uk.ac.ebi.utils.threading.BatchServiceTask;
+import uk.ac.ebi.utils.threading.BatchServiceTask.TaskComparator;
 
 /**
  * An extension of {@link BatchService} to run multiple BioSD/RDF exporters in parallel, in multi-threading fashion.
@@ -280,4 +286,18 @@ public class BioSdExportService extends BatchService<BioSdExportTask>
 	} // flushKnowledgeBase
 	
 	
+	/**
+	 * Equips the {@link ExecutorService} being used by this service with {@link PriorityBlockingQueue} and 
+	 * {@link TaskComparator}, since we need to manage task priorities.
+	 * 
+	 */
+	@Override
+	protected ExecutorService newThreadPoolExecutor ( int initialThreadPoolSize )
+	{
+		return new ThreadPoolExecutor ( 
+			initialThreadPoolSize, initialThreadPoolSize,
+      0L, TimeUnit.MILLISECONDS,
+      new PriorityBlockingQueue<Runnable> ( initialThreadPoolSize, new BatchServiceTask.TaskComparator () )
+    );
+	}
 }
