@@ -28,7 +28,7 @@ import org.slf4j.LoggerFactory;
 import uk.ac.ebi.bioportal.webservice.client.BioportalClient;
 import uk.ac.ebi.bioportal.webservice.exceptions.OntologyServiceException;
 import uk.ac.ebi.bioportal.webservice.model.OntologyClass;
-import uk.ac.ebi.fg.biosd.annotator.ontodiscover.OntoResolverAndAnnotator;
+import uk.ac.ebi.fg.biosd.annotator.AnnotatorResources;
 import uk.ac.ebi.fg.biosd.biosd2rdf.java2rdf.mapping.BioSdRfMapperFactory;
 import uk.ac.ebi.fg.biosd.biosd2rdf.utils.AnnotatorHelper;
 import uk.ac.ebi.fg.biosd.model.expgraph.BioSample;
@@ -159,7 +159,7 @@ public class OntoDiscoverersComparisonTest
 		);
 		csvw.writeNext ( new String[] { "type", "value", "term uri", "term label", "term synonims" } );
 		
-		BioportalClient bpcli = new BioportalClient ( OntoResolverAndAnnotator.BIOPORTAL_API_KEY );
+		BioportalClient bpcli = new BioportalClient ( AnnotatorResources.BIOPORTAL_API_KEY );
 		
 		int lineNo = 0;
 		for ( String[] line = null;  ( line = csvr.readNext () ) != null;  )
