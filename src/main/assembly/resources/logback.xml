@@ -23,8 +23,7 @@
 			<maxHistory>90</maxHistory>
 		</rollingPolicy>
 		<encoder>
-			<!-- TODO: %C and %L are useful, but possibly slow, is it worth to ship with these? -->
-			<pattern>%d{dd MMM yyyy HH:mm:ss.SSS} [%-6t] [%-5p] \(%C{1},%L\): %m%n</pattern>
+      <pattern>%date{yyyy/MM/dd-HH:mm:ss.SSS} [%-6thread] [%-5level] \(%logger{0},%line\): %message%n</pattern>
 		</encoder>
 		<filter class="ch.qos.logback.classic.filter.ThresholdFilter">
 			<level>ALL</level>
