@@ -63,10 +63,11 @@ public class ExpPropValueRdfMapper<T extends Accessible> extends PropertyRdfMapp
 	public static final String FETCH_ONTOLOGY_MAPPINGS_PROP_NAME = "uk.ac.ebi.fg.biosd.biosd2rdf.fetchOntologyMappings";
 	
 	/**
-	 * If this is true, the old linked data model is supported, in addition to the new one.
-	 * See <a href = 'https://www.ebi.ac.uk/rdf/biosd/newschema16'>here</a> for details.
+	 * <p>If this is true, the old linked data model is supported, in addition to the new one.
+	 * See <a href = 'https://www.ebi.ac.uk/rdf/biosd/newschema16'>here</a> for details.</p>
+	 * 
 	 */
-	public static final boolean OLD_MODEL_SUPPORT_FLAG = true; 
+	public static final boolean OLD_MODEL_SUPPORT_FLAG = false; 
 	
 
 	public final boolean fetchOntologyMappings = "true".equals ( 
