@@ -1,0 +1,10 @@
+#
+# crontab for rdf_adm@rdf-hx-01.ebi.ac.uk
+#
+PATH=/net/isilon4/research/software/Linux_x86_64/opt/stow/jdk1.7.0_55/bin:/usr/lib64/qt-3.3/bin:/ebi/lsf/ebi/ppm/9.1/bin:/ebi/lsf/ebi/ppm/9.1/linux2.6-glibc2.3-x86_64/bin:/ebi/lsf/ebi/9.1/
+BIOSD=/net/isilonP/public/rw/homes/rdf_adm/biosamples/biosd2rdf_cmdline/ebi_deploy/virtuoso
+
+# min   hour    mday    month   wday    command
+*/15		*				*				*				*				"$BIOSD/cron_push_exporter.sh"
+
+#
