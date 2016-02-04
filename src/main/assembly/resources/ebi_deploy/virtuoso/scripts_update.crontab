@@ -1,7 +1,13 @@
+# 
+# This is installed for rdf_adm and the host ebi-005.ebi.ebi.ac.uk
+# It's from ebi-xxx, because they sees both the biosamples home directory and rdf_adm directory
+# 
 PATH=/net/isilon4/research/software/Linux_x86_64/opt/stow/jdk1.7.0_55/bin:/usr/lib64/qt-3.3/bin:/ebi/lsf/ebi/ppm/9.1/bin:/ebi/lsf/ebi/ppm/9.1/linux2.6-glibc2.3-x86_64/bin:/ebi/lsf/ebi/9.1/
-BIOSD=/net/isilonP/public/rw/homes/rdf_adm/biosamples/biosd2rdf_cmdline/ebi_deploy/virtuoso
+BIOSD=/net/isilonP/public/rw/homes/rdf_adm/biosamples/biosd2rdf_cmdline
 
 # min   hour    mday    month   wday    command
-*/15		*				*				*				*				"$BIOSD/cron_scripts_update.sh"
+
+# Biosamples-related stuff
+*/15		*				*				*				*				"$BIOSD"/ebi_deploy/virtuoso/cron_scripts_update.sh &>"$BIOSD/logs/cron_scripts_update.out
 
 #

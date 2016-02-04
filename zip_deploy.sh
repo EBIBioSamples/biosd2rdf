@@ -28,17 +28,6 @@ cp -f biosd2rdf_cmdline_${version}.zip "$target"
 chmod -R ug=rwX,o=rX "$target/biosd2rdf_cmdline_${version}" 
 chmod ugo=rwX "$target/biosd2rdf_cmdline_${version}.zip"
 
-
-new_src="$target/biosd2rdf_cmdline_${version}"
-target=/net/isilonP/public/rw/homes/rdf_adm/biosamples/biosd2rdf_cmdline
-
-echo
-echo 
-echo "_______________ Deploying Virtuoso Scripts ($version) to $target _________________"
-
-/bin/cp -R -d --preserve=all --verbose "$new_src/ebi_deploy" "$target"
-chmod -R ugo=rwX "$target"
-
 echo ______________________________________________________________________________
 echo
 echo
