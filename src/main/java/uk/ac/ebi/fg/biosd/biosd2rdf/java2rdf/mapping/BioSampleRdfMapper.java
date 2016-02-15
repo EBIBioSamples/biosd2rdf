@@ -73,7 +73,7 @@ public class BioSampleRdfMapper extends BeanRdfMapper<BioSample>
 		// check all attached submissions. We also check at the sample level, just in case
 		//
 		Date releaseDate = smp.getReleaseDate ();
-		if ( !Objects.equals ( false, smp.isPublic () ) || releaseDate != null && releaseDate.after ( new Date () ) )
+		if ( Objects.equals ( false, smp.getPublicFlag () ) || releaseDate != null && releaseDate.after ( new Date () ) )
 		{
 			log.trace ( "Skipping non-public sample '{}'", smp.getAcc () );
 			return false;

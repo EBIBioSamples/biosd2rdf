@@ -72,7 +72,7 @@ public class BioSampleGroupRdfMapper extends BeanRdfMapper<BioSampleGroup>
 		// check all attached submissions. We also check at the sample level, just in case
 		//
 		Date releaseDate = sg.getReleaseDate ();
-		if ( !Objects.equals ( false, sg.isPublic () ) || releaseDate != null && releaseDate.after ( new Date () ) )
+		if ( Objects.equals ( false, sg.getPublicFlag () ) || releaseDate != null && releaseDate.after ( new Date () ) )
 		{
 			log.trace ( "Skipping non-public sample group '{}'", sg.getAcc () );
 			return false;
