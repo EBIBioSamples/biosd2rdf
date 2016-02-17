@@ -25,8 +25,10 @@ rm -Rf "$target/biosd2rdf_cmdline_${version}/{lib,rdf}"
 
 yes A| unzip biosd2rdf_cmdline_${version}.zip -d "$target"
 cp -f biosd2rdf_cmdline_${version}.zip "$target"
-chmod -R ug=rwX,o=rX "$target/biosd2rdf_cmdline_${version}" 
-chmod ugo=rwX "$target/biosd2rdf_cmdline_${version}.zip"
+
+# TODO: I know, I know, that's not good, but we have issues at EBI, like multiple users needing to access this
+# In future we'll add a check to understand when we are within our organisation. 
+chmod -R ugo=rwX "$target/biosd2rdf_cmdline_${version}" 
 
 echo ______________________________________________________________________________
 echo
