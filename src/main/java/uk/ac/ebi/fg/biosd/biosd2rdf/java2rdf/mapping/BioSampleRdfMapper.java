@@ -61,7 +61,6 @@ public class BioSampleRdfMapper extends BeanRdfMapper<BioSample>
 				new OwlObjPropRdfMapper<DatabaseRecordRef, BioSample> ( uri ( "obo", "IAO_0000219" ) ) 
 			)
 		)));
-		// TODO: more
 	}
 
 	@Override

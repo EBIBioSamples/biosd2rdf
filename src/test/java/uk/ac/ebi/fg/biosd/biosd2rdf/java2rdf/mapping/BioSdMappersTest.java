@@ -19,7 +19,6 @@ import org.semanticweb.owlapi.model.OWLOntologyStorageException;
 import org.semanticweb.owlapi.vocab.PrefixOWLOntologyFormat;
 
 import uk.ac.ebi.fg.biosd.biosd2rdf.utils.AnnotatorHelper;
-import uk.ac.ebi.fg.biosd.biosd2rdf.utils.SparqlBasedTester;
 import uk.ac.ebi.fg.biosd.model.expgraph.properties.SampleCommentType;
 import uk.ac.ebi.fg.biosd.model.expgraph.properties.SampleCommentValue;
 import uk.ac.ebi.fg.biosd.model.utils.test.TestModel;
@@ -34,6 +33,7 @@ import uk.ac.ebi.fg.core_model.organizational.Publication;
 import uk.ac.ebi.fg.core_model.terms.OntologyEntry;
 import uk.ac.ebi.fg.core_model.xref.ReferenceSource;
 import uk.ac.ebi.fg.java2rdf.utils.NamespaceUtils;
+import uk.ac.ebi.fg.java2rdf.utils.test.SparqlBasedTester;
 
 /**
  * Basic test of the BioSD-to-RDF mapping machinery.

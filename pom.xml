@@ -9,6 +9,10 @@
 	<name>SampleTab and BioSD Converter to RDF</name>
   <url>http://github.com/EBIBioSamples/biosd2rdf</url>
 
+	<scm>
+		<developerConnection>scm:git:git@github.com:EBIBioSamples/biosd2rdf.git</developerConnection>
+	</scm>	
+
   <parent>
 	  <groupId>uk.ac.ebi.fg.biosd</groupId>
 	  <artifactId>biosd_common</artifactId>
@@ -91,26 +95,6 @@
 	    <groupId>junit</groupId>
 	    <artifactId>junit</artifactId>
 	  </dependency>
-
-		
-		<!-- We reload the BioSD RDF and verify the existence of certain statements, via SPARQL -->
-		<dependency>
-	    <groupId>org.apache.jena</groupId>
-	    <artifactId>jena-arq</artifactId>
-	    <version>2.11.2</version>
-	    <scope>test</scope>
-	    <exclusions>
-	    	<!-- We use our own logger (see above) -->
-	    	<exclusion>
-					<groupId>org.slf4j</groupId>
-					<artifactId>slf4j-log4j12</artifactId>
-	    	</exclusion>
-	    	<exclusion>
-	    			<artifactId>xml-apis</artifactId>
-	    			<groupId>xml-apis</groupId>
-	    	</exclusion>
-	    </exclusions>
-		</dependency>
 		
 		<dependency>
 			<groupId>org.apache.lucene</groupId>
@@ -165,10 +149,6 @@
     </testResources>
 			
 	</build>
-	
-	<scm>
-		<developerConnection>scm:git:git@github.com:EBIBioSamples/biosd2rdf.git</developerConnection>
-	</scm>	
 	
   <repositories>
 
