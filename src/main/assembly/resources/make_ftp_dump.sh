@@ -18,7 +18,7 @@ ds_dir=/nfs/production2/linked-data/biosamples
 archive_base_name=biosd_rdf_$version
 
 # Parallel BZIP2, much faster, very cool! http://compression.ca/pbzip2
-PBZIP2=/homes/brandizi/local/bin/pbzip2
+PBZIP2=/homes/bsd-svc/local/bin/pbzip2
 cd "$ds_dir"
 tar cv "$version" --transform="s|^$version|$archive_base_name|" \
   | $PBZIP2 --stdout >/ebi/ftp/pub/databases/biosamples/biosd2rdf/$archive_base_name.tar.bz2
