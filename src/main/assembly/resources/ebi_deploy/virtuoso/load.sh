@@ -10,7 +10,7 @@ cd "$(dirname $0)"
 cd ../..
 mydir="$(pwd)"
 
-ds_dir=/nfs/production2/linked-data/biosamples/$version
+ds_dir=/nfs/production3/linked-data/biosamples/$version
 
 cd /nfs/public/rw/homes/rdf_adm/scripts/load-virtuoso-opensource
 

@@ -2,7 +2,7 @@
 cd "$(dirname $0)"
 . ./_get_ver.sh
 
-ds_dir=/nfs/production2/linked-data/biosamples/$version
+ds_dir=/nfs/production3/linked-data/biosamples/$version
 
 cd "$ds_dir"
 

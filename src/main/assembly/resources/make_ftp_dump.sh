@@ -14,7 +14,7 @@ EOT
 	exit 1
 fi
 
-ds_dir=/nfs/production2/linked-data/biosamples
+ds_dir=/nfs/production3/linked-data/biosamples
 archive_base_name=biosd_rdf_$version
 
 # Parallel BZIP2, much faster, very cool! http://compression.ca/pbzip2
