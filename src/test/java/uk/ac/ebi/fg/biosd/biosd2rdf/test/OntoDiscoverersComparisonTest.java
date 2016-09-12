@@ -29,6 +29,7 @@ import uk.ac.ebi.bioportal.webservice.client.BioportalClient;
 import uk.ac.ebi.bioportal.webservice.exceptions.OntologyServiceException;
 import uk.ac.ebi.bioportal.webservice.model.OntologyClass;
 import uk.ac.ebi.fg.biosd.annotator.AnnotatorResources;
+import uk.ac.ebi.fg.biosd.annotator.PropertyValAnnotationManager;
 import uk.ac.ebi.fg.biosd.biosd2rdf.java2rdf.mapping.BioSdRfMapperFactory;
 import uk.ac.ebi.fg.biosd.biosd2rdf.utils.AnnotatorHelper;
 import uk.ac.ebi.fg.biosd.model.expgraph.BioSample;
@@ -81,13 +82,9 @@ public class OntoDiscoverersComparisonTest
 	private void generateRDF ( String discovererProp, String inputBaseName, String outBaseName ) throws Exception
 	{
 		log.info ( "Generating Annotations for {} - {}", discovererProp, inputBaseName );
+
+		System.setProperty ( PropertyValAnnotationManager.ONTO_DISCOVERER_PROP_NAME, discovererProp );
 		
-		if ( !"zooma".equals ( discovererProp ) ) throw new UnsupportedOperationException ( 
-			"This needs to be updated, the feature annotator supports ZOOMA only"
-		);
-		
-		// TODO: fix it! 
-		// System.setProperty ( BioSdOntologyTermResolver.ONTO_DISCOVERER_PROP_NAME, discovererProp );
 		InputStream in = this.getClass ().getResourceAsStream ( "/attr_cmp_test/" + inputBaseName + ".tsv" );
 
 		// Generate a foo submission, with a foo sample
