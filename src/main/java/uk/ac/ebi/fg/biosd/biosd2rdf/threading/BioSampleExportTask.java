@@ -35,7 +35,7 @@ public class BioSampleExportTask extends BioSdExportTask
 	 */
 	public BioSampleExportTask ( BioSdRfMapperFactory rdfMapFactory, BioSample sample, Map<String, Object> params ) 
 	{
-		super ( "XPORT:" + sample.getAcc (), rdfMapFactory );
+		super ( "XPRTSMP:" + sample.getAcc (), rdfMapFactory );
 		this.sampleId = sample.getId ();
 		this.params = params;
 		this.setPriority ( RandomUtils.nextInt ( 0, 11 ) );

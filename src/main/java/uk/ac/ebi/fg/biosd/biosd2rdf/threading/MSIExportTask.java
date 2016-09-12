@@ -43,7 +43,7 @@ public class MSIExportTask extends BioSdExportTask
 	 * the submissions never get blocked by they having priority over sample tasks that are waiting to be ran.
 	 */
 	private MSIExportTask ( BioSdRfMapperFactory rdfMapFactory ) {
-		super ( "XPORT:", rdfMapFactory );
+		super ( "XPRTMSI:", rdfMapFactory );
 		this.setPriority ( RandomUtils.nextInt ( 0, 9 ) );
 	}
 	
