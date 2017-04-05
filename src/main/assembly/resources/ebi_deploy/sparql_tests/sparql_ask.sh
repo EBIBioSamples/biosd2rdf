@@ -2,7 +2,7 @@
 # Invokes a SPARQL endpoint with the ASK query in the standard input and expects a TRUE result to be
 # returned, exits with 0 if that's the case, 1 if not.
 #  
-# It also spits out a lot of diagnostic output do 2>/dev/null if you don't want to see it.
+# It also spits out a lot of diagnostic output. Do 2>/dev/null if you don't want to see it.
 #
 server_base="$1"; : ${server_base:=http://www.ebi.ac.uk/rdf/services/biosamples/sparql}
 # Get the query from stdin, strip comments away, prepend common prefixes
